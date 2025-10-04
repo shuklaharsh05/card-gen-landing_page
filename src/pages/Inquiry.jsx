@@ -234,15 +234,10 @@ export default function Inquiry() {
                     disabled={submitting}
                   >
                     <option value="">Select your business type</option>
-                    <option value="Technology">Technology</option>
-                    <option value="Healthcare">Healthcare</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Education">Education</option>
-                    <option value="Real Estate">Real Estate</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Consulting">Consulting</option>
-                    <option value="Retail">Retail</option>
-                    <option value="Food & Beverage">Food & Beverage</option>
+                    <option value="E-commerce">E-commerce</option>
+                    <option value="Interior Designer">Interior Designer</option>
+                    <option value="Makeup Artist">Makeup Artist</option>
+                    <option value="Travel Agent">Travel Agent</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>

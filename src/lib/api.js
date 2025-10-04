@@ -22,13 +22,18 @@ class ApiService {
         ...options,
       };
 
+      console.log('API Request:', { url, config, body: options.body });
+
       const response = await fetch(url, config);
       const data = await response.json();
+
+      console.log('API Response:', { status: response.status, data });
 
       if (!response.ok) {
         return {
           success: false,
           error: data.message || data.error || `HTTP ${response.status}`,
+          details: data, // Include full error details
         };
       }
 
@@ -38,6 +43,7 @@ class ApiService {
         message: data.message,
       };
     } catch (error) {
+      console.log('API Error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Network error',
@@ -45,59 +51,108 @@ class ApiService {
     }
   }
 
-  // Authentication APIs (to be implemented when auth is added)
-  async signup(data) {
-    // TODO: Implement when auth endpoints are ready
-    return { success: false, error: 'Authentication not yet implemented' };
+  // Authentication APIs
+  async signup({ name, email, password }) {
+    return this.request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password }),
+    });
   }
 
-  async login(data) {
-    // TODO: Implement when auth endpoints are ready
-    return { success: false, error: 'Authentication not yet implemented' };
+  async login({ email, password }) {
+    const response = await this.request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+
+    // If login is successful, store the token
+    if (response.success && response.data && response.data.token) {
+      localStorage.setItem('auth_token', response.data.token);
+    }
+
+    return response;
   }
 
   async logout() {
-    // TODO: Implement when auth endpoints are ready
     localStorage.removeItem('auth_token');
     return { success: true, data: null };
   }
 
   async getCurrentUser() {
-    // TODO: Implement when auth endpoints are ready
     const token = localStorage.getItem('auth_token');
     if (!token) {
       return { success: true, data: null };
     }
-    return { success: false, error: 'Authentication not yet implemented' };
+
+    const response = await this.request('/auth/profile');
+    console.log('getCurrentUser response:', response);
+    return response;
+  }
+
+  // Get user data by ID
+  async getUserById(userId) {
+    return this.request(`/users/${userId}`);
   }
 
   // Public Inquiry API
   async submitInquiry(inquiryData) {
+    // Send only the required fields as specified
+    const requestData = {
+      name: inquiryData.name,
+      email: inquiryData.email,
+      phone: inquiryData.phone,
+      businessType: inquiryData.businessType,
+      message: inquiryData.message || '', // Include message if provided
+    };
+    
+    console.log('Submitting inquiry with data:', requestData);
+    
     return this.request('/inquiries', {
       method: 'POST',
-      body: JSON.stringify(inquiryData),
+      body: JSON.stringify(requestData),
     });
   }
 
   // Public Card Viewing API
   async getCardById(cardId) {
+    console.log('getCardById - Fetching card with ID:', cardId);
+    console.log('getCardById - Calling endpoint: /api/cards/' + cardId);
     return this.request(`/cards/${cardId}`);
+  }
+
+  // Get user inquiries
+  async getUserInquiries(userId) {
+    return this.request(`/inquiries/user/${userId}`);
+  }
+
+  // Get specific inquiry by ID
+  async getInquiryById(inquiryId) {
+    return this.request(`/inquiries/${inquiryId}`);
   }
 
   // Business Card Management APIs (for authenticated users)
   async createCard(cardData, userId) {
-    return this.request('/cards', {
+    // Send all fields collected in the MyCard form including message
+    const requestData = {
+      name: cardData.name,
+      email: cardData.email,
+      phone: cardData.phone,
+      businessType: cardData.business_type, // Note: using businessType instead of business_type
+      message: cardData.message || '', // Include message if provided
+    };
+    
+    console.log('Creating card with data:', requestData);
+    console.log('Sending to endpoint: /api/inquiries');
+    
+    // Use /api/inquiries endpoint for card creation
+    return this.request('/inquiries', {
       method: 'POST',
-      body: JSON.stringify({
-        ...cardData,
-        user_id: userId,
-      }),
+      body: JSON.stringify(requestData),
     });
   }
 
-  async getCard(userId) {
-    return this.request(`/cards/user/${userId}`);
-  }
+  // Note: Removed getCategoryId method as we're sending simple form data
+
 
   async updateCard(cardId, cardData) {
     return this.request(`/cards/${cardId}`, {
@@ -114,7 +169,34 @@ class ApiService {
 
   // Appointments/Inquiries Management APIs (for authenticated users)
   async getAppointments(userId) {
-    return this.request(`/appointments/user/${userId}`);
+    // Try different possible endpoints
+    const endpoints = [
+      `/appointments/user/${userId}`,
+      `/appointments/${userId}`,
+      `/users/${userId}/appointments`
+    ];
+    
+    for (const endpoint of endpoints) {
+      try {
+        const response = await this.request(endpoint);
+        if (response.success && response.data) {
+          console.log(`Found appointments at endpoint: ${endpoint}`);
+          return {
+            ...response,
+            data: Array.isArray(response.data) ? response.data : []
+          };
+        }
+      } catch (error) {
+        console.log(`Endpoint ${endpoint} failed:`, error);
+      }
+    }
+    
+    // If all endpoints fail, return empty array
+    return {
+      success: true,
+      data: [],
+      message: 'No appointments found'
+    };
   }
 
   async updateAppointmentStatus(appointmentId, status) {
@@ -131,8 +213,34 @@ class ApiService {
   }
 
   // Dashboard stats
-  async getDashboardStats(userId) {
-    return this.request(`/dashboard/stats/${userId}`);
+
+  // Additional helper methods for user profile data
+  getUserId() {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return null;
+    
+    try {
+      // Decode JWT token to get user ID (basic implementation)
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.userId || payload.sub || payload._id;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
+  }
+
+  isAuthenticated() {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return false;
+    
+    try {
+      // Check if token is expired
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Date.now() / 1000;
+      return payload.exp > currentTime;
+    } catch (error) {
+      return false;
+    }
   }
 }
 
@@ -153,6 +261,5 @@ export const {
   submitInquiry,
   getAppointments,
   updateAppointmentStatus,
-  deleteAppointment,
-  getDashboardStats
+  deleteAppointment
 } = apiService;

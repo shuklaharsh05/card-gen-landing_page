@@ -17,15 +17,40 @@ export default function Dashboard() {
     const fetchData = async () => {
       if (!user) return;
 
-      // Get user name from user object
-      setUserName(user.user_metadata?.name || 'User');
+      console.log('Dashboard - User object:', user);
+      console.log('Dashboard - User ID:', user._id);
 
-      // Get dashboard stats
-      const response = await apiService.getDashboardStats(user.id);
-      if (response.success && response.data) {
+      // Get complete user data from /api/users/:id
+      try {
+        const userResponse = await apiService.getUserById(user._id);
+        console.log('Dashboard - getUserById response:', userResponse);
+        if (userResponse.success && userResponse.data) {
+          console.log('Dashboard - Complete user data from API:', JSON.stringify(userResponse.data, null, 2));
+          
+          // Get user name from complete user data
+          setUserName(userResponse.data.name || 'User');
+          
+          // Calculate stats from user data
+          const userData = userResponse.data;
+          setStats({
+            totalAppointments: userData.appointments ? userData.appointments.length : 0,
+            hasCard: userData.savedCards && userData.savedCards.length > 0,
+          });
+        } else {
+          // Fallback to basic user data
+          setUserName(user.name || 'User');
+          setStats({
+            totalAppointments: 0,
+            hasCard: false,
+          });
+        }
+      } catch (error) {
+        console.log('Dashboard - Error fetching user data:', error);
+        // Fallback to basic user data
+        setUserName(user.name || 'User');
         setStats({
-          totalAppointments: response.data.totalAppointments,
-          hasCard: response.data.hasCard,
+          totalAppointments: 0,
+          hasCard: false,
         });
       }
 

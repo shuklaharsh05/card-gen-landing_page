@@ -12,9 +12,16 @@ export default function Appointments() {
     const fetchAppointments = async () => {
       if (!user) return;
 
-      const response = await apiService.getAppointments(user.id);
+      const response = await apiService.getAppointments(user._id);
+      console.log('Appointments API response:', response);
+      
       if (response.success && response.data) {
-        setAppointments(response.data);
+        // Ensure appointments is always an array
+        setAppointments(Array.isArray(response.data) ? response.data : []);
+      } else {
+        // If API call fails, set empty array
+        console.log('Appointments API failed:', response.error);
+        setAppointments([]);
       }
 
       setLoading(false);
@@ -40,7 +47,7 @@ export default function Appointments() {
         </p>
       </div>
 
-      {appointments.length === 0 ? (
+      {!Array.isArray(appointments) || appointments.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
           <Calendar className="w-16 h-16 text-slate-300 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-slate-900 mb-2">No appointments yet</h3>
@@ -50,7 +57,7 @@ export default function Appointments() {
         </div>
       ) : (
         <div className="space-y-4">
-          {appointments.map((appointment) => (
+          {Array.isArray(appointments) && appointments.map((appointment) => (
             <div
               key={appointment.id}
               className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-md transition-shadow"
@@ -106,7 +113,7 @@ export default function Appointments() {
         </div>
       )}
 
-      {appointments.length > 0 && (
+      {Array.isArray(appointments) && appointments.length > 0 && (
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-6">
           <h3 className="font-semibold text-blue-900 mb-2">
             Total Appointments: {appointments.length}
