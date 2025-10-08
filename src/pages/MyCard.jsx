@@ -216,7 +216,7 @@ export default function MyCard() {
   if (card) {
     console.log('MyCard - Rendering card display');
     return (
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-7xl mx-auto font-poppins">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-slate-900 mb-2">My Business Card</h1>
           <p className="text-slate-600 text-lg">

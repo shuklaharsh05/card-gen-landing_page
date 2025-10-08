@@ -1,6 +1,6 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
-import { LayoutDashboard, Calendar, CreditCard, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Calendar, CreditCard, LogOut, Menu, X, Bookmark } from 'lucide-react';
 import { useState } from 'react';
 
 export default function UserLayout() {
@@ -18,6 +18,7 @@ export default function UserLayout() {
     { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/appointments', icon: Calendar, label: 'Appointments' },
     { path: '/my-card', icon: CreditCard, label: 'My Card' },
+    { path: '/saved-cards', icon: Bookmark, label: 'Saved Cards' },
   ];
 
   return (

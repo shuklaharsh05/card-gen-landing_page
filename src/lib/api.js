@@ -94,6 +94,78 @@ class ApiService {
     return this.request(`/users/${userId}`);
   }
 
+  // Get user's saved cards directly
+  async getUserSavedCards(userId) {
+    return this.request(`/users/${userId}/saved-cards`);
+  }
+
+  // Delete a saved card
+  async deleteSavedCard(userId, cardId) {
+    return this.request(`/users/${userId}/saved-cards/${cardId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Get user's cards (for card selection in appointments)
+  async getUserCards(userId) {
+    return this.request(`/users/${userId}/cards`);
+  }
+
+  // Get user's cards with full card data (alternative method)
+  async getUserCardsWithData(userId) {
+    try {
+      // Get user data first
+      const userResponse = await this.getUserById(userId);
+      if (!userResponse.success || !userResponse.data) {
+        return { success: false, error: 'User not found' };
+      }
+
+      const userData = userResponse.data;
+      const cardsWithData = [];
+
+      if (userData.inquiries && Array.isArray(userData.inquiries)) {
+        for (const inquiryRef of userData.inquiries) {
+          let inquiry;
+          
+          if (typeof inquiryRef === 'string') {
+            const inquiryResponse = await this.getInquiryById(inquiryRef);
+            if (inquiryResponse.success && inquiryResponse.data) {
+              inquiry = inquiryResponse.data;
+            }
+          } else {
+            inquiry = inquiryRef;
+          }
+          
+          if (inquiry && inquiry.cardGenerated === true && inquiry.cardId) {
+            const cardResponse = await this.getCardById(inquiry.cardId);
+            if (cardResponse.success && cardResponse.data) {
+              const cardData = cardResponse.data;
+              cardsWithData.push({
+                id: inquiry.cardId,
+                name: cardData.name || 'Business Card',
+                businessType: cardData.business_type || cardData.businessType || 'Business',
+                email: cardData.email,
+                createdAt: inquiry.createdAt || inquiry.created_at,
+                inquiryId: inquiry._id,
+                cardData: cardData
+              });
+            }
+          }
+        }
+      }
+
+      return {
+        success: true,
+        data: cardsWithData
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message || 'Failed to fetch user cards'
+      };
+    }
+  }
+
   // Public Inquiry API
   async submitInquiry(inquiryData) {
     // Send only the required fields as specified
@@ -180,7 +252,7 @@ class ApiService {
       try {
         const response = await this.request(endpoint);
         if (response.success && response.data) {
-          console.log(`Found appointments at endpoint: ${endpoint}`);
+          // console.log(`Found appointments at endpoint: ${endpoint}`);
           return {
             ...response,
             data: Array.isArray(response.data) ? response.data : []
@@ -197,6 +269,41 @@ class ApiService {
       data: [],
       message: 'No appointments found'
     };
+  }
+
+  // Get appointments for a specific card with pagination and filtering
+  async getCardAppointments(cardId, options = {}) {
+    console.log('🚀 getCardAppointments called with:', { cardId, options });
+    
+    const { page = 1, limit = 10, status } = options;
+    
+    // Build query parameters
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    
+    if (status) {
+      queryParams.append('status', status);
+    }
+    
+    const endpoint = `/appointments/card/${cardId}?${queryParams.toString()}`;
+    
+    console.log('📡 Fetching card appointments:', { 
+      cardId, 
+      options, 
+      endpoint,
+      queryParams: queryParams.toString()
+    });
+    
+    try {
+      const response = await this.request(endpoint);
+      console.log('✅ getCardAppointments response:', response);
+      return response;
+    } catch (error) {
+      console.error('❌ getCardAppointments error:', error);
+      throw error;
+    }
   }
 
   async updateAppointmentStatus(appointmentId, status) {
@@ -247,6 +354,62 @@ class ApiService {
 // Export singleton instance
 export const apiService = new ApiService();
 
+// Add test functions to window for easy console testing
+if (typeof window !== 'undefined') {
+  window.testCardAppointments = async (cardId = 'test123', options = {}) => {
+    console.log('🧪 Testing getCardAppointments...');
+    try {
+      const result = await apiService.getCardAppointments(cardId, options);
+      console.log('🧪 Test result:', result);
+      return result;
+    } catch (error) {
+      console.error('🧪 Test error:', error);
+      return error;
+    }
+  };
+
+  window.testMyAppointments = async (userId = '68e119bf1055a2e0c74bc4a9') => {
+    console.log('🧪 Testing getAppointments (My Appointments)...');
+    try {
+      const result = await apiService.getAppointments(userId);
+      console.log('🧪 Test result:', result);
+      return result;
+    } catch (error) {
+      console.error('🧪 Test error:', error);
+      return error;
+    }
+  };
+
+  window.testUserCards = async (userId = '68e119bf1055a2e0c74bc4a9') => {
+    console.log('🧪 Testing getUserCardsWithData...');
+    try {
+      const result = await apiService.getUserCardsWithData(userId);
+      console.log('🧪 Test result:', result);
+      return result;
+    } catch (error) {
+      console.error('🧪 Test error:', error);
+      return error;
+    }
+  };
+
+  window.testDateFilter = async (cardId = 'test123', startDate = '2023-12-01', endDate = '2023-12-31') => {
+    console.log('🧪 Testing date filtering...');
+    try {
+      const result = await apiService.getCardAppointments(cardId, {
+        page: 1,
+        limit: 10,
+        startDate,
+        endDate
+      });
+      console.log('🧪 Date filter test result:', result);
+      return result;
+    } catch (error) {
+      console.error('🧪 Date filter test error:', error);
+      return error;
+    }
+  };
+}
+
 // Export individual functions for convenience
 export const {
   signup,
@@ -260,6 +423,7 @@ export const {
   getCardById,
   submitInquiry,
   getAppointments,
+  getCardAppointments,
   updateAppointmentStatus,
   deleteAppointment
 } = apiService;
