@@ -42,29 +42,28 @@ export default function MyCard() {
 
   useEffect(() => {
     const fetchCard = async () => {
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      // ensure we don't flash form while fetching
+      setLoading(true);
 
       console.log('MyCard - User object:', user);
       console.log('MyCard - User ID:', user._id);
       console.log('MyCard - User ID type:', typeof user._id);
       console.log('MyCard - Full user data:', JSON.stringify(user, null, 2));
 
-      // Fetch complete user data from /api/users/:id
+      // Fetch complete user data and immediately use it (avoid waiting for state)
       try {
         const userResponse = await apiService.getUserById(user._id);
         console.log('MyCard - getUserById response:', userResponse);
+        const userDataToCheck = (userResponse.success && userResponse.data) ? userResponse.data : user;
         if (userResponse.success && userResponse.data) {
           console.log('MyCard - Complete user data from API:', JSON.stringify(userResponse.data, null, 2));
           setCompleteUserData(userResponse.data);
         }
-      } catch (error) {
-        console.log('MyCard - Error fetching complete user data:', error);
-      }
-
-      // First, check if user has any inquiries with cardGenerated status
-      try {
-        // Use complete user data if available, otherwise fall back to basic user data
-        const userDataToCheck = completeUserData || user;
         console.log('MyCard - Using user data:', userDataToCheck);
         
         // Check if user has inquiries in their profile
@@ -150,10 +149,11 @@ export default function MyCard() {
           } else {
             console.log('MyCard - Failed to get inquiry data');
           }
+        } else {
+          console.log('MyCard - No inquiries found on user profile');
         }
         
-        // Note: Skipping getUserInquiries fallback as it's causing HTML response errors
-        // The inquiry should be found through the user's inquiry IDs above
+        // No additional fallbacks; rely on inquiry presence only
       } catch (error) {
         console.log('MyCard - Error fetching inquiries:', error);
       }
@@ -238,10 +238,10 @@ export default function MyCard() {
           </div>
         )}
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          <div className="bg-white rounded-xl border border-slate-200 p-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Card Preview</h2>
-            <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl p-8 text-white shadow-xl">
+        <div className="flex gap-8">
+          {/* <div className="bg-white rounded-xl border border-slate-200 p-8 w-full"> */}
+            {/* <h2 className="text-2xl font-bold text-slate-900 mb-6">Card Preview</h2> */}
+            {/* <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl p-8 text-white shadow-xl">
               <div className="flex items-center gap-3 mb-6">
                 <CreditCard className="w-8 h-8" />
                 <span className="text-xl font-bold">CardPro</span>
@@ -258,33 +258,28 @@ export default function MyCard() {
                   <span>{card.phone}</span>
                 </div>
               </div>
-            </div>
-          </div>
+            </div> */}
+            {/* <iframe src={card.publicUrl} className="w-full h-full"></iframe> */}
+            {/* {console.log("my log",card)} */}
+          {/* </div> */}
 
-          <div className="space-y-6">
+          <div className="space-x-6 flex">
             <div className="bg-white rounded-xl border border-slate-200 p-8">
               <h2 className="text-2xl font-bold text-slate-900 mb-4">Shareable Link</h2>
               <p className="text-slate-600 mb-4">Share this link to let others view your card</p>
               <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={card.shareable_link}
-                  readOnly
-                  className="flex-1 px-4 py-3 border border-slate-300 rounded-lg bg-slate-50 text-slate-700"
-                />
+                <a href={card.publicUrl} className="flex-1 px-4 py-3 bg-slate-50 text-blue-600 hover:text-blue-800 underline transition-colors duration-300">{card.publicUrl}</a>
                 <button
                   onClick={copyToClipboard}
-                  className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  className="px-4 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center gap-2"
                 >
                   {copied ? (
                     <>
                       <CheckCircle className="w-4 h-4" />
-                      Copied
                     </>
                   ) : (
                     <>
                       <Copy className="w-4 h-4" />
-                      Copy
                     </>
                   )}
                 </button>
