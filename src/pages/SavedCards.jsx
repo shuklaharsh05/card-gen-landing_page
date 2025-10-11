@@ -79,7 +79,8 @@ export default function SavedCards() {
 
   const getCardName = (card) => {
     // Try different possible paths for card name
-    return card.data?.companyName || 
+    return card.data?.companyName ||
+           card.data?.customCardData?.companyName ||
            card.data?.storeName || 
            card.companyName || 
            card.storeName || 
@@ -90,6 +91,7 @@ export default function SavedCards() {
   const getCardType = (card) => {
     // Try different possible paths for card type
     return card.data?.categoryId || 
+           card.data?.customCardData?.business_type ||
            card.data?.business_type || 
            card.categoryId || 
            card.business_type || 
@@ -98,7 +100,11 @@ export default function SavedCards() {
 
   const getShareableLink = (card) => {
     // Try different possible paths for shareable link
+    if (card.shareableLink.includes('http://localhost:5173')) {
+      return card.shareableLink
+    }
     return 'http://localhost:5173' + card.shareableLink
+    // console.log('Shareable link:', 'http://localhost:5173' + card.shareableLink);
   };
 
   const handleDeleteCard = async (cardId) => {
@@ -285,29 +291,29 @@ export default function SavedCards() {
                    <span className="font-semibold text-slate-900">{card.views || 0}</span>
                  </div> */}
                  
-                 {(card.data?.email || card.email) && (
+                 {(card.data?.email || card.email || card.data?.customCardData?.contact.email) && (
                    <div className="flex items-center justify-between">
                      <span className="text-sm text-slate-800 font-normal">Email</span>
-                     <a href={`mailto:${card.data?.email || card.email}`} className="text-sm font-normal text-blue-700 underline truncate max-w-32">
-                       {card.data?.email || card.email}
+                     <a href={`mailto:${card.data?.email || card.email || card.data?.customCardData?.contact.email}`} className="text-sm font-normal text-blue-700 underline truncate max-w-32">
+                       {card.data?.email || card.email || card.data?.customCardData?.contact.email}
                      </a>
                    </div>
                  )}
                  
-                 {(card.data?.phoneNumber || card.data?.phone || card.phone) && (
+                 {(card.data?.phoneNumber || card.data?.phone || card.phone || card.data?.customCardData?.contact.phone) && (
                    <div className="flex items-center justify-between">
                      <span className="text-sm text-slate-800 font-normal">Phone</span>
-                      <a href={`tel:${card.data?.phoneNumber || card.data?.phone || card.phone}`} className="text-sm font-normal text-blue-700 underline">
-                       {card.data?.phoneNumber || card.data?.phone || card.phone}
+                      <a href={`tel:${card.data?.phoneNumber || card.data?.phone || card.phone || card.data?.customCardData?.contact.phone}`} className="text-sm font-normal text-blue-700 underline">
+                       {card.data?.phoneNumber || card.data?.phone || card.phone || card.data?.customCardData?.contact.phone}
                      </a>
                    </div>
                  )}
                  
-                 {(card.data?.website || card.website) && (
+                 {(card.data?.website || card.website || card.data?.customCardData?.contact.website) && (
                    <div className="flex items-center justify-between">
                      <span className="text-sm text-slate-800 font-normal">Website</span>
-                     <a href={card.data?.website || card.website} className="text-sm font-normal text-blue-700 underline">
-                       {card.data?.website || card.website}
+                     <a href={card.data?.website || card.website || card.data?.customCardData?.contact.website} className="text-sm font-normal text-blue-700 underline">
+                       {card.data?.website || card.website || card.data?.customCardData?.contact.website}
                      </a>
                    </div>
                  )}
