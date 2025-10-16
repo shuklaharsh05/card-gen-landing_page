@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = 'http://93.127.195.110/api';
+const API_BASE_URL = 'https://teamserver.cloud/api';
 
 // API Service Class
 class ApiService {
