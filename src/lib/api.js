@@ -53,10 +53,17 @@ class ApiService {
 
   // Authentication APIs
   async signup({ name, email, password }) {
-    return this.request('/auth/register', {
+    const response = await this.request('/auth/register', {
       method: 'POST',
       body: JSON.stringify({ name, email, password }),
     });
+
+    // If signup is successful, store the token
+    if (response.success && response.data && response.data.token) {
+      localStorage.setItem('auth_token', response.data.token);
+    }
+
+    return response;
   }
 
   async login({ email, password }) {
