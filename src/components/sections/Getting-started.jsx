@@ -43,7 +43,7 @@ function Gettingstarted() {
                     </div>
                 </div>
                 <div className='max-w-60 mr-10'>
-                    <div className='relative xl:-top-[17px] md:-top-[17px] lg:top-[6px]'>
+                    <div className='relative xl:-top-[17px] md:-top-[17px] lg:top-[6c px]'>
                     <img src="/person.png" alt="your-physical-card" className='scale-110' />
                     </div>
                 </div>
