@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { FiExternalLink } from "react-icons/fi";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext.jsx";
 
 function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,12 +32,37 @@ function Header() {
         <button className="m-4 px-6 py-1.5 bg-white text-black rounded-full font-bold">
           Prices
         </button>
-        <button className="m-4 px-6 py-1.5 bg-blue-700 text-white rounded-full">
-          Login
-        </button>
-        <button className="m-4 px-6 py-1.5 bg-black text-white rounded-full">
-          Get Your Link
-        </button>
+        {user ? (
+          <>
+            <button 
+              onClick={() => navigate('/dashboard')}
+              className="m-4 px-6 py-1.5 bg-blue-700 text-white rounded-full"
+            >
+              Dashboard
+            </button>
+            <button 
+              onClick={signOut}
+              className="m-4 px-6 py-1.5 bg-gray-600 text-white rounded-full"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <button 
+              onClick={() => navigate('/login')}
+              className="m-4 px-6 py-1.5 bg-blue-700 text-white rounded-full"
+            >
+              Login
+            </button>
+            <button 
+              onClick={() => navigate('/signup')}
+              className="m-4 px-6 py-1.5 bg-black text-white rounded-full"
+            >
+              Get Your Link
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
