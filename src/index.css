@@ -114,8 +114,10 @@
   font-style: italic;
 }
 
-.hide-bottom-overflow {
-  overflow-x: visible;
-  overflow-y: clip; /* or hidden */
-  mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

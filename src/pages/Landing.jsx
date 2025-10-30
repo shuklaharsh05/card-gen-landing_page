@@ -11,7 +11,7 @@ import Footer from '../components/sections/Footer'
 
 function Landing() {
   return (
-    <div className=''>
+    <div className='overflow-x-hidden'>
       <Header />
       <Hero />
       <Banner />
@@ -19,7 +19,7 @@ function Landing() {
       <Gettingstarted />
       <img src="/banner-2.png" alt="getting-started" className='w-full h-full object-cover' />
       <YourPhysicalCard />
-      <img src="/profile-profession.png" alt="profile-acc-to-profession" className='w-full max-h-screen object-cover' />
+      <img src="/profile-profession.png" alt="profile-acc-to-profession" className='w-full md:min-h-screen object-cover' />
       <Features />
       <CustomTemplate />
       <Footer />
