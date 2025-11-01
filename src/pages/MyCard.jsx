@@ -27,7 +27,6 @@ export default function MyCard() {
   const [inquiryData, setInquiryData] = useState(null);
   const [cardGenerated, setCardGenerated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [completeUserData, setCompleteUserData] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -39,6 +38,7 @@ export default function MyCard() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [copied, setCopied] = useState(false);
+  const [inquirySubmitted, setInquirySubmitted] = useState(false);
 
   useEffect(() => {
     const fetchCard = async () => {
@@ -55,59 +55,34 @@ export default function MyCard() {
       console.log('MyCard - User ID type:', typeof user._id);
       console.log('MyCard - Full user data:', JSON.stringify(user, null, 2));
 
-      // Fetch complete user data and immediately use it (avoid waiting for state)
+      // Check if user has any inquiries using getUserInquiries API
       try {
-        const userResponse = await apiService.getUserById(user._id);
-        console.log('MyCard - getUserById response:', userResponse);
-        const userDataToCheck = (userResponse.success && userResponse.data) ? userResponse.data : user;
-        if (userResponse.success && userResponse.data) {
-          console.log('MyCard - Complete user data from API:', JSON.stringify(userResponse.data, null, 2));
-          setCompleteUserData(userResponse.data);
-        }
-        console.log('MyCard - Using user data:', userDataToCheck);
+        const inquiriesResponse = await apiService.getUserInquiries(user._id);
+        console.log('MyCard - getUserInquiries response:', inquiriesResponse);
         
-        // Check if user has inquiries in their profile
-        if (userDataToCheck.inquiries && Array.isArray(userDataToCheck.inquiries) && userDataToCheck.inquiries.length > 0) {
-          console.log('MyCard - User has inquiries:', userDataToCheck.inquiries);
+        if (inquiriesResponse.success && inquiriesResponse.data && Array.isArray(inquiriesResponse.data) && inquiriesResponse.data.length > 0) {
+          console.log('MyCard - User has inquiries:', inquiriesResponse.data);
           
-          // Check if inquiries are full objects or just IDs
-          const latestInquiry = userDataToCheck.inquiries[userDataToCheck.inquiries.length - 1];
+          // Get the latest inquiry (most recent)
+          const latestInquiry = inquiriesResponse.data[inquiriesResponse.data.length - 1];
           console.log('MyCard - Latest inquiry:', latestInquiry);
           
-          let inquiry;
-          if (typeof latestInquiry === 'string') {
-            // If it's an ID, fetch the inquiry data
-            console.log('MyCard - Fetching inquiry data for ID:', latestInquiry);
-            const inquiryResponse = await apiService.getInquiryById(latestInquiry);
-            console.log('MyCard - inquiryResponse:', inquiryResponse);
-            console.log('MyCard - inquiryResponse success:', inquiryResponse.success);
-            console.log('MyCard - inquiryResponse data:', inquiryResponse.data);
-            
-            if (inquiryResponse.success && inquiryResponse.data) {
-              inquiry = inquiryResponse.data;
-            }
-          } else {
-            // If it's already a full object, use it directly
-            console.log('MyCard - Using inquiry object directly');
-            inquiry = latestInquiry;
-          }
-          
-          if (inquiry) {
-            console.log('MyCard - inquiry data:', inquiry);
-            console.log('MyCard - cardGenerated:', inquiry.cardGenerated);
-            console.log('MyCard - cardId:', inquiry.cardId);
+          if (latestInquiry) {
+            console.log('MyCard - inquiry data:', latestInquiry);
+            console.log('MyCard - cardGenerated:', latestInquiry.cardGenerated);
+            console.log('MyCard - cardId:', latestInquiry.cardId);
             
             // Check if inquiry has cardGenerated and cardId
-            if (inquiry.cardGenerated === true && inquiry.cardId) {
-              console.log('MyCard - Found generated inquiry with cardId:', inquiry);
-              console.log('MyCard - CardId to fetch:', inquiry.cardId);
+            if (latestInquiry.cardGenerated === true && latestInquiry.cardId) {
+              console.log('MyCard - Found generated inquiry with cardId:', latestInquiry);
+              console.log('MyCard - CardId to fetch:', latestInquiry.cardId);
               
-              setInquiryData(inquiry);
+              setInquiryData(latestInquiry);
               setCardGenerated(true);
               
               // Fetch the generated card using cardId
-              console.log('MyCard - Fetching card with ID:', inquiry.cardId);
-              const cardResponse = await apiService.getCardById(inquiry.cardId);
+              console.log('MyCard - Fetching card with ID:', latestInquiry.cardId);
+              const cardResponse = await apiService.getCardById(latestInquiry.cardId);
               console.log('MyCard - cardResponse:', cardResponse);
               console.log('MyCard - cardResponse success:', cardResponse.success);
               console.log('MyCard - cardResponse data:', cardResponse.data);
@@ -121,20 +96,20 @@ export default function MyCard() {
               }
               setLoading(false);
               return;
-            } else if (inquiry.cardGenerated === true && !inquiry.cardId) {
+            } else if (latestInquiry.cardGenerated === true && !latestInquiry.cardId) {
               console.log('MyCard - Inquiry has cardGenerated=true but no cardId. This might be a backend issue.');
-              console.log('MyCard - Full inquiry object:', inquiry);
+              console.log('MyCard - Full inquiry object:', latestInquiry);
               
               // Try to find the card by other means - maybe by inquiry ID or user ID
-              console.log('MyCard - Attempting to find card by inquiry ID:', inquiry._id);
+              console.log('MyCard - Attempting to find card by inquiry ID:', latestInquiry._id);
               
               // Try to get card by inquiry ID as a fallback
-              const cardResponse = await apiService.getCardById(inquiry._id);
+              const cardResponse = await apiService.getCardById(latestInquiry._id);
               console.log('MyCard - Card response by inquiry ID:', cardResponse);
               
               if (cardResponse.success && cardResponse.data) {
                 console.log('MyCard - Found card using inquiry ID as cardId');
-                setInquiryData(inquiry);
+                setInquiryData(latestInquiry);
                 setCardGenerated(true);
                 setCard(cardResponse.data);
                 setLoading(false);
@@ -142,15 +117,18 @@ export default function MyCard() {
               }
             } else {
               console.log('MyCard - Inquiry found but no generated card yet:', {
-                cardGenerated: inquiry.cardGenerated,
-                cardId: inquiry.cardId
+                cardGenerated: latestInquiry.cardGenerated,
+                cardId: latestInquiry.cardId
               });
+              // Set inquiry submitted state if inquiry exists but card not generated
+              setInquirySubmitted(true);
+              setInquiryData(latestInquiry);
             }
           } else {
             console.log('MyCard - Failed to get inquiry data');
           }
         } else {
-          console.log('MyCard - No inquiries found on user profile');
+          console.log('MyCard - No inquiries found for user');
         }
         
         // No additional fallbacks; rely on inquiry presence only
@@ -182,15 +160,16 @@ export default function MyCard() {
     const response = await apiService.createCard(formData, user?._id);
 
     if (!response.success) {
-      console.log('Create card error details:', response);
-      setError(response.error || 'Failed to create card');
+      console.log('Create inquiry error details:', response);
+      setError(response.error || 'Failed to submit inquiry');
       if (response.details) {
         console.log('Server error details:', response.details);
       }
       setCreating(false);
     } else {
-      setCard(response.data);
-      setSuccess('Business card created successfully!');
+      setInquirySubmitted(true);
+      setInquiryData(response.data);
+      setSuccess('Inquiry sent! Your card is on the way.');
       setCreating(false);
     }
   };
@@ -211,7 +190,7 @@ export default function MyCard() {
     );
   }
 
-  console.log('MyCard - Render check:', { card, cardGenerated, inquiryData, loading });
+  console.log('MyCard - Render check:', { card, cardGenerated, inquiryData, loading, inquirySubmitted });
   
   if (card) {
     console.log('MyCard - Rendering card display');
@@ -315,12 +294,56 @@ export default function MyCard() {
     );
   }
 
+  // Show inquiry submitted message if inquiry is submitted but card not generated
+  if (inquirySubmitted && !card) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">Inquiry Sent!</h1>
+          <p className="text-slate-600 text-lg">Your card is on the way</p>
+        </div>
+
+        <div className="bg-white rounded-xl border border-slate-200 p-8">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-8 h-8 text-blue-600" />
+            </div>
+            
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Thank You!</h2>
+            <p className="text-slate-600 mb-6">
+              We've received your inquiry and are working on creating your business card. 
+              You'll be notified once it's ready!
+            </p>
+
+            {inquiryData && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <p className="text-blue-800 text-sm">
+                  <strong>Inquiry submitted:</strong> {new Date(inquiryData.createdAt || inquiryData.created_at).toLocaleDateString()}
+                </p>
+              </div>
+            )}
+
+            <div className="bg-slate-50 rounded-lg p-4">
+              <h3 className="font-semibold text-slate-900 mb-2">What happens next?</h3>
+              <ul className="text-sm text-slate-600 space-y-1 text-left">
+                <li>• Our team will review your inquiry</li>
+                <li>• Your business card will be generated</li>
+                <li>• You'll receive a notification when it's ready</li>
+                <li>• You can then share your card with clients</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-slate-900 mb-2">Create Your Business Card</h1>
+        <h1 className="text-4xl font-bold text-slate-900 mb-2">Submit Your Inquiry</h1>
         <p className="text-slate-600 text-lg">
-          {cardGenerated ? 'Your card has been generated! You can create another one below.' : 'Fill in your information to create your digital business card'}
+          Fill in your information to submit an inquiry for your business card
         </p>
         {cardGenerated && (
           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
@@ -432,7 +455,7 @@ export default function MyCard() {
             className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             <CreditCard className="w-5 h-5" />
-            {creating ? 'Creating...' : 'Create Business Card'}
+            {creating ? 'Submitting...' : 'Submit Inquiry'}
           </button>
         </form>
       </div>
