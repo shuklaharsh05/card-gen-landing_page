@@ -100,10 +100,10 @@ export default function SavedCards() {
 
   const getShareableLink = (card) => {
     // Try different possible paths for shareable link
-    if (card.shareableLink.includes('http://localhost:5173')) {
-      return card.shareableLink
-    }
-    return 'http://localhost:5173' + card.shareableLink
+    // if (card.shareableLink.includes('http://localhost:5173')) {
+    //   return card.shareableLink
+    // }
+    return card.shareableLink
     // console.log('Shareable link:', 'http://localhost:5173' + card.shareableLink);
   };
 
