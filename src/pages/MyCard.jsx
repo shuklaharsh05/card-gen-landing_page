@@ -353,9 +353,9 @@ export default function MyCard() {
 
   const handleShareQR = async () => {
     const backendUrl = card?.shareableLink || card?.shareable_link || card?.publicUrl || card?.public_url || card?.publicURL || '';
-    const { absolute } = toSiteUrlFromBackend(backendUrl);
     // Try sharing the image file if supported
     try {
+      const { absolute } = toSiteUrlFromBackend(backendUrl);
       const dataUrl = await getBrandedQrDataUrl(absolute);
       if (navigator.canShare && navigator.canShare({ files: [] }) && dataUrl) {
         const res = await fetch(dataUrl);
@@ -367,6 +367,7 @@ export default function MyCard() {
     } catch (_) {
       // fall through to URL share
     }
+    const { absolute } = toSiteUrlFromBackend(backendUrl);
     if (navigator.share && absolute) {
       try {
         await navigator.share({ url: absolute, title: 'My Business Card' });
@@ -388,7 +389,7 @@ export default function MyCard() {
   
   if (card) {
     const backendUrl = card.shareableLink || card.shareable_link || card.publicUrl || card.public_url || card.publicURL || '';
-    const { relative: sitePath, absolute: siteUrl } = toSiteUrlFromBackend(backendUrl);
+    const { absolute: siteUrl } = toSiteUrlFromBackend(backendUrl);
     console.log('MyCard - Rendering card display');
     return (
       <div className="max-w-7xl mx-auto font-poppins">
@@ -485,6 +486,7 @@ export default function MyCard() {
                   Share
                 </button>
               </div>
+              <p className="mt-3 text-sm text-slate-600 break-all">URL: {siteUrl}</p>
               <p className="text-sm text-slate-500 mt-4">
                 Save or print this QR code for easy sharing at events
               </p>

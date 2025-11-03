@@ -1,12 +1,16 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    },
-    {
       "source": "/cards/:path*",
       "destination": "https://teamserver.cloud/cards/:path*"
+    },
+    {
+      "source": "/card/:path*",
+      "destination": "https://teamserver.cloud/card/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
