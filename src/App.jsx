@@ -10,6 +10,7 @@ import Appointments from './pages/Appointments.jsx';
 import MyCard from './pages/MyCard.jsx';
 import SavedCards from './pages/SavedCards.jsx';
 import Inquiry from './pages/Inquiry.jsx';
+import PublicCard from './pages/PublicCard.jsx';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/card/:id" element={<Inquiry />} />
+          <Route path="/cards/:id" element={<PublicCard />} />
 
           <Route
             path="/*"

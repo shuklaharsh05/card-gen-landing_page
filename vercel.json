@@ -1,38 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/cards/:path*",
-      "destination": "https://teamserver.cloud/cards/:path*"
-    },
-    {
-      "source": "/assets/:path*",
-      "destination": "https://teamserver.cloud/assets/:path*"
-    },
-    {
-      "source": "/static/:path*",
-      "destination": "https://teamserver.cloud/static/:path*"
-    },
-    {
-      "source": "/images/:path*",
-      "destination": "https://teamserver.cloud/images/:path*"
-    },
-    {
-      "source": "/img/:path*",
-      "destination": "https://teamserver.cloud/img/:path*"
-    },
-    {
-      "source": "/css/:path*",
-      "destination": "https://teamserver.cloud/css/:path*"
-    },
-    {
-      "source": "/js/:path*",
-      "destination": "https://teamserver.cloud/js/:path*"
-    },
-    {
-      "source": "/fonts/:path*",
-      "destination": "https://teamserver.cloud/fonts/:path*"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
