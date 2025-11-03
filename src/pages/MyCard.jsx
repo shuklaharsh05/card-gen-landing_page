@@ -50,11 +50,11 @@ export default function MyCard() {
     try {
       const parsed = new URL(rawUrl);
       let path = parsed.pathname || '';
-      // Normalize to our rewrite path: /card/:id (backend may give /cards/:id)
-      if (path.startsWith('/cards/')) {
-        path = path.replace('/cards/', '/card/');
+      // Normalize to preferred rewrite path: /cards/:id
+      if (path.startsWith('/card/')) {
+        path = path.replace('/card/', '/cards/');
       }
-      // If it doesn't start with /card/, keep as-is
+      // Keep existing /cards/ as-is
       const relative = path + (parsed.search || '') + (parsed.hash || '');
       const absolute = `${baseOrigin}${relative}`;
       return { relative, absolute };
