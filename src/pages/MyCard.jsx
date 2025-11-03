@@ -22,7 +22,7 @@ const businessTypes = [
 ];
 
 export default function MyCard() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [card, setCard] = useState(null);
   const [inquiryData, setInquiryData] = useState(null);
   const [cardGenerated, setCardGenerated] = useState(false);
@@ -55,90 +55,99 @@ export default function MyCard() {
       console.log('MyCard - User ID type:', typeof user._id);
       console.log('MyCard - Full user data:', JSON.stringify(user, null, 2));
 
-      // Check if user has any inquiries using getUserInquiries API
-      try {
-        const inquiriesResponse = await apiService.getUserInquiries(user._id);
-        console.log('MyCard - getUserInquiries response:', inquiriesResponse);
-        
-        if (inquiriesResponse.success && inquiriesResponse.data && Array.isArray(inquiriesResponse.data) && inquiriesResponse.data.length > 0) {
-          console.log('MyCard - User has inquiries:', inquiriesResponse.data);
+      // First check if user object already has inquiries populated
+      let inquiries = [];
+      if (user.inquiries && Array.isArray(user.inquiries) && user.inquiries.length > 0) {
+        console.log('MyCard - User object has inquiries:', user.inquiries);
+        inquiries = user.inquiries;
+      } else {
+        // Fallback: Check if user has any inquiries using getUserInquiries API
+        try {
+          const inquiriesResponse = await apiService.getUserInquiries(user._id);
+          console.log('MyCard - getUserInquiries response:', inquiriesResponse);
           
-          // Get the latest inquiry (most recent)
-          const latestInquiry = inquiriesResponse.data[inquiriesResponse.data.length - 1];
-          console.log('MyCard - Latest inquiry:', latestInquiry);
-          
-          if (latestInquiry) {
-            console.log('MyCard - inquiry data:', latestInquiry);
-            console.log('MyCard - cardGenerated:', latestInquiry.cardGenerated);
-            console.log('MyCard - cardId:', latestInquiry.cardId);
-            
-            // Check if inquiry has cardGenerated and cardId
-            if (latestInquiry.cardGenerated === true && latestInquiry.cardId) {
-              console.log('MyCard - Found generated inquiry with cardId:', latestInquiry);
-              console.log('MyCard - CardId to fetch:', latestInquiry.cardId);
-              
-              setInquiryData(latestInquiry);
-              setCardGenerated(true);
-              
-              // Fetch the generated card using cardId
-              console.log('MyCard - Fetching card with ID:', latestInquiry.cardId);
-              const cardResponse = await apiService.getCardById(latestInquiry.cardId);
-              console.log('MyCard - cardResponse:', cardResponse);
-              console.log('MyCard - cardResponse success:', cardResponse.success);
-              console.log('MyCard - cardResponse data:', cardResponse.data);
-              
-              if (cardResponse.success && cardResponse.data) {
-                console.log('MyCard - Successfully fetched card data:', cardResponse.data);
-                setCard(cardResponse.data);
-              } else {
-                console.log('MyCard - Failed to fetch card data:', cardResponse);
-                console.log('MyCard - Card fetch error details:', cardResponse.error);
-              }
-              setLoading(false);
-              return;
-            } else if (latestInquiry.cardGenerated === true && !latestInquiry.cardId) {
-              console.log('MyCard - Inquiry has cardGenerated=true but no cardId. This might be a backend issue.');
-              console.log('MyCard - Full inquiry object:', latestInquiry);
-              
-              // Try to find the card by other means - maybe by inquiry ID or user ID
-              console.log('MyCard - Attempting to find card by inquiry ID:', latestInquiry._id);
-              
-              // Try to get card by inquiry ID as a fallback
-              const cardResponse = await apiService.getCardById(latestInquiry._id);
-              console.log('MyCard - Card response by inquiry ID:', cardResponse);
-              
-              if (cardResponse.success && cardResponse.data) {
-                console.log('MyCard - Found card using inquiry ID as cardId');
-                setInquiryData(latestInquiry);
-                setCardGenerated(true);
-                setCard(cardResponse.data);
-                setLoading(false);
-                return;
-              }
-            } else {
-              console.log('MyCard - Inquiry found but no generated card yet:', {
-                cardGenerated: latestInquiry.cardGenerated,
-                cardId: latestInquiry.cardId
-              });
-              // Set inquiry submitted state if inquiry exists but card not generated
-              setInquirySubmitted(true);
-              setInquiryData(latestInquiry);
-            }
-          } else {
-            console.log('MyCard - Failed to get inquiry data');
+          if (inquiriesResponse.success && inquiriesResponse.data && Array.isArray(inquiriesResponse.data) && inquiriesResponse.data.length > 0) {
+            inquiries = inquiriesResponse.data;
           }
-        } else {
-          console.log('MyCard - No inquiries found for user');
+        } catch (error) {
+          console.log('MyCard - Error fetching inquiries:', error);
         }
-        
-        // No additional fallbacks; rely on inquiry presence only
-      } catch (error) {
-        console.log('MyCard - Error fetching inquiries:', error);
       }
 
-      // No card found through inquiries
-      console.log('No generated card found for user:', user._id);
+      // If user has ANY inquiries, they should not see the form
+      if (inquiries.length > 0) {
+        console.log('MyCard - User has inquiries:', inquiries);
+        
+        // Get the latest inquiry (most recent)
+        const latestInquiry = inquiries[inquiries.length - 1];
+        console.log('MyCard - Latest inquiry:', latestInquiry);
+        
+        if (latestInquiry) {
+          console.log('MyCard - inquiry data:', latestInquiry);
+          console.log('MyCard - cardGenerated:', latestInquiry.cardGenerated);
+          console.log('MyCard - cardId:', latestInquiry.cardId);
+          
+          // Check if inquiry has cardGenerated and cardId
+          if (latestInquiry.cardGenerated === true && latestInquiry.cardId) {
+            console.log('MyCard - Found generated inquiry with cardId:', latestInquiry);
+            console.log('MyCard - CardId to fetch:', latestInquiry.cardId);
+            
+            setInquiryData(latestInquiry);
+            setCardGenerated(true);
+            
+            // Fetch the generated card using cardId
+            console.log('MyCard - Fetching card with ID:', latestInquiry.cardId);
+            const cardResponse = await apiService.getCardById(latestInquiry.cardId);
+            console.log('MyCard - cardResponse:', cardResponse);
+            console.log('MyCard - cardResponse success:', cardResponse.success);
+            console.log('MyCard - cardResponse data:', cardResponse.data);
+            
+            if (cardResponse.success && cardResponse.data) {
+              console.log('MyCard - Successfully fetched card data:', cardResponse.data);
+              setCard(cardResponse.data);
+            } else {
+              console.log('MyCard - Failed to fetch card data:', cardResponse);
+              console.log('MyCard - Card fetch error details:', cardResponse.error);
+            }
+            setLoading(false);
+            return;
+          } else if (latestInquiry.cardGenerated === true && !latestInquiry.cardId) {
+            console.log('MyCard - Inquiry has cardGenerated=true but no cardId. This might be a backend issue.');
+            console.log('MyCard - Full inquiry object:', latestInquiry);
+            
+            // Try to find the card by other means - maybe by inquiry ID or user ID
+            console.log('MyCard - Attempting to find card by inquiry ID:', latestInquiry._id);
+            
+            // Try to get card by inquiry ID as a fallback
+            const cardResponse = await apiService.getCardById(latestInquiry._id);
+            console.log('MyCard - Card response by inquiry ID:', cardResponse);
+            
+            if (cardResponse.success && cardResponse.data) {
+              console.log('MyCard - Found card using inquiry ID as cardId');
+              setInquiryData(latestInquiry);
+              setCardGenerated(true);
+              setCard(cardResponse.data);
+              setLoading(false);
+              return;
+            }
+          }
+          
+          // If inquiry exists but card not generated yet, show inquiry submitted message
+          console.log('MyCard - Inquiry found but no generated card yet:', {
+            cardGenerated: latestInquiry.cardGenerated,
+            cardId: latestInquiry.cardId
+          });
+          setInquirySubmitted(true);
+          setInquiryData(latestInquiry);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // No inquiries found - user can submit inquiry form
+      console.log('MyCard - No inquiries found for user - showing inquiry form');
       setCard(null);
+      setInquirySubmitted(false);
       setLoading(false);
     };
 
@@ -152,7 +161,7 @@ export default function MyCard() {
     setCreating(true);
 
     if (!formData.name || !formData.email || !formData.phone || !formData.business_type) {
-      setError('Please fill in all fields');
+      setError('Please fill in all required fields (Name, Email, Phone, and Business Type)');
       setCreating(false);
       return;
     }
@@ -161,16 +170,48 @@ export default function MyCard() {
 
     if (!response.success) {
       console.log('Create inquiry error details:', response);
-      setError(response.error || 'Failed to submit inquiry');
-      if (response.details) {
-        console.log('Server error details:', response.details);
+      
+      // Parse error message from response for better user experience
+      let errorMessage = 'Failed to submit inquiry';
+      
+      if (response.error) {
+        errorMessage = response.error;
       }
+      
+      // Check for validation errors in details
+      if (response.details) {
+        // Check if it's a validation error object
+        if (response.details.errors) {
+          // Handle Mongoose validation errors
+          const validationErrors = response.details.errors;
+          const errorMessages = Object.keys(validationErrors).map(
+            key => `${key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}: ${validationErrors[key].message || validationErrors[key]}`
+          );
+          errorMessage = errorMessages.join('. ');
+        } else if (response.details.message) {
+          errorMessage = response.details.message;
+        } else if (typeof response.details === 'string') {
+          errorMessage = response.details;
+        } else if (response.details.error) {
+          errorMessage = response.details.error;
+        }
+      }
+      
+      setError(errorMessage);
       setCreating(false);
     } else {
       setInquirySubmitted(true);
       setInquiryData(response.data);
       setSuccess('Inquiry sent! Your card is on the way.');
       setCreating(false);
+      
+      // Refresh user data to include the new inquiry so it persists after refresh
+      try {
+        await refreshUser();
+      } catch (refreshError) {
+        console.log('Error refreshing user data:', refreshError);
+        // Non-critical error, user will see updated data on next refresh
+      }
     }
   };
 
@@ -294,8 +335,12 @@ export default function MyCard() {
     );
   }
 
+  // Check if user has inquiries - either from state or directly from user object
+  // This ensures form is never shown if user has already submitted an inquiry
+  const hasInquiries = (user?.inquiries && Array.isArray(user.inquiries) && user.inquiries.length > 0) || inquirySubmitted;
+  
   // Show inquiry submitted message if inquiry is submitted but card not generated
-  if (inquirySubmitted && !card) {
+  if (hasInquiries && !card) {
     return (
       <div className="max-w-2xl mx-auto">
         <div className="mb-8 text-center">
@@ -338,6 +383,8 @@ export default function MyCard() {
     );
   }
 
+  // Only show form if user has no inquiries (one inquiry per user rule)
+  // hasInquiries check ensures form is never shown if user already submitted inquiry
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">

@@ -32,7 +32,7 @@ export default function UserLayout() {
           <div className="p-6 border-b border-slate-800">
             <div className="flex items-center gap-2">
               <CreditCard className="w-8 h-8 text-blue-400" />
-              <span className="text-2xl font-bold">CardPro</span>
+              <span className="text-2xl font-bold">Visiting Links</span>
             </div>
           </div>
 

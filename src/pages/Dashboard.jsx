@@ -158,7 +158,7 @@ export default function Dashboard() {
           Welcome back, {userName}!
         </h1>
         <p className="text-slate-600 text-lg">
-          Here's an overview of your CardPro account
+          Here's an overview of your account
         </p>
       </div>
 

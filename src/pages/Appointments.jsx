@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { apiService } from '../lib/api.js';
-import { Calendar, Mail, Phone, MessageSquare, Filter, User, CreditCard, Download, Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar, Mail, Phone, MessageSquare, Filter, User, CreditCard, Download, Calendar as CalendarIcon, Eye, X } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 export default function Appointments() {
@@ -16,6 +16,8 @@ export default function Appointments() {
   });
   const [userCard, setUserCard] = useState(null); // Single card for the user
   const [loadingCard, setLoadingCard] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   // Fetch user's single card
   const fetchUserCard = async () => {
@@ -192,6 +194,13 @@ export default function Appointments() {
       fetchUserCard();
     }
   }, [user]);
+
+  // If there's no userCard (after card fetch completes), stop the main loader
+  useEffect(() => {
+    if (!loadingCard && !userCard) {
+      setLoading(false);
+    }
+  }, [loadingCard, userCard]);
 
 
   if (loading) {
@@ -429,6 +438,7 @@ export default function Appointments() {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Status</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Message</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Date</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
@@ -469,7 +479,9 @@ export default function Appointments() {
                         <div className="flex items-start gap-2">
                           <MessageSquare className="w-4 h-4 mt-0.5 flex-shrink-0" />
                           <span className="truncate" title={appointment.message}>
-                            {appointment.message}
+                            {appointment.message.length > 12 
+                              ? `${appointment.message.substring(0, 12)}...` 
+                              : appointment.message}
                           </span>
                         </div>
                       ) : (
@@ -483,6 +495,19 @@ export default function Appointments() {
                         day: 'numeric',
                       })}
                     </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => {
+                          setSelectedAppointment(appointment);
+                          setShowModal(true);
+                        }}
+                        className="flex items-center gap-1 px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+                        title="View full details"
+                      >
+                        <Eye className="w-4 h-4" />
+                        Details
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -492,16 +517,115 @@ export default function Appointments() {
       )}
 
 
-      {/* {Array.isArray(appointments) && appointments.length > 0 && (
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h3 className="font-semibold text-blue-900 mb-2">
-            Total Appointments: {appointments.length}
-          </h3>
-          <p className="text-blue-700 text-sm">
-            Keep track of all your client inquiries and follow up promptly to grow your business.
-          </p>
+      {/* Appointment Details Modal */}
+      {showModal && selectedAppointment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-slate-900">Appointment Details</h2>
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  setSelectedAppointment(null);
+                }}
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                aria-label="Close modal"
+              >
+                <X className="w-5 h-5 text-slate-600" />
+              </button>
+            </div>
+            
+            <div className="px-6 py-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-sm font-semibold text-slate-700 mb-1 block">Name</label>
+                  <div className="flex items-center gap-2 text-slate-900">
+                    <User className="w-4 h-4 text-slate-500" />
+                    <span>{selectedAppointment.name || 'N/A'}</span>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-semibold text-slate-700 mb-1 block">Email</label>
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <Mail className="w-4 h-4 text-slate-500" />
+                    <span>{selectedAppointment.email || 'N/A'}</span>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-semibold text-slate-700 mb-1 block">Phone</label>
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <Phone className="w-4 h-4 text-slate-500" />
+                    <span>{selectedAppointment.phone || 'N/A'}</span>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-semibold text-slate-700 mb-1 block">Status</label>
+                  <span
+                    className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                      selectedAppointment.status === 'pending' || selectedAppointment.status === 'Pending'
+                        ? 'bg-amber-100 text-amber-700'
+                        : selectedAppointment.status === 'confirmed' || selectedAppointment.status === 'Confirmed'
+                        ? 'bg-green-100 text-green-700'
+                        : selectedAppointment.status === 'cancelled' || selectedAppointment.status === 'Cancelled'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-blue-100 text-blue-700'
+                    }`}
+                  >
+                    {selectedAppointment.status 
+                      ? selectedAppointment.status.charAt(0).toUpperCase() + selectedAppointment.status.slice(1)
+                      : 'N/A'}
+                  </span>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-semibold text-slate-700 mb-1 block">Date</label>
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <Calendar className="w-4 h-4 text-slate-500" />
+                    <span>
+                      {new Date(selectedAppointment.created_at || selectedAppointment.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              {selectedAppointment.message && (
+                <div>
+                  <label className="text-sm font-semibold text-slate-700 mb-2 block">Message</label>
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                    <div className="flex items-start gap-2">
+                      <MessageSquare className="w-5 h-5 text-slate-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-slate-700 whitespace-pre-wrap break-words">
+                        {selectedAppointment.message}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="sticky bottom-0 bg-slate-50 border-t border-slate-200 px-6 py-4 flex justify-end">
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  setSelectedAppointment(null);
+                }}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
-      )} */}
+      )}
     </div>
   );
 }

@@ -45,7 +45,7 @@ export default function Signup() {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
             <CreditCard className="w-10 h-10 text-blue-600" />
-            <span className="text-3xl font-bold text-slate-800">CardPro</span>
+            <span className="text-3xl font-bold text-slate-800">Visiting Links</span>
           </Link>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Create Your Account</h1>
           <p className="text-slate-600">Start building your digital presence today</p>
