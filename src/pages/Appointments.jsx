@@ -435,7 +435,7 @@ export default function Appointments() {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Name</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Email</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Phone</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Status</th>
+                  {/* <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Status</th> */}
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Message</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Date</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Actions</th>
@@ -459,7 +459,7 @@ export default function Appointments() {
                         {appointment.phone}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    {/* <td className="px-6 py-4">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${
                           appointment.status === 'pending' || appointment.status === 'Pending'
@@ -473,7 +473,7 @@ export default function Appointments() {
                       >
                         {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
                       </span>
-                    </td>
+                    </td> */}
                     <td className="px-6 py-4 text-sm text-slate-600 max-w-xs">
                       {appointment.message ? (
                         <div className="flex items-start gap-2">
@@ -561,7 +561,7 @@ export default function Appointments() {
                   </div>
                 </div>
                 
-                <div>
+                {/* <div>
                   <label className="text-sm font-semibold text-slate-700 mb-1 block">Status</label>
                   <span
                     className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
@@ -578,7 +578,7 @@ export default function Appointments() {
                       ? selectedAppointment.status.charAt(0).toUpperCase() + selectedAppointment.status.slice(1)
                       : 'N/A'}
                   </span>
-                </div>
+                </div> */}
                 
                 <div>
                   <label className="text-sm font-semibold text-slate-700 mb-1 block">Date</label>
