@@ -51,6 +51,26 @@ class ApiService {
     }
   }
 
+  // Auth code exchange (short-lived code -> JWT/session)
+  async exchangeAuthCode(code) {
+    const response = await this.request('/auth/exchange-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code,
+        origin: window.location.origin,
+      }),
+    });
+
+    // If exchange is successful, store the token (support both top-level and wrapped shapes)
+    const token = response?.token || response?.data?.token;
+    if (response?.success && token) {
+      localStorage.setItem('auth_token', token);
+    }
+
+    return response;
+  }
+
   // Authentication APIs
   async signup({ name, email, password }) {
     const response = await this.request('/auth/register', {
