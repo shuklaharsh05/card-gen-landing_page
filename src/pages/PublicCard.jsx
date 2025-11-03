@@ -17,7 +17,7 @@ export default function PublicCard() {
               src={src}
               className="w-full h-screen"
               allowTransparency
-              sandbox="allow-forms allow-same-origin allow-scripts allow-popups allow-top-navigation-by-user-activation"
+              sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation-by-user-activation allow-clipboard-write"
             />
           </div>
         </div>
