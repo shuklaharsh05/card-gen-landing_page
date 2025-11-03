@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { apiService } from '../lib/api.js';
 import { QRCodeSVG } from 'qrcode.react';
@@ -11,6 +11,8 @@ import {
   CheckCircle,
   AlertCircle,
   Copy,
+  Download,
+  Share2,
 } from 'lucide-react';
 
 const businessTypes = [
@@ -39,6 +41,30 @@ export default function MyCard() {
   const [success, setSuccess] = useState('');
   const [copied, setCopied] = useState(false);
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
+  const qrContainerRef = useRef(null);
+
+  // Build site URL variants from a backend share URL using fixed domain mask
+  const toSiteUrlFromBackend = (rawUrl) => {
+    if (!rawUrl) return { relative: '', absolute: '' };
+    const baseOrigin = 'https://card-gen-landing-page.vercel.app';
+    try {
+      const parsed = new URL(rawUrl);
+      let path = parsed.pathname || '';
+      // Normalize to our rewrite path: /card/:id (backend may give /cards/:id)
+      if (path.startsWith('/cards/')) {
+        path = path.replace('/cards/', '/card/');
+      }
+      // If it doesn't start with /card/, keep as-is
+      const relative = path + (parsed.search || '') + (parsed.hash || '');
+      const absolute = `${baseOrigin}${relative}`;
+      return { relative, absolute };
+    } catch (_e) {
+      // If it's not an absolute URL, assume it's already a path
+      const relative = rawUrl.startsWith('/') ? rawUrl : `/${rawUrl}`;
+      const absolute = `${baseOrigin}${relative}`;
+      return { relative, absolute };
+    }
+  };
 
   useEffect(() => {
     const fetchCard = async () => {
@@ -216,10 +242,137 @@ export default function MyCard() {
   };
 
   const copyToClipboard = async () => {
-    if (card) {
-      await navigator.clipboard.writeText(card.shareable_link);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+    if (!card) return;
+    const backendUrl = card.shareableLink || card.shareable_link || card.publicUrl || card.public_url || card.publicURL || '';
+    const { absolute } = toSiteUrlFromBackend(backendUrl);
+    if (!absolute) return;
+    await navigator.clipboard.writeText(absolute);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const getQrDataUrl = async () => {
+    const container = qrContainerRef.current;
+    if (!container) return '';
+    const svg = container.querySelector('svg');
+    if (!svg) return '';
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+    try {
+      const img = new Image();
+      const size = parseInt(svg.getAttribute('width') || '200', 10);
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      await new Promise((resolve, reject) => {
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0);
+          resolve();
+        };
+        img.onerror = reject;
+        img.src = url;
+      });
+      const dataUrl = canvas.toDataURL('image/png');
+      return dataUrl;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  // Build a branded QR poster: title (business name), QR in middle, link below
+  const getBrandedQrDataUrl = async (siteUrl) => {
+    const baseQr = await getQrDataUrl();
+    if (!baseQr) return '';
+
+    // Determine title from available card data
+    const title = (card?.name) || (card?.card?.data?.companyName) || (card?.card?.data?.storeName) || 'My Business Card';
+
+    // Load QR image
+    const qrImg = new Image();
+    await new Promise((resolve, reject) => {
+      qrImg.onload = resolve;
+      qrImg.onerror = reject;
+      qrImg.src = baseQr;
+    });
+
+    // Canvas dimensions
+    const posterWidth = 800;
+    const padding = 48;
+    const titleSize = 36;
+    const urlSize = 22;
+    const gap = 24;
+    const qrSize = 520; // fixed QR draw size
+
+    const posterHeight = padding + titleSize + gap + qrSize + gap + urlSize + padding;
+    const canvas = document.createElement('canvas');
+    canvas.width = posterWidth;
+    canvas.height = posterHeight;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, posterWidth, posterHeight);
+
+    // Title
+    ctx.fillStyle = '#0f172a'; // slate-900
+    ctx.font = `600 ${titleSize}px system-ui, -apple-system, Segoe UI, Roboto`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(title, posterWidth / 2, padding);
+
+    // QR image
+    const qrX = (posterWidth - qrSize) / 2;
+    const qrY = padding + titleSize + gap;
+    ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+    // Link
+    ctx.fillStyle = '#2563eb'; // blue-600
+    ctx.font = `500 ${urlSize}px system-ui, -apple-system, Segoe UI, Roboto`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    const urlY = qrY + qrSize + gap + urlSize;
+    ctx.fillText(siteUrl, posterWidth / 2, urlY);
+
+    return canvas.toDataURL('image/png');
+  };
+
+  const handleDownloadQR = async () => {
+    const backendUrl = card?.shareableLink || card?.shareable_link || card?.publicUrl || card?.public_url || card?.publicURL || '';
+    const { absolute } = toSiteUrlFromBackend(backendUrl);
+    const dataUrl = await getBrandedQrDataUrl(absolute);
+    if (!dataUrl) return;
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'card-qr.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const handleShareQR = async () => {
+    const backendUrl = card?.shareableLink || card?.shareable_link || card?.publicUrl || card?.public_url || card?.publicURL || '';
+    const { absolute } = toSiteUrlFromBackend(backendUrl);
+    // Try sharing the image file if supported
+    try {
+      const dataUrl = await getBrandedQrDataUrl(absolute);
+      if (navigator.canShare && navigator.canShare({ files: [] }) && dataUrl) {
+        const res = await fetch(dataUrl);
+        const blob = await res.blob();
+        const file = new File([blob], 'card-qr.png', { type: 'image/png' });
+        await navigator.share({ files: [file], title: 'My Business Card', text: 'Scan to view my card' });
+        return;
+      }
+    } catch (_) {
+      // fall through to URL share
+    }
+    if (navigator.share && absolute) {
+      try {
+        await navigator.share({ url: absolute, title: 'My Business Card' });
+      } catch (_) {
+        // ignore cancel
+      }
     }
   };
 
@@ -234,6 +387,8 @@ export default function MyCard() {
   console.log('MyCard - Render check:', { card, cardGenerated, inquiryData, loading, inquirySubmitted });
   
   if (card) {
+    const backendUrl = card.shareableLink || card.shareable_link || card.publicUrl || card.public_url || card.publicURL || '';
+    const { relative: sitePath, absolute: siteUrl } = toSiteUrlFromBackend(backendUrl);
     console.log('MyCard - Rendering card display');
     return (
       <div className="max-w-7xl mx-auto font-poppins">
@@ -288,10 +443,10 @@ export default function MyCard() {
               <h2 className="text-2xl font-bold text-slate-900 mb-4">Shareable Link</h2>
               <p className="text-slate-600 mb-4">Share this link to let others view your card</p>
               <div className="flex gap-2">
-                <a href={card.publicUrl} className="flex-1 px-4 py-3 bg-slate-50 text-blue-600 hover:text-blue-800 underline transition-colors duration-300">{card.publicUrl}</a>
+                <a href={siteUrl} className="flex-1 px-4 py-3 bg-slate-50 text-blue-600 hover:text-blue-800 underline transition-colors duration-300">{siteUrl || 'Link unavailable'}</a>
                 <button
                   onClick={copyToClipboard}
-                  className="px-4 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center justify-center w-10 h-10"
                 >
                   {copied ? (
                     <>
@@ -311,8 +466,24 @@ export default function MyCard() {
               <p className="text-slate-600 mb-6">
                 Scan this code to instantly access your business card
               </p>
-              <div className="bg-white p-6 rounded-lg border-2 border-slate-200 inline-block">
-                <QRCodeSVG value={card.shareable_link} size={200} level="H" />
+              <div className="bg-white p-6 rounded-lg border-2 border-slate-200 inline-block" ref={qrContainerRef}>
+                <QRCodeSVG value={siteUrl} size={200} level="H" />
+              </div>
+              <div className="mt-4 flex items-center gap-2">
+                <button
+                  onClick={handleDownloadQR}
+                  className="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center gap-2 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  Download QR
+                </button>
+                <button
+                  onClick={handleShareQR}
+                  className="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 transition-colors"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Share
+                </button>
               </div>
               <p className="text-sm text-slate-500 mt-4">
                 Save or print this QR code for easy sharing at events
