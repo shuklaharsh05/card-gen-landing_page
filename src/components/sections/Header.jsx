@@ -12,8 +12,17 @@ function Header() {
   const { user, signOut } = useAuth();
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 5);
-    window.addEventListener("scroll", handleScroll);
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 5);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -27,7 +36,7 @@ function Header() {
   return (
     <header
       className={`fixed top-0 w-full bg-white transition-all duration-500 z-50 ${
-        scrolled ? "py-2 shadow-md" : "py-4"
+        scrolled ? "py-1 shadow-md" : "py-4"
       }`}
     >
       {/* Main Container */}

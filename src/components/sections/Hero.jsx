@@ -1,44 +1,122 @@
 "use client";
-import React from "react";
+import React, { useRef, memo } from "react";
+import { motion, useInView } from "framer-motion";
 
-export default function Hero() {
+function Hero() {
+  // Animation variants
+  const fadeUp = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
+  };
+
+  const imagePop = {
+    hidden: { opacity: 0, scale: 0.8, y: 30 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
+  };
+
+  // New variant for Hero-phone sliding in
+  const imageSlideIn = {
+    hidden: { opacity: 0, y: 100, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut",
+        delay: 0.2, // 0.2s delay after Hero.png
+      },
+    },
+  };
+
+  const textRef = useRef(null);
+  const imgRef = useRef(null);
+
+  const textInView = useInView(textRef, { once: true, amount: 0.4 });
+  const imgInView = useInView(imgRef, { once: true, amount: 0.4 });
+
   return (
-    <section className="w-full py-28 lg:py-36 bg-white my-auto">
-      {/* Centered container — same width as header */}
-      <div className="max-w-[1200px] mx-auto flex flex-col-reverse md:flex-row justify-between items-center gap-10 px-6">
-        {/* Left Section */}
-        <div className="lg:space-y-8 md:space-y-6 text-center md:text-left">
-          <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-6xl poppins-bold leading-tight text-black">
-            One Link.
-            <br /> All Connections
+    <section className="w-full bg-white overflow-hidden py-14 pt-32 md:pt-56 min-h-screen">
+      <div className="mx-auto flex flex-col items-center text-center px-6 relative">
+        {/* Text Section */}
+        <motion.div
+          ref={textRef}
+          variants={fadeUp}
+          initial="hidden"
+          animate={textInView ? "visible" : "hidden"}
+          className="flex flex-col items-center justify-center space-y-2 md:space-y-5 z-10 poppins-semibold"
+        >
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl poppins-bold leading-tight text-black">
+            Your Entire{" "}
+            <span className="bg-gradient-to-r from-[#000000] to-[#004DFF] bg-clip-text text-transparent">
+              Profile.
+            </span>
+            <br /> One Link{" "}
+            <span className="bg-gradient-to-r from-[#000000] to-[#004DFF] bg-clip-text text-transparent">
+              Away
+            </span>
           </h1>
 
-          <p className="text-gray-600 lg:leading-relaxed text-xs sm:text-base md:text-base lg:text-lg poppins-light mt-3">
-            Choose your link type according to your requirements.
-            <br className="hidden lg:block" />
-            We provide you with two options to select from personal and
-            professional.
+          <p className="text-black font-semibold text-sm sm:text-base md:text-3xl poppins-light max-w-[600px]">
+            All information in <span className="font-bold">one link.</span> Get one card.
           </p>
 
-          <div className="flex flex-row justify-center md:justify-start items-center gap-3 sm:gap-4 mt-5">
-            <button className="w-full sm:w-auto lg:px-6 md:px-4 md:py-2 px-2 py-2 text-sm md:text-base border-2 border-black text-black rounded-full font-medium hover:bg-black hover:text-white transition">
-              Work Link
+          {/* Buttons */}
+          <div className="flex flex-col md:flex-row justify-center items-center gap-3 md:gap-10 mt-10">
+            <button className="px-5 py-2 md:px-6 mt-2 md:mt-8 md:py-3 border border-[#000000] rounded-[20px] text-sm md:text-base font-medium transition hover:bg-[#2C4AE5] hover:border-white hover:text-white">
+              <span className="bg-gradient-to-r from-[#000000] to-[#004DFF] bg-clip-text text-transparent">
+                Professional Link
+              </span>
             </button>
-            <button className="w-full sm:w-auto lg:px-6 md:px-4 md:py-2 px-2 py-2 text-sm md:text-base border-2 border-black bg-black text-white rounded-full font-medium hover:bg-white hover:text-black transition">
+            <button className="px-8 py-2 md:px-11 md:mt-8 md:py-3 bg-black text-white rounded-[20px] text-sm md:text-base font-medium hover:bg-white hover:text-black border border-black transition">
               Business Link
             </button>
           </div>
-        </div>
+        </motion.div>
+      </div>
 
-        {/* Right Section */}
-        <div className="relative flex justify-center md:justify-end">
-          <img
-            src="/Hero.jpg"
-            alt="Hero"
-            className="object-contain w-[280px] sm:w-[300px] md:w-[600px] lg:w-[650px] h-auto"
+      {/* Mockup Section */}
+      <div className="relative flex justify-center items-center mt-12 md:mt-20 w-full py-16 md:py-14 lg:py-44">
+        {/* Hero.png */}
+        <motion.div
+          ref={imgRef}
+          variants={imagePop}
+          initial="hidden"
+          animate={imgInView ? "visible" : "hidden"}
+          className="relative w-full"
+        >
+          <motion.img
+            src="/Hero.png"
+            alt="Phone Mockup"
+            className="w-full z-20 drop-shadow-2xl"
           />
-        </div>
+        </motion.div>
+
+        {/* Hero-phone.png */}
+        <motion.div
+          variants={imageSlideIn}
+          initial="hidden"
+          animate={imgInView ? "visible" : "hidden"}
+          className="absolute w-full -top-12 md:-top-36 lg:-top-10 flex justify-center"
+        >
+          <motion.img
+            src="/Hero-phone.png"
+            alt="Phone Mockup"
+            className="lg:min-w-[70%] scale-75 md:scale-75 lg:scale-100 mx-auto z-20 drop-shadow-2xl"
+          />
+        </motion.div>
       </div>
     </section>
   );
 }
+
+export default memo(Hero);

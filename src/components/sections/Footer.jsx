@@ -8,23 +8,23 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-10 md:py-6 xl:py-10 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 items-start text-center md:text-left space-y-10 md:space-y-0">
         
         {/* Left Section */}
-        <div className="flex flex-col items-center md:items-start">
+        <div className="flex flex-col gap-2 items-center md:items-start">
           <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-            <h2 className="md:text-xl lg:text-2xl font-semibold tracking-wide">VisitingLink</h2>
-            <FiExternalLink className="text-green-400 text-lg" />
+            <h2 className="text-2xl lg:text-3xl font-semibold tracking-wide">VisitingLink</h2>
+            <FiExternalLink className="text-purple-400 text-4xl" />
           </div>
           <p className="text-gray-300 text-sm lg:text-sm leading-relaxed max-w-sm">
             Earn More. Enjoy More. Your Benefits,<br /> Delivered with one link.
           </p>
 
           {/* Search bar */}
-          <div className="relative mt-5 w-full md:w-[90%] max-w-xs">
+          <div className="relative mt-8 w-full md:w-[90%] max-w-xs -ml-1">
             <input
               type="text"
               placeholder="Search..."
               className="w-full bg-white/5 border border-white/20 rounded-full py-2 pl-4 pr-10 outline-none text-white placeholder-gray-400 focus:ring-2 focus:ring-white/40 transition"
             />
-            <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-white/80 text-lg" />
+            <FiSearch className="absolute right-5 top-1/2 -translate-y-1/2 text-white/80 text-lg" />
           </div>
         </div>
 
@@ -44,7 +44,7 @@ function Footer() {
 
         {/* Right Section */}
         <div className="flex flex-col items-center md:items-end justify-between h-full gap-6 md:gap-0 border-t border-white/10 md:border-none pt-6 md:pt-0">
-          <div className="text-center md:text-right">
+          <div className="text-center md:text-left">
             <h4 className="font-semibold mb-3 text-gray-200 text-base sm:text-lg">Privacy Policies</h4>
             <ul className="space-y-2 text-gray-400 text-sm sm:text-base">
               <li><a href="#" className="hover:text-white transition">Terms And Conditions</a></li>
@@ -72,7 +72,7 @@ function Footer() {
       </div>
 
       {/* Divider + Copyright */}
-      <div className="bg-white border-t border-white/20 mt-8 md:mt-5 xl:mt-10 py-3 xl:py-5 text-center text-sm sm:text-base text-black">
+      <div className="py-8 text-center text-sm sm:text-base text-white">
         © 2025 Visitinglink. All Rights Reserved.
       </div>
     </footer>

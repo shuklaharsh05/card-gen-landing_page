@@ -121,3 +121,32 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+@keyframes bounce-gentle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-bounce-gentle {
+  animation: bounce-gentle 1.5s ease-in-out infinite;
+  will-change: transform;
+  transform: translateZ(0);
+}
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee 25s linear infinite;
+  will-change: transform;
+}
