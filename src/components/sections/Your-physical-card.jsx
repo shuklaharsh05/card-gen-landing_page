@@ -57,16 +57,16 @@ function YourPhysicalCard() {
       {/* Metal & PVC Cards Section */}
       <div className="flex flex-col md:flex-row justify-center items-center gap-44 pt-40 md:gap-10 lg:gap-20 md:pt-32 xl:pt-40 px-6 relative">
         {/* Metal Card */}
-        <div className="relative bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow-md w-full max-w-sm max-h-[400px] flex flex-col items-center justify-end text-center p-8 overflow-visible">
+        <div className="relative bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow-md w-full max-w-sm max-h-[400px] flex flex-col items-center justify-end text-center p-4 overflow-visible">
           <img
             src="/card-1.png"
             alt="Metal Card"
             className="absolute -top-1/4 md:-top-1/4 left-1/2 -translate-x-1/2 w-[250px] md:w-[280px] xl:w-[330px] drop-shadow-lg scale-150 transition-transform duration-300"
           />
-          <div className="lg:mt-28 md:mt-20 mt-14">
-            <h2 className="text-xl md:text-2xl font-bold text-black">Metal Card</h2>
-            <div className="md:w-36 w-24 h-[2px] mx-auto my-4 md:my-6 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-            <p className="text-black text-sm md:text-md leading-relaxed px-2">
+          <div className="lg:mt-32 md:mt-20 mt-14">
+            <h2 className="text-xl md:text-3xl font-bold text-black">Metal Card</h2>
+            <div className="md:w-36 w-24 h-[2px] mx-auto my-4 md:my-4 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+            <p className="text-black text-base md:text-base leading-relaxed px-2">
               Select your preferred card type to order and enjoy the benefits of
               an NFC-enabled card.
             </p>
@@ -77,16 +77,16 @@ function YourPhysicalCard() {
         </div>
 
         {/* PVC Card */}
-        <div className="relative bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow-md w-full max-w-sm max-h-[400px] flex flex-col items-center justify-end text-center p-8 overflow-visible">
+        <div className="relative bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow-md w-full max-w-sm max-h-[400px] flex flex-col items-center justify-end text-center p-4 overflow-visible">
           <img
             src="/card-2.png"
             alt="PVC Card"
             className="absolute -top-1/4 md:-top-1/4 left-1/2 -translate-x-1/2 w-[250px] md:w-[280px] xl:w-[330px] drop-shadow-lg scale-150 transition-transform duration-300"
           />
-          <div className="lg:mt-28 md:mt-20 mt-14">
-            <h2 className="text-xl md:text-2xl font-bold text-black">PVC Card</h2>
-            <div className="md:w-36 w-24 h-[2px] mx-auto my-4 md:my-6 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-            <p className="text-black text-sm md:text-md leading-relaxed px-2">
+          <div className="lg:mt-32 md:mt-20 mt-14">
+            <h2 className="text-xl md:text-3xl font-bold text-black">PVC Card</h2>
+            <div className="md:w-36 w-24 h-[2px] mx-auto my-4 md:my-4 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+            <p className="text-black text-base leading-relaxed px-2">
               A PVC card equipped with NFC technology that lets you tap and
               share your details effortlessly.
             </p>
@@ -126,10 +126,10 @@ function YourPhysicalCard() {
               key={index}
               className="bg-white shadow-md rounded-2xl p-4 md:p-4 lg:p-10 text-left border border-gray-100 hover:shadow-lg transition-all duration-300"
             >
-              <h3 className="md:font-bold font-semibold text-md md:text-lg lg:text-xl text-black mb-2">
+              <h3 className="md:font-bold font-semibold text-lg md:text-xl lg:text-2xl text-black mb-2">
                 {card.title}
               </h3>
-              <p className="text-gray-600 text-xs lg:text-md leading-relaxed">
+              <p className="text-gray-600 text-base lg:text-base leading-relaxed">
                 {card.desc}
               </p>
             </div>

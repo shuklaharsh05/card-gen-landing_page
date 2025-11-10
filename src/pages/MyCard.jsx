@@ -46,7 +46,7 @@ export default function MyCard() {
   // Build site URL variants from a backend share URL using fixed domain mask
   const toSiteUrlFromBackend = (rawUrl) => {
     if (!rawUrl) return { relative: '', absolute: '' };
-    const baseOrigin = 'https://card-gen-landing-page.vercel.app';
+    const baseOrigin = 'https://visitinglink.com';
     try {
       const parsed = new URL(rawUrl);
       let path = parsed.pathname || '';
@@ -392,15 +392,15 @@ export default function MyCard() {
     const { absolute: siteUrl } = toSiteUrlFromBackend(backendUrl);
     console.log('MyCard - Rendering card display');
     return (
-      <div className="max-w-7xl mx-auto font-poppins">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">My Business Card</h1>
-          <p className="text-slate-600 text-lg">
+      <div className="max-w-7xl w-full px-4 sm:px-6 lg:px-8 mx-auto font-poppins">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-2">My Business Card</h1>
+          <p className="text-slate-600 text-base sm:text-lg">
             {cardGenerated ? 'Your business card has been generated and is ready to share' : 'Your digital business card is ready to share'}
           </p>
           {cardGenerated && inquiryData && (
-            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-blue-800 text-sm">
+            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+              <p className="text-blue-800 text-xs sm:text-sm">
                 <strong>Generated from inquiry:</strong> Submitted on {new Date(inquiryData.createdAt || inquiryData.created_at).toLocaleDateString()}
               </p>
             </div>
@@ -408,13 +408,13 @@ export default function MyCard() {
         </div>
 
         {success && (
-          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex gap-3">
+          <div className="mb-4 sm:mb-6 bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4 flex gap-3">
             <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-            <p className="text-green-800">{success}</p>
+            <p className="text-green-800 text-sm sm:text-base">{success}</p>
           </div>
         )}
 
-        <div className="flex gap-8">
+        <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8">
           {/* <div className="bg-white rounded-xl border border-slate-200 p-8 w-full"> */}
             {/* <h2 className="text-2xl font-bold text-slate-900 mb-6">Card Preview</h2> */}
             {/* <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl p-8 text-white shadow-xl">
@@ -439,15 +439,15 @@ export default function MyCard() {
             {/* {console.log("my log",card)} */}
           {/* </div> */}
 
-          <div className="space-x-6 flex">
-            <div className="bg-white rounded-xl border border-slate-200 p-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">Shareable Link</h2>
-              <p className="text-slate-600 mb-4">Share this link to let others view your card</p>
-              <div className="flex gap-2">
-                <a href={siteUrl} className="flex-1 px-4 py-3 bg-slate-50 text-blue-600 hover:text-blue-800 underline transition-colors duration-300">{siteUrl || 'Link unavailable'}</a>
+          <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
+            <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 lg:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3 sm:mb-4">Shareable Link</h2>
+              <p className="text-slate-600 mb-3 sm:mb-4 text-sm sm:text-base">Share this link to let others view your card</p>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <a href={siteUrl} className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-slate-50 text-blue-600 hover:text-blue-800 underline transition-colors duration-300 text-xs sm:text-sm break-all">{siteUrl || 'Link unavailable'}</a>
                 <button
                   onClick={copyToClipboard}
-                  className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center justify-center w-10 h-10"
+                  className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center justify-center w-10 h-10 flex-shrink-0 self-start sm:self-auto"
                 >
                   {copied ? (
                     <>
@@ -462,44 +462,44 @@ export default function MyCard() {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-slate-200 p-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">QR Code</h2>
-              <p className="text-slate-600 mb-6">
+            <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 lg:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3 sm:mb-4">QR Code</h2>
+              <p className="text-slate-600 mb-4 sm:mb-6 text-sm sm:text-base">
                 Scan this code to instantly access your business card
               </p>
-              <div className="bg-white p-6 rounded-lg border-2 border-slate-200 inline-block" ref={qrContainerRef}>
-                <QRCodeSVG value={siteUrl} size={200} level="H" />
+              <div className="bg-white p-4 sm:p-6 rounded-lg border-2 border-slate-200 inline-block" ref={qrContainerRef}>
+                <QRCodeSVG value={siteUrl} size={160} level="H" />
               </div>
-              <div className="mt-4 flex items-center gap-2">
+              <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 <button
                   onClick={handleDownloadQR}
-                  className="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center gap-2 transition-colors"
+                  className="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center gap-2 transition-colors text-sm"
                 >
                   <Download className="w-4 h-4" />
                   Download QR
                 </button>
                 <button
                   onClick={handleShareQR}
-                  className="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 transition-colors"
+                  className="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2 transition-colors text-sm"
                 >
                   <Share2 className="w-4 h-4" />
                   Share
                 </button>
               </div>
-              <p className="mt-3 text-sm text-slate-600 break-all">URL: {siteUrl}</p>
-              <p className="text-sm text-slate-500 mt-4">
+              <p className="mt-3 text-xs sm:text-sm text-slate-600 break-all">URL: {siteUrl}</p>
+              <p className="text-xs sm:text-sm text-slate-500 mt-4">
                 Save or print this QR code for easy sharing at events
               </p>
             </div>
           </div>
         </div>
 
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h3 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
-            <LinkIcon className="w-5 h-5" />
+        <div className="mt-6 sm:mt-8 bg-blue-50 border border-blue-200 rounded-xl p-4 sm:p-6">
+          <h3 className="font-semibold text-blue-900 mb-2 flex items-center gap-2 text-base sm:text-lg">
+            <LinkIcon className="w-4 h-4 sm:w-5 sm:h-5" />
             Share Your Card
           </h3>
-          <p className="text-blue-700 text-sm">
+          <p className="text-blue-700 text-xs sm:text-sm">
             Use the shareable link or QR code to share your business card with clients and
             colleagues. They can view your information and book appointments directly.
           </p>
@@ -515,35 +515,35 @@ export default function MyCard() {
   // Show inquiry submitted message if inquiry is submitted but card not generated
   if (hasInquiries && !card) {
     return (
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Inquiry Sent!</h1>
-          <p className="text-slate-600 text-lg">Your card is on the way</p>
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Inquiry Sent!</h1>
+          <p className="text-slate-600 text-base sm:text-lg">Your card is on the way</p>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 p-8">
+        <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 lg:p-8">
           <div className="text-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-8 h-8 text-blue-600" />
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+              <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
             </div>
             
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Thank You!</h2>
-            <p className="text-slate-600 mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3 sm:mb-4">Thank You!</h2>
+            <p className="text-slate-600 mb-4 sm:mb-6 text-sm sm:text-base">
               We've received your inquiry and are working on creating your business card. 
               You'll be notified once it's ready!
             </p>
 
             {inquiryData && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <p className="text-blue-800 text-sm">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+                <p className="text-blue-800 text-xs sm:text-sm">
                   <strong>Inquiry submitted:</strong> {new Date(inquiryData.createdAt || inquiryData.created_at).toLocaleDateString()}
                 </p>
               </div>
             )}
 
-            <div className="bg-slate-50 rounded-lg p-4">
-              <h3 className="font-semibold text-slate-900 mb-2">What happens next?</h3>
-              <ul className="text-sm text-slate-600 space-y-1 text-left">
+            <div className="bg-slate-50 rounded-lg p-3 sm:p-4">
+              <h3 className="font-semibold text-slate-900 mb-2 text-sm sm:text-base">What happens next?</h3>
+              <ul className="text-xs sm:text-sm text-slate-600 space-y-1 text-left">
                 <li>• Our team will review your inquiry</li>
                 <li>• Your business card will be generated</li>
                 <li>• You'll receive a notification when it's ready</li>
@@ -559,27 +559,27 @@ export default function MyCard() {
   // Only show form if user has no inquiries (one inquiry per user rule)
   // hasInquiries check ensures form is never shown if user already submitted inquiry
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-slate-900 mb-2">Submit Your Inquiry</h1>
-        <p className="text-slate-600 text-lg">
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Submit Your Inquiry</h1>
+        <p className="text-slate-600 text-base sm:text-lg">
           Fill in your information to submit an inquiry for your business card
         </p>
         {cardGenerated && (
-          <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
-            <p className="text-green-800 text-sm">
+          <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
+            <p className="text-green-800 text-xs sm:text-sm">
               <strong>Your business card is ready!</strong> Check the "My Card" section to view and share it.
             </p>
           </div>
         )}
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 p-8">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 lg:p-8">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-red-800">{error}</p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 flex gap-3">
+              <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <p className="text-red-800 text-sm sm:text-base">{error}</p>
             </div>
           )}
 
@@ -592,7 +592,7 @@ export default function MyCard() {
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
               placeholder="John Doe"
               disabled={creating}
             />
@@ -607,7 +607,7 @@ export default function MyCard() {
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
               placeholder="john@example.com"
               disabled={creating}
             />
@@ -622,7 +622,7 @@ export default function MyCard() {
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
               placeholder="+1 (555) 123-4567"
               disabled={creating}
             />
@@ -639,7 +639,7 @@ export default function MyCard() {
               id="business_type"
               value={formData.business_type}
               onChange={(e) => setFormData({ ...formData, business_type: e.target.value })}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
               disabled={creating}
             >
               <option value="">Select a business type</option>
@@ -663,7 +663,7 @@ export default function MyCard() {
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               rows={3}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all resize-none"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all resize-none text-sm sm:text-base"
               placeholder="Tell us about your specific requirements or any additional information..."
               disabled={creating}
             />
@@ -672,9 +672,9 @@ export default function MyCard() {
           <button
             type="submit"
             disabled={creating}
-            className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
           >
-            <CreditCard className="w-5 h-5" />
+            <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
             {creating ? 'Submitting...' : 'Submit Inquiry'}
           </button>
         </form>

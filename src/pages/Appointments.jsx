@@ -297,12 +297,12 @@ export default function Appointments() {
   };
 
   return (
-    <div className="max-w-[95rem] mx-auto font-poppins">
-      <div className="mb-8">
+    <div className="max-w-[95rem] mx-auto font-poppins px-4 sm:px-6 lg:px-8">
+      <div className="mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">Appointments</h1>
-            <p className="text-slate-600 text-lg">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Appointments</h1>
+            <p className="text-slate-600 text-base sm:text-lg">
               Manage your client inquiries and appointment requests
             </p>
           </div>
@@ -311,10 +311,11 @@ export default function Appointments() {
             {appointments.length > 0 && (
               <button
                 onClick={exportToExcel}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
               >
                 <Download className="w-4 h-4" />
-                Export to Excel
+                <span className="hidden sm:inline">Export to Excel</span>
+                <span className="sm:hidden">Export</span>
               </button>
             )}
           </div>
@@ -322,7 +323,7 @@ export default function Appointments() {
 
 
         {/* Filter Controls */}
-        <div className="mt-6 bg-white border border-slate-200 rounded-xl p-6">
+        <div className="mt-4 sm:mt-6 bg-white border border-slate-200 rounded-xl p-4 sm:p-6">
             <div className="flex flex-col md:flex-row gap-4">
               <div className='flex-1'>
                 <label className="block text-sm font-normal text-slate-700 mb-2">
@@ -331,7 +332,7 @@ export default function Appointments() {
                 <select
                   value={filters.status}
                   onChange={(e) => handleStatusFilter(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                 >
                   <option value="">All Statuses</option>
                   <option value="Pending">Pending</option>
@@ -349,7 +350,7 @@ export default function Appointments() {
                   type="date"
                   value={filters.startDate}
                   onChange={(e) => handleDateFilter('startDate', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                 />
               </div>
               
@@ -361,13 +362,13 @@ export default function Appointments() {
                   type="date"
                   value={filters.endDate}
                   onChange={(e) => handleDateFilter('endDate', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                 />
               </div>
-              <div className="flex items-end justify-between">
+              <div className="flex items-end">
                 <button
                   onClick={clearFilters}
-                  className="px-4 py-[9px] text-base text-slate-600 hover:text-slate-800 border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors"
+                  className="w-full md:w-auto px-4 py-2 text-sm sm:text-base text-slate-600 hover:text-slate-800 border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors"
                 >
                   Clear Filters
                 </button>
@@ -376,26 +377,26 @@ export default function Appointments() {
             
             
             
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="mt-4 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
               {loadingCard ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-sm text-blue-700">Loading your card...</span>
+                  <span className="text-xs sm:text-sm text-blue-700">Loading your card...</span>
                 </div>
               ) : userCard ? (
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <CreditCard className="w-5 h-5 text-gray-900" />
-                    <span className="text-base font-normal text-black">
-                      Showing appointments for: <span className="font-semibold">{userCard.name}</span> ({userCard.businessType})
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-gray-900 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm lg:text-base font-normal text-black truncate">
+                      Showing appointments for: <span className="font-semibold">{userCard.name}</span> <span className="hidden sm:inline">({userCard.businessType})</span>
                       {/* {console.log('userCard', userCard)} */}
                     </span>
                   </div>
-                  <div>
+                  <div className="flex-shrink-0">
                     {Array.isArray(appointments) && appointments.length > 0 && (
                         <div>
-                          <h3 className="font-semibold text-gray-900">
-                            Total Appointments: {appointments.length}
+                          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
+                            Total: {appointments.length}
                           </h3>
                         </div>
                       )}
@@ -403,8 +404,8 @@ export default function Appointments() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <CalendarIcon className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm text-blue-700">
+                  <CalendarIcon className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm text-blue-700">
                     No card found. Create a business card first to view appointments.
                   </span>
                 </div>
@@ -414,49 +415,48 @@ export default function Appointments() {
       </div>
 
       {!Array.isArray(appointments) || appointments.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-          <Calendar className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-slate-900 mb-2">
+        <div className="bg-white rounded-xl border border-slate-200 p-8 sm:p-12 text-center">
+          <Calendar className="w-12 h-12 sm:w-16 sm:h-16 text-slate-300 mx-auto mb-4" />
+          <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">
             No appointments found
           </h3>
-          <p className="text-slate-600">
+          <p className="text-sm sm:text-base text-slate-600">
             {!userCard
               ? 'You need to create a business card first. Go to "My Card" to create one.'
-              : 'No appointments have been booked for this card yet.'
-            }
+              : 'No appointments have been booked for this card yet.'}
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+        <div className="bg-white w-full rounded-xl border border-slate-200">
+          <div className="overflow-x-auto sm:mx-0">
+            <table className="w-full min-w-[320px] sm:min-w-[640px]">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Name</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Email</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Phone</th>
-                  {/* <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Status</th> */}
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Message</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Date</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-900">Actions</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-slate-900">Name</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-slate-900">Email</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-slate-900">Phone</th>
+                  {/* <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-slate-900">Status</th> */}
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-slate-900">Message</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-slate-900">Date</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-slate-900">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
                 {Array.isArray(appointments) && appointments.map((appointment) => (
                   <tr key={appointment.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4 text-sm font-normal text-slate-900">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-normal text-slate-900">
                       {appointment.name}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
-                      <div className="flex items-center gap-2">
-                        <Mail className="w-4 h-4" />
-                        {appointment.email}
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-slate-600">
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        <Mail className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                        <span className="truncate max-w-[120px] sm:max-w-none">{appointment.email}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
-                      <div className="flex items-center gap-2">
-                        <Phone className="w-4 h-4" />
-                        {appointment.phone}
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-slate-600">
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        <Phone className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                        <span className="truncate">{appointment.phone}</span>
                       </div>
                     </td>
                     {/* <td className="px-6 py-4">
@@ -474,13 +474,13 @@ export default function Appointments() {
                         {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
                       </span>
                     </td> */}
-                    <td className="px-6 py-4 text-sm text-slate-600 max-w-xs">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-slate-600 max-w-[100px] sm:max-w-xs">
                       {appointment.message ? (
-                        <div className="flex items-start gap-2">
-                          <MessageSquare className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <div className="flex items-start gap-1 sm:gap-2">
+                          <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" />
                           <span className="truncate" title={appointment.message}>
-                            {appointment.message.length > 12 
-                              ? `${appointment.message.substring(0, 12)}...` 
+                            {appointment.message.length > 10 
+                              ? `${appointment.message.substring(0, 10)}...` 
                               : appointment.message}
                           </span>
                         </div>
@@ -488,24 +488,24 @@ export default function Appointments() {
                         <span className="text-slate-400">-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-500">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-slate-500 whitespace-nowrap">
                       {new Date(appointment.created_at || appointment.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric',
                       })}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <button
                         onClick={() => {
                           setSelectedAppointment(appointment);
                           setShowModal(true);
                         }}
-                        className="flex items-center gap-1 px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+                        className="flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
                         title="View full details"
                       >
-                        <Eye className="w-4 h-4" />
-                        Details
+                        <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="hidden sm:inline">Details</span>
                       </button>
                     </td>
                   </tr>
@@ -519,10 +519,10 @@ export default function Appointments() {
 
       {/* Appointment Details Modal */}
       {showModal && selectedAppointment && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-slate-900">Appointment Details</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto m-2 sm:m-0">
+            <div className="sticky top-0 bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">Appointment Details</h2>
               <button
                 onClick={() => {
                   setShowModal(false);
@@ -531,40 +531,40 @@ export default function Appointments() {
                 className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                 aria-label="Close modal"
               >
-                <X className="w-5 h-5 text-slate-600" />
+                <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
               </button>
             </div>
             
-            <div className="px-6 py-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-1 block">Name</label>
+                  <label className="text-xs sm:text-sm font-semibold text-slate-700 mb-1 block">Name</label>
                   <div className="flex items-center gap-2 text-slate-900">
-                    <User className="w-4 h-4 text-slate-500" />
-                    <span>{selectedAppointment.name || 'N/A'}</span>
+                    <User className="w-3 h-3 sm:w-4 sm:h-4 text-slate-500 flex-shrink-0" />
+                    <span className="text-sm sm:text-base break-words">{selectedAppointment.name || 'N/A'}</span>
                   </div>
                 </div>
                 
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-1 block">Email</label>
+                  <label className="text-xs sm:text-sm font-semibold text-slate-700 mb-1 block">Email</label>
                   <div className="flex items-center gap-2 text-slate-600">
-                    <Mail className="w-4 h-4 text-slate-500" />
-                    <span>{selectedAppointment.email || 'N/A'}</span>
+                    <Mail className="w-3 h-3 sm:w-4 sm:h-4 text-slate-500 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm break-all">{selectedAppointment.email || 'N/A'}</span>
                   </div>
                 </div>
                 
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-1 block">Phone</label>
+                  <label className="text-xs sm:text-sm font-semibold text-slate-700 mb-1 block">Phone</label>
                   <div className="flex items-center gap-2 text-slate-600">
-                    <Phone className="w-4 h-4 text-slate-500" />
-                    <span>{selectedAppointment.phone || 'N/A'}</span>
+                    <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-slate-500 flex-shrink-0" />
+                    <span className="text-sm sm:text-base">{selectedAppointment.phone || 'N/A'}</span>
                   </div>
                 </div>
                 
                 {/* <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-1 block">Status</label>
+                  <label className="text-xs sm:text-sm font-semibold text-slate-700 mb-1 block">Status</label>
                   <span
-                    className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                    className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${
                       selectedAppointment.status === 'pending' || selectedAppointment.status === 'Pending'
                         ? 'bg-amber-100 text-amber-700'
                         : selectedAppointment.status === 'confirmed' || selectedAppointment.status === 'Confirmed'
@@ -581,10 +581,10 @@ export default function Appointments() {
                 </div> */}
                 
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-1 block">Date</label>
+                  <label className="text-xs sm:text-sm font-semibold text-slate-700 mb-1 block">Date</label>
                   <div className="flex items-center gap-2 text-slate-600">
-                    <Calendar className="w-4 h-4 text-slate-500" />
-                    <span>
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-slate-500 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm">
                       {new Date(selectedAppointment.created_at || selectedAppointment.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',
@@ -599,11 +599,11 @@ export default function Appointments() {
               
               {selectedAppointment.message && (
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-2 block">Message</label>
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                  <label className="text-xs sm:text-sm font-semibold text-slate-700 mb-2 block">Message</label>
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 sm:p-4">
                     <div className="flex items-start gap-2">
-                      <MessageSquare className="w-5 h-5 text-slate-500 mt-0.5 flex-shrink-0" />
-                      <p className="text-slate-700 whitespace-pre-wrap break-words">
+                      <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs sm:text-sm text-slate-700 whitespace-pre-wrap break-words">
                         {selectedAppointment.message}
                       </p>
                     </div>
@@ -612,13 +612,13 @@ export default function Appointments() {
               )}
             </div>
             
-            <div className="sticky bottom-0 bg-slate-50 border-t border-slate-200 px-6 py-4 flex justify-end">
+            <div className="sticky bottom-0 bg-slate-50 border-t border-slate-200 px-4 sm:px-6 py-3 sm:py-4 flex justify-end">
               <button
                 onClick={() => {
                   setShowModal(false);
                   setSelectedAppointment(null);
                 }}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                className="px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm sm:text-base"
               >
                 Close
               </button>

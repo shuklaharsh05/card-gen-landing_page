@@ -100,11 +100,10 @@ export default function SavedCards() {
 
   const getShareableLink = (card) => {
     // Try different possible paths for shareable link
-    // if (card.shareableLink.includes('http://localhost:5173')) {
-    //   return card.shareableLink
-    // }
-    return card.shareableLink
-    // console.log('Shareable link:', 'http://localhost:5173' + card.shareableLink);
+    if (!card.shareableLink) return null;
+    
+    // Replace teamserver.cloud with www.visitinglink.com
+    return card.shareableLink.replace('teamserver.cloud', 'www.visitinglink.com');
   };
 
   const handleDeleteCard = async (cardId) => {
