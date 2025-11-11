@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { apiService } from '../lib/api.js';
+import { classifyIdentifier, getIdentifierErrorMessage } from '../utils/identifier.js';
 
 const AuthContext = createContext(undefined);
 
@@ -33,8 +34,22 @@ export function AuthProvider({ children }) {
     checkAuth();
   }, []);
 
-  const signUp = async (email, password, name) => {
-    const response = await apiService.signup({ name, email, password });
+  const signUp = async (identifier, password, name) => {
+    const identifierData = classifyIdentifier(identifier);
+
+    if (!identifierData.isValid) {
+      return { error: { message: getIdentifierErrorMessage() } };
+    }
+
+    const normalizedValue = identifierData.value;
+    const payload = {
+      name,
+      email: normalizedValue,
+      password,
+      ...(identifierData.type === 'phone' ? { phone: normalizedValue } : {}),
+    };
+
+    const response = await apiService.signup(payload);
     if (!response.success) {
       return { error: { message: response.error || 'Signup failed' } };
     }
@@ -55,8 +70,21 @@ export function AuthProvider({ children }) {
     return { error: null };
   };
 
-  const signIn = async (email, password) => {
-    const response = await apiService.login({ email, password });
+  const signIn = async (identifier, password) => {
+    const identifierData = classifyIdentifier(identifier);
+
+    if (!identifierData.isValid) {
+      return { error: { message: getIdentifierErrorMessage() } };
+    }
+
+    const normalizedValue = identifierData.value;
+    const credentials = {
+      email: normalizedValue,
+      password,
+      ...(identifierData.type === 'phone' ? { phone: normalizedValue } : {}),
+    };
+
+    const response = await apiService.login(credentials);
     if (!response.success) {
       return { error: { message: response.error || 'Login failed' } };
     }

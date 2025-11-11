@@ -72,10 +72,17 @@ class ApiService {
   }
 
   // Authentication APIs
-  async signup({ name, email, password }) {
+  async signup({ name, email, password, phone }) {
+    const payload = {
+      name,
+      email,
+      password,
+      ...(phone ? { phone } : {}),
+    };
+
     const response = await this.request('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify(payload),
     });
 
     // If signup is successful, store the token
@@ -86,10 +93,16 @@ class ApiService {
     return response;
   }
 
-  async login({ email, password }) {
+  async login({ email, password, phone }) {
+    const payload = {
+      email,
+      password,
+      ...(phone ? { phone } : {}),
+    };
+
     const response = await this.request('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify(payload),
     });
 
     // If login is successful, store the token
