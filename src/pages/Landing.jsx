@@ -20,8 +20,8 @@ function Landing() {
       <Features />
       <FullScreenFeatures />
       {/* <img src="/banner-2.png" alt="getting-started" className='w-full h-full object-cover' /> */}
-      <video src="/banner-phone.mp4" autoPlay loop muted className='w-full h-full object-cover block lg:hidden' />
-      <video src="/banner-desktop.mp4" autoPlay loop muted className='w-full h-full object-cover hidden lg:block' />
+      <video src="/banner-phone.mp4" autoPlay loop muted playsInline className='w-full h-full object-cover block lg:hidden' />
+      <video src="/banner-desktop.mp4" autoPlay loop muted playsInline className='w-full h-full object-cover hidden lg:block' />
       <Gettingstarted />
       <YourPhysicalCard />
       <CustomTemplate />
