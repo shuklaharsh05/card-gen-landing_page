@@ -1,11 +1,11 @@
 "use client";
 import React, { useRef, memo } from "react";
 import { motion, useInView } from "framer-motion";
-
+import { useNavigate } from "react-router-dom";
 function YourPhysicalCard() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.3 });
-
+  const navigate = useNavigate();
   const phoneVariant = {
     hidden: { opacity: 0, x: -150 },
     visible: {
@@ -70,7 +70,7 @@ function YourPhysicalCard() {
               Select your preferred card type to order and enjoy the benefits of
               an NFC-enabled card.
             </p>
-            <button className="mt-6 bg-black text-white md:px-8 px-6 md:py-3 py-2 rounded-full font-medium hover:bg-gray-800 transition duration-200">
+            <button className="mt-6 bg-black text-white md:px-8 px-6 md:py-3 py-2 rounded-full font-medium hover:bg-gray-800 transition duration-200" onClick={() => navigate("/login")}>
               Get Card
             </button>
           </div>
@@ -90,7 +90,7 @@ function YourPhysicalCard() {
               A PVC card equipped with NFC technology that lets you tap and
               share your details effortlessly.
             </p>
-            <button className="mt-6 bg-black text-white md:px-8 px-6 md:py-3 py-2 rounded-full font-medium hover:bg-gray-800 transition duration-200">
+            <button className="mt-6 bg-black text-white md:px-8 px-6 md:py-3 py-2 rounded-full font-medium hover:bg-gray-800 transition duration-200" onClick={() => navigate("/login")}>
               Get Card
             </button>
           </div>

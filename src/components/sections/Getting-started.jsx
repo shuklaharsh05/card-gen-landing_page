@@ -105,7 +105,7 @@ function Gettingstarted() {
             </div>
             <div>
               <a
-                href="/"
+                href="/login"
                 className="bg-black text-white px-6 py-2 rounded-2xl text-sm md:text-xl poppins-semibold"
               >
                 Business Link

@@ -1,8 +1,9 @@
 "use client";
 import React, { useRef, memo } from "react";
 import { motion, useInView } from "framer-motion";
-
+import { useNavigate } from "react-router-dom";
 function Hero() {
+  const navigate = useNavigate();
   // Animation variants
   const fadeUp = {
     hidden: { opacity: 0, y: 40 },
@@ -72,12 +73,12 @@ function Hero() {
 
           {/* Buttons */}
           <div className="flex flex-col md:flex-row justify-center items-center gap-3 md:gap-10 mt-10">
-            <button className="px-5 py-2 md:px-6 mt-2 md:mt-8 md:py-3 border border-[#000000] rounded-[20px] text-sm md:text-base font-medium transition hover:bg-[#2C4AE5] hover:border-white hover:text-white">
-              <span className="bg-gradient-to-r from-[#000000] to-[#004DFF] bg-clip-text text-transparent">
+            <button className="px-5 py-2 md:px-6 mt-2 md:mt-8 md:py-3 border border-[#000000] rounded-[20px] text-sm md:text-base font-medium transition hover:bg-[#2C4AE5] hover:border-white hover:text-white" onClick={() => navigate("/login")}>
+              <span className="bg-gradient-to-r from-[#000000] to-[#004DFF] bg-clip-text text-transparent hover:text-white">
                 Professional Link
               </span>
             </button>
-            <button className="px-8 py-2 md:px-11 md:mt-8 md:py-3 bg-black text-white rounded-[20px] text-sm md:text-base font-medium hover:bg-white hover:text-black border border-black transition">
+            <button className="px-8 py-2 md:px-11 md:mt-8 md:py-3 bg-black text-white rounded-[20px] text-sm md:text-base font-medium hover:bg-white hover:text-black border border-black transition" onClick={() => navigate("/login")}>
               Business Link
             </button>
           </div>

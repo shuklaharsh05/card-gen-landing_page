@@ -1,8 +1,9 @@
 "use client";
 import React, { useRef, memo } from "react";
 import { motion, useInView } from "framer-motion";
-
+import { useNavigate } from "react-router-dom";
 function FullScreenFeatures() {
+  const navigate = useNavigate();
   const sections = [
     {
       heading: "Create Your Business Smart Link",
@@ -74,7 +75,7 @@ function FullScreenFeatures() {
                 </p>
               )}
               {item.button && (
-                <button className="max-w-fit mx-auto md:mx-0 bg-black text-white rounded-2xl px-8 py-3 font-medium hover:opacity-80 transition">
+                <button className="max-w-fit mx-auto md:mx-0 bg-black text-white rounded-2xl px-8 py-3 font-medium hover:opacity-80 transition" onClick={() => navigate("/login")}>
                   {item.button}
                 </button>
               )}

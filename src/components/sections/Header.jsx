@@ -40,10 +40,10 @@ function Header() {
       }`}
     >
       {/* Main Container */}
-      <div className="max-w-[1200px] mx-auto flex items-center justify-between px-4">
+      <div className="max-w-[1250px] mx-auto flex items-center justify-between px-4">
         {/* Left Side */}
         <div className="flex items-center gap-2">
-          <img src="/logo.svg" alt="logo" className="h-16 object-contain" />
+          <img src="/logo.svg" alt="logo" className="h-16 lg:h-[70px] object-contain" />
         </div>
 
         {/* Desktop Buttons */}
