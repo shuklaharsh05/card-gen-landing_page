@@ -44,7 +44,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[url('/mobile-form-bg.webp')] lg:bg-[url('/form-bg.webp')] bg-cover bg-center relative">
+    <div className="min-h-screen bg-[url('/mobile-form-bg.webp')] lg:bg-[url('/form-bg.png')] bg-cover bg-center relative">
       <div className="w-[90%] lg:w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-4 lg:p-8 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 lg:left-auto -right-36 xl:-right-16 2xl:right-10">
         <div className="mb-4 space-y-2">
           <img src="/form-icon.svg" alt="logo" className="h-8 lg:h-12 object-contain mb-4" />
