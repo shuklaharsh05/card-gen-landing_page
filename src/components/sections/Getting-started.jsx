@@ -95,10 +95,10 @@ function Gettingstarted() {
         >
           <div className="w-full md:w-[60%] space-y-4 pl-4 py-8 md:space-y-6 md:my-auto md:pl-12 md:pr-6">
             <div className="md:gap-5 gap-2 flex flex-col">
-              <h3 className="text-lg md:text-3xl lg:text-4xl xl:text-4xl leading-[1.2] lg:leading-[1.5] font-bold">
+              <h3 className="text-base md:text-3xl lg:text-4xl xl:text-4xl leading-[1.2] lg:leading-[1.5] font-bold">
                 Get One Link For your Business Profile
               </h3>
-              <p className="text-sm md:text-md xl:text-lg md:leading-[1.5]">
+              <p className="text-xs md:text-md xl:text-lg md:leading-[1.5]">
                 A universal QR code solution for appointment software, perfect
                 for Business to efficiently schedule all online meetings.
               </p>
