@@ -12,6 +12,7 @@ import SavedCards from './pages/SavedCards.jsx';
 import Inquiry from './pages/Inquiry.jsx';
 import PublicCard from './pages/PublicCard.jsx';
 import AuthCallback from './pages/AuthCallback.jsx';
+import PricingClient from './pages/Pricing.jsx';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/prices" element={<PricingClient />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/card/:id" element={<Inquiry />} />

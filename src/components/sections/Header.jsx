@@ -5,6 +5,7 @@ import { useAuth } from "../../contexts/AuthContext.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 
+
 function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -48,7 +49,7 @@ function Header() {
 
         {/* Desktop Buttons */}
         <div className="hidden md:flex items-center gap-3">
-          <button className="px-5 py-1.5 bg-white text-black rounded-full font-semibold border border-gray-300 hover:bg-gray-100">
+          <button onClick={() => navigate("/prices")} className="px-5 py-1.5 bg-white text-black rounded-full font-semibold border border-gray-300 hover:bg-gray-100">
             Prices
           </button>
           {user ? (

@@ -86,7 +86,7 @@ function Hero() {
       </div>
 
       {/* Mockup Section */}
-      <div className="relative flex justify-center items-center mt-12 md:mt-20 w-full py-16 md:py-14 lg:py-44">
+      <div className="relative flex justify-center items-center mt-12 md:mt-20 w-full py-12 md:py-32 lg:py-56">
         {/* Hero.png */}
         <motion.div
           ref={imgRef}
@@ -107,7 +107,7 @@ function Hero() {
           variants={imageSlideIn}
           initial="hidden"
           animate={imgInView ? "visible" : "hidden"}
-          className="absolute w-full -top-12 md:-top-36 lg:-top-10 flex justify-center"
+          className="absolute w-full -top-16 md:-top-28 lg:-top-10 flex justify-center"
         >
           <motion.img
             src="/Hero-phone.png"

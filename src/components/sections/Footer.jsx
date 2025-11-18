@@ -10,8 +10,7 @@ function Footer() {
         {/* Left Section */}
         <div className="flex flex-col gap-2 items-center md:items-start">
           <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-            <h2 className="text-2xl lg:text-3xl font-semibold tracking-wide">VisitingLink</h2>
-            <FiExternalLink className="text-purple-400 text-4xl" />
+            <img src="/logo.svg" alt="logo" className="h-16 lg:h-[70px] object-contain " />
           </div>
           <p className="text-gray-300 text-sm lg:text-sm leading-relaxed max-w-sm">
             Earn More. Enjoy More. Your Benefits,<br /> Delivered with one link.
