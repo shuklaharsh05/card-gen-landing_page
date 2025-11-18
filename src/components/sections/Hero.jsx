@@ -56,14 +56,16 @@ function Hero() {
           animate={textInView ? "visible" : "hidden"}
           className="flex flex-col items-center justify-center space-y-2 md:space-y-5 z-10 poppins-semibold"
         >
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl poppins-bold leading-tight text-black">
-            Your Entire{" "}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl poppins-bold leading-tight text-black"
+              style={{lineHeight: "5rem"}}
+          >
+            Share your{" "}
             <span className="bg-gradient-to-r from-[#000000] to-[#004DFF] bg-clip-text text-transparent">
-              Profile.
+               Business
             </span>
-            <br /> One Link{" "}
+            <br />Details in One{" "}
             <span className="bg-gradient-to-r from-[#000000] to-[#004DFF] bg-clip-text text-transparent">
-              Away
+              Smart Link
             </span>
           </h1>
 

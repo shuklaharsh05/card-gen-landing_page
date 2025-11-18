@@ -150,3 +150,23 @@
   animation: marquee 25s linear infinite;
   will-change: transform;
 }
+.floating-whatsapp {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 58px;
+  height: 58px;
+  background-color: #25d366;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 9999;
+}
+
+.floating-whatsapp img {
+  width: 34px;
+  height: 34px;
+}

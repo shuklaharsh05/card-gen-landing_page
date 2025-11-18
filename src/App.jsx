@@ -13,6 +13,7 @@ import Inquiry from './pages/Inquiry.jsx';
 import PublicCard from './pages/PublicCard.jsx';
 import AuthCallback from './pages/AuthCallback.jsx';
 import PricingClient from './pages/Pricing.jsx';
+import './index.css'; // make sure your CSS for the button is loaded
 
 function App() {
   return (
@@ -43,6 +44,19 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+
+      {/* Floating WhatsApp Button */}
+      <a
+        href="https://wa.me/919236553585"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="floating-whatsapp"
+      >
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+          alt="WhatsApp"
+        />
+      </a>
     </AuthProvider>
   );
 }
