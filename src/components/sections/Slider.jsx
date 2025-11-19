@@ -50,7 +50,7 @@ function Slider() {
   return (
     <div className="w-full bg-white flex flex-col justify-around items-center gap-10 md:py-0 md:gap-20 md:px-6 xl:px-20 overflow-hidden">
       {/* Top Image Marquee */}
-      <div className="w-full overflow-hidden flex justify-center items-center">
+      <div className="w-full overflow-hidden flex justify-center items-center md:mt-16">
         <motion.div
           className="flex items-center gap-16"
           style={{ willChange: "transform" }}

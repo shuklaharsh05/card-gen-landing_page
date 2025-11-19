@@ -56,18 +56,26 @@ function Hero() {
           animate={textInView ? "visible" : "hidden"}
           className="flex flex-col items-center justify-center space-y-2 md:space-y-5 z-10 poppins-semibold"
         >
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl poppins-bold leading-tight text-black"
-              style={{lineHeight: "5rem"}}
-          >
-            Share your{" "}
-            <span className="bg-gradient-to-r from-[#000000] to-[#004DFF] bg-clip-text text-transparent">
-               Business
-            </span>
-            <br />Details in One{" "}
-            <span className="bg-gradient-to-r from-[#000000] to-[#004DFF] bg-clip-text text-transparent">
-              Smart Link
-            </span>
-          </h1>
+        <h1
+          className="
+            text-2xl md:text-4xl lg:text-7xl 
+            poppins-bold 
+            leading-[2rem] 
+            md:leading-[3rem] 
+            lg:leading-[5rem]
+            text-black
+          "
+        >
+          Share your{" "}
+          <span className="bg-gradient-to-r from-[#000000] to-[#004DFF] bg-clip-text text-transparent">
+            Business
+          </span>
+          <br />
+          Details in One{" "}
+          <span className="bg-gradient-to-r from-[#000000] to-[#004DFF] bg-clip-text text-transparent">
+            Smart Link
+          </span>
+        </h1>
 
           <p className="text-black font-semibold text-sm sm:text-base md:text-3xl poppins-light max-w-[600px]">
             All information in <span className="font-bold">one link.</span> Get one card.
