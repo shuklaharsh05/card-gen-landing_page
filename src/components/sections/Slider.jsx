@@ -48,7 +48,7 @@ function Slider() {
   const marqueeImages = [...images, ...images, ...images, ...images, ...images, ...images];
 
   return (
-    <div className="w-full bg-white flex flex-col justify-around items-center gap-10 md:py-0 md:gap-20 md:px-6 xl:px-20 overflow-hidden">
+    <div className="w-full bg-white flex flex-col justify-around items-center gap-10 md:py-0 md:gap-20 md:px-6 xl:px-20 md:mt-44 lg:mt-96 overflow-hidden">
       {/* Top Image Marquee */}
       <div className="w-full overflow-hidden flex justify-center items-center md:mt-16">
         <motion.div
@@ -75,7 +75,7 @@ function Slider() {
       </div>
 
       {/* Stats Section */}
-      <div className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto gap-4 md:gap-4 xl:gap-14 px-6 md:px-0 lg:py-10">
+      <div className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto gap-4 md:gap-4 xl:gap-14 px-6 md:px-0 lg:py-10 mt-8">
         {/* 1️⃣ */}
         <div className="flex flex-col items-center justify-around bg-[#71efe8]/[0.16] rounded-2xl p-5 md:p-6 xl:p-4">
           <div className="md:w-full w-28 h-20 md:h-32 flex justify-center items-center">
@@ -86,22 +86,22 @@ function Slider() {
             />
           </div>
           <div>
-          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-center mt-2">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-center mt-10 md:mt-2">
             <CountUp to={1200} step={16} duration={1.5} />+
           </h1>
-          <p className="text-sm text-gray-700 text-center text-nowrap">
-            Trusted Businesses Profile
+          <p className="text-sm text-gray-700 text-center">
+            Trusted Profile
           </p>
           </div>
         </div>
 
         {/* 2️⃣ */}
         <div className="flex flex-col items-center justify-around bg-[#71efe8]/[0.16] rounded-2xl p-5 md:p-6 xl:p-4">
-          <div className="w-full h-20 md:h-32 flex justify-center items-center">
+          <div className="w-full h-32 md:h-32 flex justify-center items-center">
             <img
               src="/2.png"
               alt="stat-2"
-              className="object-contain w-28 h-full md:w-44 md:h-44 animate-bounce-gentle"
+              className="object-contain w-32 h-full md:w-44 md:h-44 animate-bounce-gentle"
             />
           </div>
           <div>
@@ -114,7 +114,7 @@ function Slider() {
 
         {/* 3️⃣ */}
         <div className="flex flex-col items-center justify-around bg-[#71efe8]/[0.16] rounded-2xl p-5 md:p-6 xl:p-4">
-          <div className="md:w-full w-16 h-20 md:h-32 flex justify-center items-center">
+          <div className="md:w-full w-32 h-20 md:h-32 flex justify-center items-center">
             <img
               src="/3.png"
               alt="stat-3"

@@ -75,7 +75,7 @@ function FullScreenFeatures() {
                 </p>
               )}
               {item.button && (
-                <button className="max-w-fit mx-auto md:mx-0 bg-black text-white rounded-2xl px-8 py-3 font-medium hover:opacity-80 transition" onClick={() => navigate("/login")}>
+                <button className="hidden md:block max-w-fit mt-8 mx-auto md:mx-0 bg-black text-white rounded-2xl px-8 py-3 font-medium hover:opacity-80 transition" onClick={() => navigate("/login")}>
                   {item.button}
                 </button>
               )}
@@ -93,6 +93,11 @@ function FullScreenFeatures() {
                   className="w-full object-contain "
                 />
               </motion.div>
+            )}
+            {item.button && (
+              <button className="md:hidden max-w-fit mt-8 mx-auto md:mx-0 bg-black text-white rounded-2xl px-8 py-3 font-medium hover:opacity-80 transition" onClick={() => navigate("/login")}>
+                {item.button}
+              </button>
             )}
           </motion.div>
         );

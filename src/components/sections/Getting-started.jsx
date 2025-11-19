@@ -119,13 +119,13 @@ function Gettingstarted() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
-            className="max-w-52 md:max-w-96 lg:overflow-visible"
+            className="max-w-96 md:max-w-96 lg:overflow-visible "
           >
-            <div className="relative xl:-top-[30px] md:-top-[37.5px] lg:top-[20px] top-[7px]">
+            <div className="relative xl:-top-[30px] md:-top-[37.5px] lg:top-[20px] top-[0px]">
               <img
                 src="/person.png"
                 alt="your-physical-card"
-                className="scale-150 md:scale-125 lg:scale-150 h-[200px] md:h-[300px]"
+                className="scale-125 md:scale-125 lg:scale-150 h-[200px] w-[400px] md:w-full md:h-[300px]"
               />
             </div>
           </motion.div>

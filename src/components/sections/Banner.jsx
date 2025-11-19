@@ -16,9 +16,11 @@ export default function Banner() {
         <p className="text-gray-700 text-base lg:text-2xl md:mt-4 lg:mt-8 leading-relaxed poppins-regular">
           Create one smart link for{" "}
           <span className="bg-gradient-to-r from-gray-600 to-[#004DFF] bg-clip-text text-transparent font-semibold">
-            all your business
-            <br />
+            all your business{" "}<br className="lg:hidden block" />
+
           </span>
+          {/* Responsive line break */}
+          <br className="hidden lg:block" />
           and social media{" "}
           <span className="bg-gradient-to-r from-gray-600 to-[#004DFF] bg-clip-text text-transparent font-semibold">
             profiles.

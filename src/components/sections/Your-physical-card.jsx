@@ -112,7 +112,7 @@ function YourPhysicalCard() {
           <img
             src="/phone-card.png"
             alt="Phone"
-            className="w-auto drop-shadow-2xl"
+            className="w-auto scale-110 drop-shadow-2xl"
           />
         </motion.div>
 

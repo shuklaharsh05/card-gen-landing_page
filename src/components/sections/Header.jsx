@@ -43,9 +43,9 @@ function Header() {
       {/* Main Container */}
       <div className="max-w-[1250px] mx-auto flex items-center justify-between px-4">
         {/* Left Side */}
-        <div className="flex items-center gap-2">
+        <a href="/" className="flex items-center gap-2">
           <img src="/logo.svg" alt="logo" className="h-16 lg:h-[70px] object-contain" />
-        </div>
+        </a>
 
         {/* Desktop Buttons */}
         <div className="hidden md:flex items-center gap-3">

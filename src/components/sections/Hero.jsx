@@ -46,7 +46,7 @@ function Hero() {
   const imgInView = useInView(imgRef, { once: true, amount: 0.4 });
 
   return (
-    <section className="w-full bg-white overflow-hidden py-14 pt-32 md:pt-56 min-h-screen">
+    <section className="w-full bg-white overflow-hidden transform translate-y-1/4 min-h-screen pb-32">
       <div className="mx-auto flex flex-col items-center text-center px-6 relative">
         {/* Text Section */}
         <motion.div
@@ -54,11 +54,11 @@ function Hero() {
           variants={fadeUp}
           initial="hidden"
           animate={textInView ? "visible" : "hidden"}
-          className="flex flex-col items-center justify-center space-y-2 md:space-y-5 z-10 poppins-semibold"
+          className="flex flex-col items-center justify-center space-y-5 md:space-y-5 z-10 poppins-semibold"
         >
         <h1
           className="
-            text-2xl md:text-4xl lg:text-7xl 
+            text-2xl md:text-4xl lg:text-6xl 
             poppins-bold 
             leading-[2rem] 
             md:leading-[3rem] 
@@ -82,13 +82,13 @@ function Hero() {
           </p>
 
           {/* Buttons */}
-          <div className="flex flex-col md:flex-row justify-center items-center gap-3 md:gap-10 mt-10">
-            <button className="px-5 py-2 md:px-6 mt-2 md:mt-8 md:py-3 border border-[#000000] rounded-[20px] text-sm md:text-base font-medium transition hover:bg-[#2C4AE5] hover:border-white hover:text-white" onClick={() => navigate("/login")}>
+          <div className="flex flex-row justify-center items-center gap-3 md:gap-10 mt-32">
+            <button className="px-5 py-2 md:px-6 md:py-3 border border-[#000000] rounded-[20px] text-xs md:text-base font-medium transition hover:bg-[#2C4AE5] hover:border-white hover:text-white" onClick={() => navigate("/login")}>
               <span className="bg-gradient-to-r from-[#000000] to-[#004DFF] bg-clip-text text-transparent hover:text-white">
                 Professional Link
               </span>
             </button>
-            <button className="px-8 py-2 md:px-11 md:mt-8 md:py-3 bg-black text-white rounded-[20px] text-sm md:text-base font-medium hover:bg-white hover:text-black border border-black transition" onClick={() => navigate("/login")}>
+            <button className="px-8 py-2 md:px-11 md:py-3 bg-black text-white rounded-[20px] text-xs md:text-base font-medium hover:bg-white hover:text-black border border-black transition" onClick={() => navigate("/login")}>
               Business Link
             </button>
           </div>
@@ -117,12 +117,12 @@ function Hero() {
           variants={imageSlideIn}
           initial="hidden"
           animate={imgInView ? "visible" : "hidden"}
-          className="absolute w-full -top-16 md:-top-28 lg:-top-10 flex justify-center"
+          className="absolute w-full -top-16 md:-top-28 lg:-top-30 flex justify-center"
         >
           <motion.img
             src="/Hero-phone.png"
             alt="Phone Mockup"
-            className="lg:min-w-[70%] scale-75 md:scale-75 lg:scale-100 mx-auto z-20 drop-shadow-2xl"
+            className="lg:min-w-[70%] scale-75 md:scale-50 lg:scale-75 mx-auto z-20 drop-shadow-2xl"
           />
         </motion.div>
       </div>

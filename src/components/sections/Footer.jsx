@@ -5,19 +5,19 @@ import { FiExternalLink, FiSearch } from "react-icons/fi";
 function Footer() {
   return (
     <footer className="bg-black text-white">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-10 md:py-6 xl:py-10 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 items-start text-center md:text-left space-y-10 md:space-y-0">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-6 pt-12 md:py-6 xl:py-10 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 items-start text-center md:text-left space-y-0 md:space-y-0">
         
         {/* Left Section */}
-        <div className="flex flex-col gap-2 items-center md:items-start">
+        <div className="flex flex-col md:gap-2 items-center md:items-start">
           <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-            <img src="/Footer-logo.png" alt="logo" className="h-16 lg:h-[50px] object-contain " />
+            <img src="/Footer-logo.png" alt="logo" className="h-8 md:h-16 lg:h-[50px] object-contain " />
           </div>
-          <p className="text-gray-300 text-sm lg:text-sm leading-relaxed max-w-sm">
+          <p className="text-gray-300 mt-1 text-sm lg:text-sm leading-relaxed max-w-sm">
             Earn More. Enjoy More. Your Benefits,<br /> Delivered with one link.
           </p>
 
           {/* Search bar */}
-          <div className="relative mt-8 w-full md:w-[90%] max-w-xs -ml-1">
+          <div className="relative mt-3 md:mt-8 w-full md:w-[90%] max-w-xs -ml-1">
             <input
               type="text"
               placeholder="Search..."
@@ -25,6 +25,9 @@ function Footer() {
             />
             <FiSearch className="absolute right-5 top-1/2 -translate-y-1/2 text-white/80 text-lg" />
           </div>
+          {/* <div className="flex md:hidden items-center justify-center md:justify-start gap-2">
+            <img src="/Footer-logo.png" alt="logo" className="h-8 md:h-16 lg:h-[50px] object-contain " />
+          </div> */}
         </div>
 
         {/* Middle Section */}
@@ -71,7 +74,7 @@ function Footer() {
       </div>
 
       {/* Divider + Copyright */}
-      <div className="py-8 text-center text-sm sm:text-base text-white">
+      <div className="md:py-8 py-4 text-center text-sm sm:text-base text-white">
         © 2025 Visitinglink. All Rights Reserved.
       </div>
     </footer>
