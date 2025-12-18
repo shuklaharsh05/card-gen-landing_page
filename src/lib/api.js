@@ -359,6 +359,25 @@ class ApiService {
     });
   }
 
+  // Payment APIs
+  async createPaymentOrder(inquiryId, amount) {
+    return this.request('/payment/create-order', {
+      method: 'POST',
+      body: JSON.stringify({ inquiryId, amount }),
+    });
+  }
+
+  async verifyPayment({ razorpay_order_id, razorpay_payment_id, razorpay_signature }) {
+    return this.request('/payment/verify', {
+      method: 'POST',
+      body: JSON.stringify({
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+      }),
+    });
+  }
+
   // Dashboard stats
 
   // Additional helper methods for user profile data
@@ -465,5 +484,7 @@ export const {
   getAppointments,
   getCardAppointments,
   updateAppointmentStatus,
-  deleteAppointment
+  deleteAppointment,
+  createPaymentOrder,
+  verifyPayment
 } = apiService;
