@@ -11,7 +11,10 @@ import {
   AlertCircle,
   ExternalLink,
   Trash2,
-  Edit
+  Edit,
+  ChevronRight,
+  Search,
+  X
 } from 'lucide-react';
 
 export default function SavedCards() {
@@ -21,6 +24,7 @@ export default function SavedCards() {
   const [error, setError] = useState('');
   const [copiedCardId, setCopiedCardId] = useState(null);
   const [deletingCardId, setDeletingCardId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchSavedCards = async () => {
@@ -88,15 +92,55 @@ export default function SavedCards() {
            'Unnamed Card';
   };
 
-  const getCardType = (card) => {
+  // const getCardType = (card) => {
+  //   // Try different possible paths for card type
+  //   return card.data?.categoryId || 
+  //          card.data?.customCardData?.business_type ||
+  //          card.data?.business_type || 
+  //          card.categoryId || 
+  //          card.business_type || 
+  //          'Business';
+  // };
+  const getCardTagline = (card) => {
     // Try different possible paths for card type
-    return card.data?.categoryId || 
-           card.data?.customCardData?.business_type ||
-           card.data?.business_type || 
-           card.categoryId || 
-           card.business_type || 
-           'Business';
-  };
+    return card.data?.tagline || 
+           card.data?.customCardData?.tagline ||
+           card.data?.tagline || 
+           'No tagline';
+  }
+
+  const getCardLogo = (card) => {
+    return card.data?.logo || 
+           card.data?.customCardData?.profilePicture || 
+           card.data?.customCardData?.profileImage || 
+           card.data?.logo || 
+           'No logo';
+  }
+
+  const getCardAbout = (card) => {
+    const about = card.data?.about || 
+           card.data?.customCardData?.about.description || 
+           card.data?.about.description || 
+           card.data?.customCardData?.about || 
+           card.data?.about || 
+           'No about';
+    return about.length > 100 ? about.substring(0, 100) + '...' : about;
+  }
+
+  const getCardEmail = (card) => {
+    return card.data?.email || 
+           card.email || 
+           card.data?.customCardData?.contact?.email ||
+           '';
+  }
+
+  const getCardPhone = (card) => {
+    return card.data?.phoneNumber || 
+           card.data?.phone || 
+           card.phone || 
+           card.data?.customCardData?.contact?.phone ||
+           '';
+  }
 
   const getShareableLink = (card) => {
     // Try different possible paths for shareable link
@@ -202,16 +246,65 @@ export default function SavedCards() {
     );
   }
 
+  // Filter cards based on search query
+  const filteredCards = savedCards.filter((card) => {
+    if (!searchQuery.trim()) return true;
+    
+    const query = searchQuery.toLowerCase().trim();
+    const companyName = getCardName(card).toLowerCase();
+    const email = getCardEmail(card).toLowerCase();
+    const phone = getCardPhone(card).toLowerCase();
+    
+    return companyName.includes(query) || 
+           email.includes(query) || 
+           phone.includes(query);
+  });
+
   return (
-    <div className="max-w-[95rem] mx-auto font-poppins">
+    <div className="max-w-[95rem] mx-auto font-poppins px-4 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-slate-900 mb-2">Saved Cards</h1>
-        <p className="text-slate-600 text-lg">
-          {savedCards.length > 0 
-            ? `You have ${savedCards.length} saved business card${savedCards.length > 1 ? 's' : ''}`
-            : 'You haven\'t saved any business cards yet'
-          }
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Saved Cards</h1>
+            <p className="text-slate-600 text-base sm:text-lg">
+              {savedCards.length > 0 
+                ? `You have ${savedCards.length} saved business card${savedCards.length > 1 ? 's' : ''}`
+                : 'You haven\'t saved any business cards yet'
+              }
+            </p>
+          </div>
+          
+          {savedCards.length > 0 && (
+            <div className="relative w-full sm:w-auto sm:min-w-[300px] lg:min-w-[500px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-800" />
+              <input
+                type="text"
+                placeholder="Search your saved cards"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-full focus:outline-1 focus:outline-black transition-all text-sm sm:text-base"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+        
+        {searchQuery && (
+          <p className="text-sm text-slate-600">
+            {filteredCards.length === 0 
+              ? 'No cards found matching your search.'
+              : `Found ${filteredCards.length} card${filteredCards.length > 1 ? 's' : ''} matching "${searchQuery}"`
+            }
+          </p>
+        )}
       </div>
 
       {savedCards.length === 0 ? (
@@ -223,32 +316,43 @@ export default function SavedCards() {
           </p>
         
         </div>
+      ) : filteredCards.length === 0 ? (
+        <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
+          <Search className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-slate-900 mb-2">No Cards Found</h3>
+          <p className="text-slate-600 mb-6">
+            No cards match your search criteria. Try a different search term.
+          </p>
+          <button
+            onClick={() => setSearchQuery('')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Clear Search
+          </button>
+        </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {savedCards.map((card, index) => (
-            <div key={card._id || index} className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-start justify-between mb-4">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCards.map((card, index) => (
+            <div key={card._id || index} className="bg-white rounded-3xl p-6 relative" style={{ boxShadow: '0 4px 2px 0 rgba(0, 0, 0, 0.1)' }}>
+              <div className="flex items-center gap-4 mb-4">
+
+                <div className="p-1.5 bg-gradient-to-b from-[#e6e5e5] to-[#bfbfbf] rounded-full aspect-square">
+                <img src={getCardLogo(card)} alt={getCardName(card)} className="w-28 min-w-20 border-2 border-white rounded-full object-contain object-center aspect-square" />
+                </div>
                 <div className="">
                 <h3 className="text-lg font-bold text-slate-900 uppercase">
                   {getCardName(card)}
                 </h3>
-                <p className="text-sm text-slate-600 font-normal capitalize">
+                <p className="text-sm text-slate-600 font-normal capitalize mb-1">
                 {/* {getCardName(card)} */}
-                  {getCardType(card)}
+                  {/* {getCardType(card)} */}
+                  {getCardTagline(card)}
+                </p>
+                <p className="text-[12px] text-slate-600 font-normal capitalize leading-tight">
+                  {getCardAbout(card)}
                 </p>
                 </div>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => copyToClipboard(card)}
-                    className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                    title="Copy link"
-                  >
-                    {copiedCardId === card._id ? (
-                      <CheckCircle className="w-4 h-4 text-green-600" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </button>
+                <div className="absolute top-2 right-2">
                   <button
                     onClick={() => handleDeleteCard(card._id)}
                     disabled={deletingCardId === card._id}
@@ -266,29 +370,30 @@ export default function SavedCards() {
                     )}
                   </button>
                 </div>
+
+                <div className="absolute bottom-3 right-4">
+                 {getShareableLink(card) ? (
+                   <a
+                     href={getShareableLink(card)}
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     className="w-4 h-4"
+                   >
+                     <img src="/arrow.svg" alt="View Card" className="w-[18px]" />
+                   </a>
+                 ) : (
+                   <button
+                     disabled
+                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-300 text-slate-500 rounded-lg text-sm font-normal cursor-not-allowed"
+                   >
+                     No Link
+                   </button>
+                 )}
+                 </div>
               </div>
 
-              <div className="mb-4">
-                {/* <h3 className="text-lg font-bold text-slate-900 mb-1 uppercase">
-                  {getCardName(card)}
-                </h3>
-                <p className="text-sm text-slate-600 mb-2 capitalize">
-                  {getCardType(card)}
-                </p> */}
-                {/* <div className="flex items-center gap-2 text-xs text-slate-500">
-                  <Calendar className="w-3 h-3" />
-                  <span>Created {new Date(card.createdAt || card.created_at).toLocaleDateString()}</span>
-                </div> */}
-              </div>
 
-               <div className="space-y-2 mb-6">
-                 {/* <div className="flex items-center justify-between">
-                   <div className="flex items-center gap-2 text-slate-600">
-                     <Eye className="w-4 h-4" />
-                     <span className="text-sm">Views</span>
-                   </div>
-                   <span className="font-semibold text-slate-900">{card.views || 0}</span>
-                 </div> */}
+               {/* <div className="space-y-2 mb-6">
                  
                  {(card.data?.email || card.email || card.data?.customCardData?.contact.email) && (
                    <div className="flex items-center justify-between">
@@ -317,37 +422,10 @@ export default function SavedCards() {
                    </div>
                  )}
 
-                 {/* {getShareableLink(card) && (
-                   <div className="flex items-center justify-between">
-                     <span className="text-sm text-slate-600">Link</span>
-                     <span className="text-xs font-normal text-blue-600 truncate max-w-32">
-                       {getShareableLink(card).substring(0, 30)}...
-                     </span>
-                   </div>
-                 )} */}
-               </div>
+               </div> */}
 
-               <div className="flex gap-2">
-                 {getShareableLink(card) ? (
-                   <a
-                     href={getShareableLink(card)}
-                     target="_blank"
-                     rel="noopener noreferrer"
-                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-normal hover:bg-blue-700 transition-colors"
-                   >
-                     <ExternalLink className="w-4 h-4" />
-                     View Card
-                   </a>
-                 ) : (
-                   <button
-                     disabled
-                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-300 text-slate-500 rounded-lg text-sm font-normal cursor-not-allowed"
-                   >
-                     <ExternalLink className="w-4 h-4" />
-                     No Link
-                   </button>
-                 )}
-                <button
+               
+                {/* <button
                   onClick={() => handleShare(card)}
                   disabled={!getShareableLink(card)}
                   className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-normal transition-colors ${
@@ -358,8 +436,8 @@ export default function SavedCards() {
                 >
                   <Share2 className="w-4 h-4" />
                   Share
-                </button>
-              </div>
+                </button> */}
+
 
               {copiedCardId === card._id && (
                 <div className="mt-3 text-xs text-green-600 flex items-center gap-1">

@@ -14,54 +14,88 @@ export default function PricingClient() {
   const [paymentMessage, setPaymentMessage] = useState("");
 
   const { user } = useAuth();
-  const { initiatePayment, loading: paymentLoading, error: paymentError } = useRazorpay();
+  const {
+    initiatePayment,
+    loading: paymentLoading,
+    error: paymentError,
+  } = useRazorpay();
   const navigate = useNavigate();
 
-  const plans = [
+  const cardPlans = [
     {
-      name: "Base",
-      priceMonthly: 80,
-      priceYearly: 800,
+      name: "Card Lite",
+      price: 899,
       description: "For most businesses that want to optimize web queries.",
       features: [
-        "All limited links",
-        "Own analytics platform",
-        "Chat support",
-        "Optimize hashtags",
-        "Unlimited users",
+        "Digital visiting profile",
+        "Name, photo, designation",
+        "Call, WhatsApp, Email buttons",
+        "Google Map location",
+        "Multi-link buttons",
+        "(Website, Social Media, Review link, etc.)",
+        "Auto-generated clean layout",
+        "QR code + Link",
+        "PVC Physical Visiting link card",
       ],
-      buttonText: "Get Started",
-      featured: false,
+      idealFor: "Individuals, shop owners quick online presence",
     },
     {
-      name: "Pro",
-      priceMonthly: 120,
-      priceYearly: 1200,
+      name: "Card Pro",
+      price: 1299,
       description: "For most businesses that want to optimize web queries.",
       features: [
-        "All limited links",
-        "Own analytics platform",
-        "Chat support",
-        "Optimize hashtags",
-        "Unlimited users",
+        "All Business Profile ( Vision+ Mission )",
+        "Professionally designed profile",
+        "Brand UI & color theme",
+        "Icon-based multi-link section",
+        "About business section",
+        "Services / products list",
+        "Clean, business-ready link",
+        "More trust + better presentation",
+        "All Link Lite Features As well",
+        "PVC Physical Visiting link card",
       ],
-      buttonText: "Get Started",
-      featured: true,
+      idealFor: "Professionals, small businesses, service providers",
+    },
+  ];
+
+  const webPlans = [
+    {
+      name: "Web Lite",
+      price: 2499,
+      description: "For most businesses that want to optimize web queries.",
+      features: [
+        "Digital visiting profile",
+        "Name, photo, designation",
+        "Call, WhatsApp, Email buttons",
+        "Google Map location",
+        "Multi-link buttons",
+        "(Website, Social Media, Review link, etc.)",
+        "Auto-generated clean layout",
+        "QR code + Link",
+        "PVC Physical Visiting link card",
+        "All Business Profile ( Vision+ Mission )",
+        "Professionally designed profile",
+      ],
+      idealFor: "Individuals, shop owners quick online presence",
     },
     {
-      name: "Enterprise",
-      priceMonthly: 260,
-      priceYearly: 2600,
+      name: "Web Pro",
+      price: 3499,
       description: "For most businesses that want to optimize web queries.",
       features: [
-        "All limited links",
-        "Own analytics platform",
-        "Chat support",
-        "Optimize hashtags",
-        "Unlimited users",
+        " Custom-built website, 100% unique",
+        " Tailored brand style and colors",
+        " Clean modern layout with icons",
+        " About, Services, and Contact sections",
+        " Mobile-friendly and fast loading",
+        " Business-ready professional look",
+        " Boosts trust and online presence",
+        " Optional PVC physical link card",
+        " one year AMC ",
+        " 24*7 Chat Support",
       ],
-      buttonText: "Get Started",
-      featured: false,
+      idealFor: "Professionals, small businesses, service providers",
     },
   ];
 
@@ -72,7 +106,9 @@ export default function PricingClient() {
   const handlePlanSelect = async (plan) => {
     // If user is not logged in, redirect to login
     if (!user) {
-      navigate("/login", { state: { from: "/pricing", selectedPlan: plan.name } });
+      navigate("/login", {
+        state: { from: "/pricing", selectedPlan: plan.name },
+      });
       return;
     }
 
@@ -82,7 +118,9 @@ export default function PricingClient() {
 
     if (!inquiryId) {
       setPaymentStatus("error");
-      setPaymentMessage("Please create a business card inquiry first before purchasing a plan.");
+      setPaymentMessage(
+        "Please create a business card inquiry first before purchasing a plan."
+      );
       return;
     }
 
@@ -100,7 +138,9 @@ export default function PricingClient() {
       customerPhone: user.phone || "",
       onSuccess: (data) => {
         setPaymentStatus("success");
-        setPaymentMessage(`Payment successful! Your ${plan.name} plan is now active.`);
+        setPaymentMessage(
+          `Payment successful! Your ${plan.name} plan is now active.`
+        );
         setSelectedPlan(null);
         // Optionally redirect or refresh user data
         // navigate('/dashboard');
@@ -114,181 +154,152 @@ export default function PricingClient() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f9f9ff] py-16 px-4">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-[#1a1a3d]">
-          Simple, transparent pricing
-        </h1>
-        <p className="text-gray-500 mt-2">No contracts. No surprise fees.</p>
+    <div className="bg-[#F1F5FF]">
+      <div>
+        <img src="/Pricing/banner.png" alt="Card Plans" />
+      </div>
 
-        {/* Billing toggle */}
-        <div className="mt-6 inline-flex bg-[#e6ebff] rounded-full p-1">
-          <button
-            onClick={() => setBillingCycle("monthly")}
-            className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-              billingCycle === "monthly"
-                ? "bg-white text-[#2563eb] shadow-md"
-                : "text-gray-600"
-            }`}
-          >
-            MONTHLY
-          </button>
-          <button
-            onClick={() => setBillingCycle("yearly")}
-            className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-              billingCycle === "yearly"
-                ? "bg-white text-[#2563eb] shadow-md"
-                : "text-gray-600"
-            }`}
-          >
-            YEARLY
-          </button>
+      <h1 className="text-center text-2xl md:text-4xl lg:text-6xl font-bold">
+        All Information in One link, One Click{" "}
+      </h1>
+      <p className="text-center text-sm md:text-base lg:text-lg">
+        Digital Business card link{" "}
+      </p>
+
+      <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center">
+          <img src="/Pricing/24-hour.png" alt="Card Lite" />
+          <h2>24*7 Chat Support</h2>
+        </div>
+        <div className="flex items-center justify-center">
+          <img src="/Pricing/cart.png" alt="Card Lite" />
+          <h2>One Time Purchase </h2>
+        </div>
+        <div className="flex items-center justify-center">
+          <img src="/Pricing/refund.png" alt="Card Lite" />
+          <h2>30 Days Design Back Guaranty </h2>
         </div>
       </div>
 
-      {/* Payment Status Messages */}
-      {paymentStatus && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`mb-8 max-w-md w-full mx-auto p-4 rounded-xl flex items-start gap-3 ${
-            paymentStatus === "success"
-              ? "bg-green-50 border border-green-200"
-              : "bg-red-50 border border-red-200"
-          }`}
-        >
-          {paymentStatus === "success" ? (
-            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-          ) : (
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          )}
-          <p
-            className={`text-sm ${
-              paymentStatus === "success" ? "text-green-800" : "text-red-800"
-            }`}
-          >
-            {paymentMessage}
-          </p>
-        </motion.div>
-      )}
-
-      {paymentError && !paymentStatus && (
-        <div className="mb-8 max-w-md w-full mx-auto p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800">{paymentError}</p>
-        </div>
-      )}
-
-      {/* Pricing cards */}
-      <div className="flex flex-col lg:flex-row items-center justify-center gap-8 max-w-6xl w-full">
-        {plans.map((plan, i) => {
-          const isProcessing = paymentLoading && selectedPlan === plan.name;
-          const price = getPrice(plan);
-
-          return (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: i * 0.1 }}
-              className={`relative flex flex-col justify-between text-center p-8 w-full sm:w-[340px] rounded-3xl shadow-lg ${
-                plan.featured
-                  ? "bg-gradient-to-b from-[#567cff] to-[#4361ee] text-white scale-105"
-                  : "bg-white text-[#1a1a3d]"
-              }`}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8 max-w-5xl mx-auto mb-10 lg:mt-12 lg:mb-20">
+        {cardPlans.map((plan) => (
+          <div>
+            <div
+              key={plan.name}
+              className="h-full bg-white border border-gray-100 rounded-3xl p-4"
             >
-              {/* Most popular badge */}
-              {plan.featured && (
-                <div className="absolute top-4 right-4 bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                  MOST POPULAR
+              <div className="flex items-center justify-between w-full mb-4">
+                <h2 className="text-2xl lg:text-3xl font-bold">{plan.name}</h2>
+                <div className="flex flex-col items-center justify-center">
+                  <img
+                    src="/Pricing/view.png"
+                    alt="View Sample"
+                    className="w-10 h-10"
+                  />
+                  <p className="text-[10px]">View Sample</p>
                 </div>
-              )}
-
-              <div>
-                <h2
-                  className={`text-4xl font-bold ${
-                    plan.featured ? "text-white" : "text-[#1a1a3d]"
-                  }`}
-                >
-                  Rs. {price}
-                  <span className="text-lg font-medium">
-                    {" "}
-                    /{billingCycle === "monthly" ? "month" : "year"}
-                  </span>
-                </h2>
-                <h3 className="text-xl font-semibold mt-4">{plan.name}</h3>
-                <p
-                  className={`mt-2 text-sm ${
-                    plan.featured ? "text-white/90" : "text-gray-500"
-                  }`}
-                >
-                  {plan.description}
-                </p>
-
-                <ul className="mt-6 space-y-3 text-sm text-left">
-                  {plan.features.map((feature, idx) => (
-                    <li
-                      key={idx}
-                      className={`flex items-center gap-2 ${
-                        plan.featured ? "text-white" : "text-gray-700"
-                      }`}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-4 h-4 text-[#60a5fa] flex-shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
               </div>
-
+              <div className="space-y-2 w-full">
+                {plan.features.map((feature) => (
+                  <p
+                    key={feature}
+                    className="flex items-center justify-start gap-2"
+                  >
+                    {" "}
+                    <img
+                      src="/Pricing/check.png"
+                      alt="Check"
+                      className="w-5 h-5"
+                    />{" "}
+                    {feature}
+                  </p>
+                ))}
+              </div>
               <button
+                className="flex items-center justify-center bg-black text-white rounded-2xl p-2 w-full mt-4 lg:mt-8"
                 onClick={() => handlePlanSelect(plan)}
-                disabled={paymentLoading}
-                className={`mt-8 w-full py-3 rounded-full text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-                  plan.featured
-                    ? "bg-white text-[#2563eb] hover:bg-gray-100 disabled:bg-gray-200"
-                    : "bg-[#e6ebff] text-[#1a1a3d] hover:bg-[#dce3ff] disabled:bg-gray-200"
-                } disabled:cursor-not-allowed`}
               >
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  plan.buttonText
-                )}
+                <p>Rs. {plan.price}/-</p>
               </button>
-            </motion.div>
-          );
-        })}
+            </div>
+            <div className="flex items-center justify-center">
+              <p className="text-base lg:text-lg font-bold">Ideal For: </p>
+              <p className="text-sm lg:text-base">{plan.idealFor}</p>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Info text for non-logged in users */}
-      {!user && (
-        <p className="mt-8 text-sm text-gray-500 text-center">
-          Please{" "}
-          <button
-            onClick={() => navigate("/login")}
-            className="text-[#2563eb] font-medium hover:underline"
-          >
-            sign in
-          </button>{" "}
-          to purchase a plan.
-        </p>
-      )}
+        <p className="text-center text-sm md:text-base lg:text-lg font-bold">Web Version </p>
+      <h2 className="text-center text-2xl lg:text-3xl font-bold">Visiting Link website Profile </h2>
+      <p className="text-center text-sm md:text-base lg:text-lg">
+      Your Professional Business Profile That impress People 
+      </p>
+
+      <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8 max-w-5xl mx-auto mb-10 lg:mt-12 lg:mb-20">
+        {webPlans.map((plan) => (
+          <div>
+            <div
+              key={plan.name}
+              className="h-full bg-white border border-gray-100 rounded-3xl p-4"
+            >
+              <div className="flex items-center justify-between w-full mb-4">
+                <h2 className="text-2xl lg:text-3xl font-bold">{plan.name}</h2>
+                <div className="flex flex-col items-center justify-center">
+                  <img
+                    src="/Pricing/view.png"
+                    alt="View Sample"
+                    className="w-10 h-10"
+                  />
+                  <p className="text-[10px]">View Sample</p>
+                </div>
+              </div>
+              <div className="space-y-2 w-full">
+                {plan.features.map((feature) => (
+                  <p
+                    key={feature}
+                    className="flex items-center justify-start gap-2"
+                  >
+                    {" "}
+                    <img
+                      src="/Pricing/check.png"
+                      alt="Check"
+                      className="w-5 h-5"
+                    />{" "}
+                    {feature}
+                  </p>
+                ))}
+              </div>
+              <button
+                className="flex items-center justify-center bg-black text-white rounded-2xl p-2 w-full mt-4 lg:mt-8"
+                onClick={() => handlePlanSelect(plan)}
+              >
+                <p>Rs. {plan.price}/-</p>
+              </button>
+            </div>
+            <div className="flex items-center justify-center">
+              <p className="text-base lg:text-lg font-bold">Ideal For: </p>
+              <p className="text-sm lg:text-base">{plan.idealFor}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <img src="/Pricing/botton-banner.png" alt="Web Banner" className="w-full" />
+      <div className="bg-[#A378ED] p-4 rounded-3xl text-white flex items-center justify-between mb-24 lg:mb-40">
+        <div className="max-w-xl">
+          <h2 className="text-2xl lg:text-4xl font-bold">No i want Custom Website Design only</h2>
+          <p className="text-base lg:text-xl mt-4">By our Visiting link Certified Developers.</p>
+        </div>
+        <img src="/Pricing/fireworks.svg" alt="Developer" className="w-full h-full max-w-96" />
+        <div className="max-w-xl">
+          <p className="text-base lg:text-xl">We do custom designs, creating unique pieces tailored to your vision, style, and needs, bringing your ideas into reality beautifully</p>
+          <button className="bg-white text-black rounded-2xl p-2 w-full mt-4 lg:mt-8">Contact Us</button>
+        </div>
+
+      </div>
+      </div>
     </div>
   );
 }
