@@ -1,19 +1,20 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext.jsx';
-import ProtectedRoute from './components/ProtectedRoute.jsx';
-import UserLayout from './components/UserLayout.jsx';
-import Landing from './pages/Landing.jsx';
-import Login from './pages/Login.jsx';
-import Signup from './pages/Signup.jsx';
-import Dashboard from './pages/Dashboard.jsx';
-import Appointments from './pages/Appointments.jsx';
-import MyCard from './pages/MyCard.jsx';
-import SavedCards from './pages/SavedCards.jsx';
-import Inquiry from './pages/Inquiry.jsx';
-import PublicCard from './pages/PublicCard.jsx';
-import AuthCallback from './pages/AuthCallback.jsx';
-import PricingClient from './pages/Pricing.jsx';
-import './index.css'; // make sure your CSS for the button is loaded
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import UserLayout from "./components/UserLayout.jsx";
+import Landing from "./pages/Landing.jsx";
+import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Appointments from "./pages/Appointments.jsx";
+import MyCard from "./pages/MyCard.jsx";
+import SavedCards from "./pages/SavedCards.jsx";
+import Inquiry from "./pages/Inquiry.jsx";
+import PublicCard from "./pages/PublicCard.jsx";
+import AuthCallback from "./pages/AuthCallback.jsx";
+import PricingClient from "./pages/Pricing.jsx";
+import Contacts from "./pages/Contacts.jsx";
+import "./index.css"; // make sure your CSS for the button is loaded
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
             <Route path="appointments" element={<Appointments />} />
             <Route path="my-card" element={<MyCard />} />
             <Route path="saved-cards" element={<SavedCards />} />
+            <Route path="contacts" element={<Contacts />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Route>
         </Routes>

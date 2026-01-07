@@ -378,6 +378,20 @@ class ApiService {
     });
   }
 
+  // Contacts API
+  async getContacts(userId) {
+    return this.request(`/contacts?userId=${encodeURIComponent(userId)}`);
+  }
+
+  // Contacts API
+  async saveContact(contactData) {
+    // contactData should include: userId, name, and optional email, phone, company, designation, notes
+    return this.request('/contacts', {
+      method: 'POST',
+      body: JSON.stringify(contactData),
+    });
+  }
+
   // Dashboard stats
 
   // Additional helper methods for user profile data
@@ -486,5 +500,7 @@ export const {
   updateAppointmentStatus,
   deleteAppointment,
   createPaymentOrder,
-  verifyPayment
+  verifyPayment,
+  getContacts,
+  saveContact
 } = apiService;

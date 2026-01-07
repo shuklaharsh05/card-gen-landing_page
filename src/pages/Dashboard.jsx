@@ -152,7 +152,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="max-w-[95rem] mx-auto font-poppins">
+    <div className="w-full mx-auto font-poppins px-4 sm:px-6 lg:px-8">
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-slate-900 mb-2">
           Welcome back, {userName}!

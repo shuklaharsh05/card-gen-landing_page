@@ -311,11 +311,11 @@ export default function Appointments() {
             {appointments.length > 0 && (
               <button
                 onClick={exportToExcel}
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors"
               >
-                <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">Export to Excel</span>
-                <span className="sm:hidden">Export</span>
+                {/* <Download className="w-4 h-4" /> */}
+                {/* <span className="hidden sm:inline">Export to Excel</span> */}
+                <span>Export</span>
               </button>
             )}
           </div>

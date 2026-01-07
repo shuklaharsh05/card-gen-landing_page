@@ -1,7 +1,16 @@
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext.jsx';
-import { LayoutDashboard, Calendar, CreditCard, LogOut, Menu, X, Bookmark } from 'lucide-react';
-import { useState } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext.jsx";
+import {
+  LayoutDashboard,
+  Calendar,
+  CreditCard,
+  LogOut,
+  Menu,
+  X,
+  Bookmark,
+  Users,
+} from "lucide-react";
+import { useState } from "react";
 
 export default function UserLayout() {
   const location = useLocation();
@@ -11,21 +20,22 @@ export default function UserLayout() {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/');
+    navigate("/");
   };
 
   const navItems = [
-    { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/appointments', icon: Calendar, label: 'Appointments' },
-    { path: '/my-card', icon: CreditCard, label: 'My Card' },
-    { path: '/saved-cards', icon: Bookmark, label: 'Saved Cards' },
+    { path: "/saved-cards", icon: Bookmark, label: "Saved Cards" },
+    { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { path: "/appointments", icon: Calendar, label: "Appointments" },
+    { path: "/my-card", icon: CreditCard, label: "My Card" },
+    { path: "/contacts", icon: Users, label: "Contacts" },
   ];
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
       <aside
         className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
         <div className="h-full flex flex-col">
@@ -47,8 +57,8 @@ export default function UserLayout() {
                   onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                     isActive
-                      ? 'bg-blue-600 text-white shadow-lg'
-                      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "text-slate-300 hover:bg-slate-800 hover:text-white"
                   }`}
                 >
                   <Icon className="w-5 h-5" />
