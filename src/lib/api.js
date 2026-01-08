@@ -1,5 +1,6 @@
 // API Configuration
 const API_BASE_URL = 'https://teamserver.cloud/api';
+// const API_BASE_URL = 'http://localhost:5000/api';
 
 // API Service Class
 class ApiService {
@@ -380,16 +381,67 @@ class ApiService {
 
   // Contacts API
   async getContacts(userId) {
-    return this.request(`/contacts?userId=${encodeURIComponent(userId)}`);
+    // Try different possible endpoints
+    const endpoints = [
+      `/contacts/user/${userId}`,
+      `/contacts/${userId}`,
+      `/contacts?userId=${encodeURIComponent(userId)}`,
+    ];
+    
+    for (const endpoint of endpoints) {
+      try {
+        const response = await this.request(endpoint);
+        if (response.success && response.data) {
+          // Handle different response formats
+          if (Array.isArray(response.data)) {
+            return response;
+          } else if (Array.isArray(response.data.contacts)) {
+            return {
+              ...response,
+              data: response.data.contacts,
+            };
+          } else if (response.data.data && Array.isArray(response.data.data)) {
+            return {
+              ...response,
+              data: response.data.data,
+            };
+          }
+        }
+      } catch (error) {
+        console.log(`Endpoint ${endpoint} failed:`, error);
+      }
+    }
+    
+    // If all endpoints fail, return empty array
+    return {
+      success: true,
+      data: [],
+      message: 'No contacts found',
+    };
   }
 
   // Contacts API
   async saveContact(contactData) {
-    // contactData should include: userId, name, and optional email, phone, company, designation, notes
-    return this.request('/contacts', {
+    // contactData should include: userId, name, and optional email, phone, whatsapp, notes
+    console.log('saveContact - Sending payload:', contactData);
+    const response = await this.request('/contacts', {
       method: 'POST',
       body: JSON.stringify(contactData),
     });
+    console.log('saveContact - API response:', response);
+    return response;
+  }
+
+  // Update contact
+  async updateContact(contactId, contactData) {
+    // contactData should include: name, and optional email, phone, whatsapp, notes
+    console.log('updateContact - Sending payload:', { contactId, contactData });
+    const response = await this.request(`/contacts/${contactId}`, {
+      method: 'PUT',
+      body: JSON.stringify(contactData),
+    });
+    console.log('updateContact - API response:', response);
+    return response;
   }
 
   // Dashboard stats

@@ -6,14 +6,14 @@ import {
   User,
   Mail,
   Phone,
-  Building2,
-  Briefcase,
+  MessageCircle,
   StickyNote,
   CheckCircle,
   AlertCircle,
   Search,
   UserPlus,
   X,
+  Pen,
 } from "lucide-react";
 
 export default function Contacts() {
@@ -29,8 +29,7 @@ export default function Contacts() {
     name: "",
     email: "",
     phone: "",
-    company: "",
-    designation: "",
+    whatsapp: "",
     notes: "",
   });
 
@@ -38,6 +37,8 @@ export default function Contacts() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [sameAsPhone, setSameAsPhone] = useState(false);
+  const [editingContactId, setEditingContactId] = useState(null);
 
   if (!user) {
     return (
@@ -59,20 +60,35 @@ export default function Contacts() {
 
   useEffect(() => {
     const fetchContacts = async () => {
+      if (!user) return;
+
       try {
         setContactsLoading(true);
         setContactsError("");
+        console.log("Fetching contacts for user:", user._id || user.id);
         const res = await apiService.getContacts(user._id || user.id);
-        if (res.success && Array.isArray(res.data)) {
-          setContacts(res.data);
-        } else if (res.success && Array.isArray(res.data?.contacts)) {
-          setContacts(res.data.contacts);
+        console.log("Contacts API response:", res);
+
+        if (res.success) {
+          if (Array.isArray(res.data)) {
+            console.log("Setting contacts (direct array):", res.data);
+            setContacts(res.data);
+          } else if (res.data && Array.isArray(res.data.contacts)) {
+            console.log("Setting contacts (nested):", res.data.contacts);
+            setContacts(res.data.contacts);
+          } else {
+            console.log("No contacts found or invalid format:", res.data);
+            setContacts([]);
+          }
         } else {
+          console.error("Contacts API failed:", res.error);
+          setContactsError(res.error || "Unable to load contacts right now.");
           setContacts([]);
         }
       } catch (err) {
         console.error("Error fetching contacts:", err);
         setContactsError("Unable to load contacts right now.");
+        setContacts([]);
       } finally {
         setContactsLoading(false);
       }
@@ -83,7 +99,56 @@ export default function Contacts() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: value };
+      // If phone number changes and "same as phone" is checked, update WhatsApp
+      if (name === "phone" && sameAsPhone) {
+        updated.whatsapp = value;
+      }
+      return updated;
+    });
+  };
+
+  const handleSameAsPhoneToggle = (e) => {
+    const checked = e.target.checked;
+    setSameAsPhone(checked);
+    if (checked) {
+      // Copy phone to WhatsApp
+      setFormData((prev) => ({ ...prev, whatsapp: prev.phone }));
+    }
+  };
+
+  const handleEditContact = (contact) => {
+    setEditingContactId(contact._id);
+    setFormData({
+      name: contact.name || "",
+      email: contact.email || "",
+      phone: contact.phone || "",
+      whatsapp: contact.whatsapp || "",
+      notes: contact.notes || "",
+    });
+    // Check if WhatsApp is same as phone
+    setSameAsPhone(
+      contact.whatsapp && contact.phone && contact.whatsapp === contact.phone
+    );
+    setSuccessMessage("");
+    setErrorMessage("");
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setEditingContactId(null);
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      whatsapp: "",
+      notes: "",
+    });
+    setSameAsPhone(false);
+    setSuccessMessage("");
+    setErrorMessage("");
   };
 
   const handleSubmit = async (e) => {
@@ -91,50 +156,104 @@ export default function Contacts() {
     setSuccessMessage("");
     setErrorMessage("");
 
-    if (!formData.name.trim()) {
+    const trimmedName = formData.name.trim();
+    if (!trimmedName) {
       setErrorMessage("Name is required.");
+      return;
+    }
+    if (trimmedName.length < 2 || trimmedName.length > 120) {
+      setErrorMessage("Name must be between 2 and 120 characters.");
       return;
     }
 
     setLoading(true);
 
     try {
+      // Build payload - only include fields that have values
       const payload = {
         userId: user._id || user.id,
-        name: formData.name.trim(),
-        email: formData.email.trim() || undefined,
-        phone: formData.phone.trim() || undefined,
-        company: formData.company.trim() || undefined,
-        designation: formData.designation.trim() || undefined,
-        notes: formData.notes.trim() || undefined,
+        name: trimmedName,
       };
 
-      const response = await apiService.saveContact(payload);
+      // Only add optional fields if they have values
+      const trimmedEmail = formData.email.trim();
+      if (trimmedEmail) {
+        payload.email = trimmedEmail;
+      }
+
+      const trimmedPhone = formData.phone.trim();
+      if (trimmedPhone) {
+        payload.phone = trimmedPhone;
+      }
+
+      const trimmedWhatsapp = formData.whatsapp.trim();
+      if (trimmedWhatsapp) {
+        payload.whatsapp = trimmedWhatsapp;
+      }
+
+      const trimmedNotes = formData.notes.trim();
+      if (trimmedNotes) {
+        payload.notes = trimmedNotes;
+      }
+
+      console.log("Saving contact with payload:", payload);
+
+      let response;
+      if (editingContactId) {
+        // Update existing contact
+        response = await apiService.updateContact(editingContactId, payload);
+        setSuccessMessage("Contact updated successfully.");
+      } else {
+        // Create new contact
+        response = await apiService.saveContact(payload);
+        setSuccessMessage("Contact saved successfully.");
+      }
 
       if (!response.success) {
         throw new Error(response.error || "Failed to save contact");
       }
 
-      setSuccessMessage("Contact saved successfully.");
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        company: "",
-        designation: "",
-        notes: "",
-      });
+      // Reset form if creating new contact
+      if (!editingContactId) {
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          whatsapp: "",
+          notes: "",
+        });
+        setSameAsPhone(false);
+      }
       // Refresh contacts list after saving
       try {
         const res = await apiService.getContacts(user._id || user.id);
-        if (res.success && Array.isArray(res.data)) {
-          setContacts(res.data);
-        } else if (res.success && Array.isArray(res.data?.contacts)) {
-          setContacts(res.data.contacts);
+        console.log("Refreshing contacts after save:", res);
+        if (res.success) {
+          if (Array.isArray(res.data)) {
+            setContacts(res.data);
+          } else if (res.data && Array.isArray(res.data.contacts)) {
+            setContacts(res.data.contacts);
+          }
         }
       } catch (err) {
         console.error("Error refreshing contacts:", err);
       }
+      // Close modal after successful save
+      setTimeout(() => {
+        setModalOpen(false);
+        setEditingContactId(null);
+        setSuccessMessage("");
+        if (!editingContactId) {
+          setFormData({
+            name: "",
+            email: "",
+            phone: "",
+            whatsapp: "",
+            notes: "",
+          });
+          setSameAsPhone(false);
+        }
+      }, 1500);
     } catch (err) {
       setErrorMessage(err.message || "Failed to save contact.");
     } finally {
@@ -148,12 +267,12 @@ export default function Contacts() {
     const name = (contact.name || "").toLowerCase();
     const email = (contact.email || "").toLowerCase();
     const phone = (contact.phone || "").toLowerCase();
-    const company = (contact.company || "").toLowerCase();
+    const whatsapp = (contact.whatsapp || "").toLowerCase();
     return (
       name.includes(q) ||
       email.includes(q) ||
       phone.includes(q) ||
-      company.includes(q)
+      whatsapp.includes(q)
     );
   });
 
@@ -200,16 +319,15 @@ export default function Contacts() {
                   name: "",
                   email: "",
                   phone: "",
-                  company: "",
-                  designation: "",
+                  whatsapp: "",
                   notes: "",
                 });
                 setModalOpen(true);
               }}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-slate-300 bg-white text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-slate-300 bg-blue-600 text-xs sm:text-sm font-medium text-white hover:bg-white hover:text-blue-600 hover:border-blue-600 transition-colors"
             >
               <UserPlus className="w-4 h-4" />
-              Save Contact
+              Create Contact
             </button>
             <button
               type="button"
@@ -228,8 +346,7 @@ export default function Contacts() {
                   Name: c.name || "",
                   Email: c.email || "",
                   Phone: c.phone || "",
-                  Company: c.company || "",
-                  Designation: c.designation || "",
+                  "WhatsApp Number": c.whatsapp || "",
                   Notes: c.notes || "",
                 }));
                 const wb = XLSX.utils.book_new();
@@ -238,7 +355,6 @@ export default function Contacts() {
                   { wch: 20 },
                   { wch: 30 },
                   { wch: 18 },
-                  { wch: 25 },
                   { wch: 20 },
                   { wch: 40 },
                 ];
@@ -263,7 +379,7 @@ export default function Contacts() {
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
               }}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-green-600 text-white text-xs sm:text-sm font-medium hover:bg-green-700"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border bg-green-600 text-white text-xs sm:text-sm font-medium hover:bg-white hover:text-green-600 hover:border-green-600 transition-colors"
             >
               Export
             </button>
@@ -330,27 +446,33 @@ export default function Contacts() {
                 contact._id ||
                 `${contact.name}-${contact.phone || contact.email}`
               }
-              className="border border-slate-200 rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              className="border border-slate-200 rounded-xl p-3 sm:p-4 relative group"
             >
-              <div className="min-w-0 flex-1">
-                <p className="text-sm sm:text-base font-semibold text-slate-900">
+              <button
+                onClick={() => handleEditContact(contact)}
+                className="absolute top-3 right-3 p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                aria-label="Edit contact"
+                title="Edit contact"
+              >
+                <Pen className="w-4 h-4" />
+              </button>
+              <div className="min-w-0 flex flex-col lg:flex-row w-full justify-between pr-8">
+                <p className="text-base lg:text-xl font-semibold text-slate-900">
                   {contact.name}
                 </p>
-                <p className="text-xs sm:text-sm text-slate-600">
-                  {[contact.designation, contact.company]
-                    .filter(Boolean)
-                    .join(" · ")}
-                </p>
-                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[11px] sm:text-xs text-slate-600">
-                  {contact.email && <span>{contact.email}</span>}
-                  {contact.phone && <span>{contact.phone}</span>}
+                <div className="mt-1 flex flex-col md:flex-row items-start w-full lg:w-auto gap-1 md:gap-2 text-[12px] lg:text-sm xl:text-base text-slate-600">
+                  {contact.email && <span>Email: {contact.email}</span>}
+                  {contact.phone && <span>Phone: {contact.phone}</span>}
+                  {contact.whatsapp && (
+                    <span>WhatsApp: {contact.whatsapp}</span>
+                  )}
                 </div>
-                {contact.notes && (
-                  <p className="mt-1 text-[11px] sm:text-xs text-slate-500 line-clamp-2">
-                    {contact.notes}
-                  </p>
-                )}
               </div>
+              {contact.notes && (
+                <p className="mt-1 text-xs lg:text-sm xl:text-base text-slate-500 line-clamp-2">
+                  Notes: {contact.notes}
+                </p>
+              )}
             </div>
           ))}
         </div>
@@ -361,11 +483,11 @@ export default function Contacts() {
           <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 sm:p-7">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg sm:text-xl font-semibold text-slate-900">
-                Save Contact
+                {editingContactId ? "Edit Contact" : "Create Contact"}
               </h2>
               <button
                 type="button"
-                onClick={() => setModalOpen(false)}
+                onClick={handleCloseModal}
                 className="p-1.5 rounded-full hover:bg-slate-100"
                 aria-label="Close"
               >
@@ -447,42 +569,34 @@ export default function Contacts() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Company
-                  </label>
-                  <div className="relative">
-                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input
-                      type="text"
-                      name="company"
-                      value={formData.company}
-                      onChange={handleChange}
-                      className="w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm sm:text-base"
-                      placeholder="Acme Inc."
-                      disabled={loading}
-                    />
-                  </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  WhatsApp Number
+                </label>
+                <div className="relative">
+                  <MessageCircle className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type="tel"
+                    name="whatsapp"
+                    value={formData.whatsapp}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm sm:text-base disabled:bg-slate-50 disabled:cursor-not-allowed"
+                    placeholder="+91 98765 43210"
+                    disabled={loading || sameAsPhone}
+                  />
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Designation
-                  </label>
-                  <div className="relative">
-                    <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input
-                      type="text"
-                      name="designation"
-                      value={formData.designation}
-                      onChange={handleChange}
-                      className="w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm sm:text-base"
-                      placeholder="Marketing Manager"
-                      disabled={loading}
-                    />
-                  </div>
-                </div>
+                <label className="flex items-center gap-2 mt-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={sameAsPhone}
+                    onChange={handleSameAsPhoneToggle}
+                    className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
+                    disabled={loading}
+                  />
+                  <span className="text-xs sm:text-sm text-slate-600">
+                    Same as phone number
+                  </span>
+                </label>
               </div>
 
               <div>
@@ -506,7 +620,7 @@ export default function Contacts() {
               <div className="pt-2 flex justify-end gap-3">
                 <button
                   type="button"
-                  onClick={() => setModalOpen(false)}
+                  onClick={handleCloseModal}
                   className="px-4 py-2 text-xs sm:text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100"
                   disabled={loading}
                 >
@@ -517,7 +631,13 @@ export default function Contacts() {
                   disabled={loading}
                   className="inline-flex items-center justify-center px-5 py-2 bg-blue-600 text-white text-xs sm:text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {loading ? "Saving..." : "Save Contact"}
+                  {loading
+                    ? editingContactId
+                      ? "Updating..."
+                      : "Saving..."
+                    : editingContactId
+                    ? "Update Contact"
+                    : "Save Contact"}
                 </button>
               </div>
             </form>

@@ -17,6 +17,11 @@ import {
   Search,
   X,
   UserPlus,
+  MessageCircle,
+  User,
+  Mail,
+  Phone,
+  StickyNote,
 } from "lucide-react";
 
 export default function SavedCards() {
@@ -37,10 +42,10 @@ export default function SavedCards() {
     name: "",
     email: "",
     phone: "",
-    company: "",
-    designation: "",
+    whatsapp: "",
     notes: "",
   });
+  const [sameAsPhone, setSameAsPhone] = useState(false);
 
   useEffect(() => {
     const fetchSavedCards = async () => {
@@ -236,16 +241,32 @@ export default function SavedCards() {
       name: "",
       email: "",
       phone: "",
-      company: "",
-      designation: "",
+      whatsapp: "",
       notes: "",
     });
+    setSameAsPhone(false);
     setContactModalOpen(true);
   };
 
   const handleContactChange = (e) => {
     const { name, value } = e.target;
-    setContactForm((prev) => ({ ...prev, [name]: value }));
+    setContactForm((prev) => {
+      const updated = { ...prev, [name]: value };
+      // If phone number changes and "same as phone" is checked, update WhatsApp
+      if (name === "phone" && sameAsPhone) {
+        updated.whatsapp = value;
+      }
+      return updated;
+    });
+  };
+
+  const handleSameAsPhoneToggle = (e) => {
+    const checked = e.target.checked;
+    setSameAsPhone(checked);
+    if (checked) {
+      // Copy phone to WhatsApp
+      setContactForm((prev) => ({ ...prev, whatsapp: prev.phone }));
+    }
   };
 
   const handleSaveContact = async (e) => {
@@ -254,23 +275,48 @@ export default function SavedCards() {
       setContactError("You must be signed in to save contacts.");
       return;
     }
-    if (!contactForm.name.trim()) {
+    const trimmedName = contactForm.name.trim();
+    if (!trimmedName) {
       setContactError("Name is required.");
+      return;
+    }
+    if (trimmedName.length < 2 || trimmedName.length > 120) {
+      setContactError("Name must be between 2 and 120 characters.");
       return;
     }
     setContactSaving(true);
     setContactError("");
     setContactSuccess("");
     try {
+      // Build payload - only include fields that have values
       const payload = {
         userId: user._id || user.id,
-        name: contactForm.name.trim(),
-        email: contactForm.email.trim() || undefined,
-        phone: contactForm.phone.trim() || undefined,
-        company: contactForm.company.trim() || undefined,
-        designation: contactForm.designation.trim() || undefined,
-        notes: contactForm.notes.trim() || undefined,
+        name: trimmedName,
       };
+
+      // Only add optional fields if they have values
+      const trimmedEmail = contactForm.email.trim();
+      if (trimmedEmail) {
+        payload.email = trimmedEmail;
+      }
+
+      const trimmedPhone = contactForm.phone.trim();
+      if (trimmedPhone) {
+        payload.phone = trimmedPhone;
+      }
+
+      const trimmedWhatsapp = contactForm.whatsapp.trim();
+      if (trimmedWhatsapp) {
+        payload.whatsapp = trimmedWhatsapp;
+      }
+
+      const trimmedNotes = contactForm.notes.trim();
+      if (trimmedNotes) {
+        payload.notes = trimmedNotes;
+      }
+
+      console.log("Saving contact with payload:", payload);
+
       const response = await apiService.saveContact(payload);
       if (!response.success) {
         throw new Error(response.error || "Failed to save contact");
@@ -417,10 +463,10 @@ export default function SavedCards() {
               <button
                 type="button"
                 onClick={openContactModal}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-slate-300 bg-blue-600 text-sm font-medium text-white hover:bg-white hover:text-blue-600 hover:border-blue-600 transition-colors"
               >
                 <UserPlus className="w-4 h-4" />
-                Save Contact
+                Create Contact
               </button>
               <button
                 type="button"
@@ -476,7 +522,7 @@ export default function SavedCards() {
                   document.body.removeChild(link);
                   URL.revokeObjectURL(url);
                 }}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border bg-green-600 text-white text-sm font-medium hover:bg-white hover:text-green-600 hover:border-green-600 transition-colors"
               >
                 Export
               </button>
@@ -523,11 +569,11 @@ export default function SavedCards() {
           </button>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex flex-wrap gap-6">
           {filteredCards.map((card, index) => (
             <div
               key={card._id || index}
-              className="bg-white rounded-3xl p-6 relative"
+              className="bg-white rounded-3xl py-6 px-4 lg:p-6 relative max-w-[500px]"
               style={{ boxShadow: "0 4px 2px 0 rgba(0, 0, 0, 0.1)" }}
             >
               <div className="flex items-center gap-4 mb-4">
@@ -535,19 +581,19 @@ export default function SavedCards() {
                   <img
                     src={getCardLogo(card)}
                     alt={getCardName(card)}
-                    className="w-28 min-w-20 border-2 border-white rounded-full object-contain object-center aspect-square"
+                    className="w-14 lg:w-28 min-w-14 lg:min-w-20 border-2 border-white rounded-full object-contain object-center aspect-square"
                   />
                 </div>
                 <div className="">
-                  <h3 className="text-lg lg:text-xl font-bold text-slate-900 uppercase">
+                  <h3 className="text-lg lg:text-xl leading-tight font-bold text-slate-900 uppercase">
                     {getCardName(card)}
                   </h3>
-                  <p className="text-base lg:text-lg text-slate-600 font-normal capitalize mb-1">
+                  <p className="text-sm lg:text-lg leading-tight text-slate-600 font-normal capitalize mb-1">
                     {/* {getCardName(card)} */}
                     {/* {getCardType(card)} */}
                     {getCardTagline(card)}
                   </p>
-                  <p className="text-xs lg:text-sm text-slate-600 font-normal capitalize leading-tight">
+                  <p className="text-[8px] lg:text-xs text-slate-600 font-normal capitalize leading-tight">
                     {getCardAbout(card)}
                   </p>
                 </div>
@@ -599,50 +645,6 @@ export default function SavedCards() {
                 </div>
               </div>
 
-              {/* <div className="space-y-2 mb-6">
-                 
-                 {(card.data?.email || card.email || card.data?.customCardData?.contact.email) && (
-                   <div className="flex items-center justify-between">
-                     <span className="text-sm text-slate-800 font-normal">Email</span>
-                     <a href={`mailto:${card.data?.email || card.email || card.data?.customCardData?.contact.email}`} className="text-sm font-normal text-blue-700 underline truncate max-w-32">
-                       {card.data?.email || card.email || card.data?.customCardData?.contact.email}
-                     </a>
-                   </div>
-                 )}
-                 
-                 {(card.data?.phoneNumber || card.data?.phone || card.phone || card.data?.customCardData?.contact.phone) && (
-                   <div className="flex items-center justify-between">
-                     <span className="text-sm text-slate-800 font-normal">Phone</span>
-                      <a href={`tel:${card.data?.phoneNumber || card.data?.phone || card.phone || card.data?.customCardData?.contact.phone}`} className="text-sm font-normal text-blue-700 underline">
-                       {card.data?.phoneNumber || card.data?.phone || card.phone || card.data?.customCardData?.contact.phone}
-                     </a>
-                   </div>
-                 )}
-                 
-                 {(card.data?.website || card.website || card.data?.customCardData?.contact.website) && (
-                   <div className="flex items-center justify-between">
-                     <span className="text-sm text-slate-800 font-normal">Website</span>
-                     <a href={card.data?.website || card.website || card.data?.customCardData?.contact.website} className="text-sm font-normal text-blue-700 underline">
-                       {card.data?.website || card.website || card.data?.customCardData?.contact.website}
-                     </a>
-                   </div>
-                 )}
-
-               </div> */}
-
-              {/* <button
-                  onClick={() => handleShare(card)}
-                  disabled={!getShareableLink(card)}
-                  className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-normal transition-colors ${
-                    getShareableLink(card)
-                      ? 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                  }`}
-                >
-                  <Share2 className="w-4 h-4" />
-                  Share
-                </button> */}
-
               {copiedCardId === card._id && (
                 <div className="mt-3 text-xs text-green-600 flex items-center gap-1">
                   <CheckCircle className="w-3 h-3" />
@@ -653,19 +655,6 @@ export default function SavedCards() {
           ))}
         </div>
       )}
-
-      {/* {savedCards.length > 0 && (
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h3 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
-            <Share2 className="w-5 h-5" />
-            Manage Your Cards
-          </h3>
-          <p className="text-blue-700 text-sm">
-            Use the share buttons to distribute your business cards. Each card has its own unique link 
-            that you can share with clients and colleagues. Track views and manage your cards from this page.
-          </p>
-        </div>
-      )} */}
 
       {noDataExportMessage && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
@@ -727,7 +716,7 @@ export default function SavedCards() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 sm:p-7">
             <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-1">
-              Save Contact
+              Create Contact
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 mb-4">
               Quickly save a new contact to your account. You can manage all
@@ -803,41 +792,34 @@ export default function SavedCards() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1.5">
-                    Company
-                  </label>
-                  <div className="relative">
-                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input
-                      type="text"
-                      name="company"
-                      value={contactForm.company}
-                      onChange={handleContactChange}
-                      className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
-                      placeholder="Acme Inc."
-                      disabled={contactSaving}
-                    />
-                  </div>
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1.5">
+                  WhatsApp Number
+                </label>
+                <div className="relative">
+                  <MessageCircle className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="tel"
+                    name="whatsapp"
+                    value={contactForm.whatsapp}
+                    onChange={handleContactChange}
+                    className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm disabled:bg-slate-50 disabled:cursor-not-allowed"
+                    placeholder="+91 98765 43210"
+                    disabled={contactSaving || sameAsPhone}
+                  />
                 </div>
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1.5">
-                    Designation
-                  </label>
-                  <div className="relative">
-                    <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input
-                      type="text"
-                      name="designation"
-                      value={contactForm.designation}
-                      onChange={handleContactChange}
-                      className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
-                      placeholder="Marketing Manager"
-                      disabled={contactSaving}
-                    />
-                  </div>
-                </div>
+                <label className="flex items-center gap-2 mt-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={sameAsPhone}
+                    onChange={handleSameAsPhoneToggle}
+                    className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
+                    disabled={contactSaving}
+                  />
+                  <span className="text-xs text-slate-600">
+                    Same as phone number
+                  </span>
+                </label>
               </div>
 
               <div>

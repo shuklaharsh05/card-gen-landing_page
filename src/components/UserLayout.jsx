@@ -101,7 +101,7 @@ export default function UserLayout() {
           </button>
         </header>
 
-        <main className="flex-1 p-6 lg:p-8">
+        <main className="flex-1 py-4 lg:p-8">
           <Outlet />
         </main>
       </div>

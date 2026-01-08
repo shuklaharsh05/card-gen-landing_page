@@ -1,31 +1,43 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext.jsx';
-import { CreditCard, Mail, Lock, User, AlertCircle } from 'lucide-react';
-import { classifyIdentifier, getIdentifierErrorMessage } from '../utils/identifier.js';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext.jsx";
+import {
+  CreditCard,
+  Mail,
+  Lock,
+  User,
+  AlertCircle,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import {
+  classifyIdentifier,
+  getIdentifierErrorMessage,
+} from "../utils/identifier.js";
 
 export default function Signup() {
-  const [name, setName] = useState('');
-  const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [name, setName] = useState("");
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     if (!name || !identifier || !password) {
-      setError('Please fill in all fields');
+      setError("Please fill in all fields");
       setLoading(false);
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError("Password must be at least 6 characters");
       setLoading(false);
       return;
     }
@@ -44,7 +56,7 @@ export default function Signup() {
       setError(error.message);
       setLoading(false);
     } else {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   };
 
@@ -56,9 +68,17 @@ export default function Signup() {
             <CreditCard className="w-10 h-10 text-blue-600" />
             <span className="text-3xl font-bold text-slate-800">Visiting Links</span>
           </Link> */}
-          <img src="/form-icon.svg" alt="logo" className="h-8 lg:h-12 object-contain mb-4" />
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Create Your Account</h1>
-          <p className="text-slate-600">Start building your digital presence today</p>
+          <img
+            src="/form-icon.svg"
+            alt="logo"
+            className="h-8 lg:h-12 object-contain mb-4"
+          />
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">
+            Create Your Account
+          </h1>
+          <p className="text-slate-600">
+            Start building your digital presence today
+          </p>
         </div>
 
         <div className="bg-white">
@@ -71,7 +91,10 @@ export default function Signup() {
             )}
 
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-slate-700 mb-2"
+              >
                 Full Name
               </label>
               <div className="relative">
@@ -89,7 +112,10 @@ export default function Signup() {
             </div>
 
             <div>
-              <label htmlFor="identifier" className="block text-sm font-medium text-slate-700 mb-2">
+              <label
+                htmlFor="identifier"
+                className="block text-sm font-medium text-slate-700 mb-2"
+              >
                 Email Address or Phone Number
               </label>
               <div className="relative">
@@ -107,39 +133,60 @@ export default function Signup() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-slate-700 mb-2"
+              >
                 Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
+                  className="w-full pl-11 pr-12 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
                   placeholder="••••••••"
                   disabled={loading}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                  disabled={loading}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
               </div>
-              <p className="text-xs text-slate-500 mt-1">Must be at least 6 characters</p>
+              <p className="text-xs text-slate-500 mt-1">
+                Must be at least 6 characters
+              </p>
             </div>
 
             <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 disabled:opacity-50 mt-6 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Creating account...' : 'Create Account'}
-            </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 disabled:opacity-50 mt-6 disabled:cursor-not-allowed"
+              >
+                {loading ? "Creating account..." : "Create Account"}
+              </button>
             </div>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-slate-600">
-              Already have an account?{' '}
-              <Link to="/login" className="text-blue-600 font-semibold hover:text-blue-700">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-blue-600 font-semibold hover:text-blue-700"
+              >
                 Sign in
               </Link>
             </p>
