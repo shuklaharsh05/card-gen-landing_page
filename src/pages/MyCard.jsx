@@ -440,7 +440,7 @@ export default function MyCard() {
           {/* </div> */}
 
           <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
-            <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 lg:p-8">
+            {/* <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 lg:p-8">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3 sm:mb-4">Shareable Link</h2>
               <p className="text-slate-600 mb-3 sm:mb-4 text-sm sm:text-base">Share this link to let others view your card</p>
               <div className="flex flex-col sm:flex-row gap-2">
@@ -460,37 +460,84 @@ export default function MyCard() {
                   )}
                 </button>
               </div>
-            </div>
+            </div> */}
 
-            <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 lg:p-8">
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3 sm:mb-4">QR Code</h2>
-              <p className="text-slate-600 mb-4 sm:mb-6 text-sm sm:text-base">
-                Scan this code to instantly access your business card
-              </p>
-              <div className="bg-white p-4 sm:p-6 rounded-lg border-2 border-slate-200 inline-block" ref={qrContainerRef}>
-                <QRCodeSVG value={siteUrl} size={160} level="H" />
-              </div>
-              <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                <button
-                  onClick={handleDownloadQR}
-                  className="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center gap-2 transition-colors text-sm"
-                >
-                  <Download className="w-4 h-4" />
-                  Download QR
-                </button>
-                <button
-                  onClick={handleShareQR}
-                  className="flex-1 sm:flex-none px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2 transition-colors text-sm"
-                >
-                  <Share2 className="w-4 h-4" />
-                  Share
-                </button>
-              </div>
-              <p className="mt-3 text-xs sm:text-sm text-slate-600 break-all">URL: {siteUrl}</p>
-              <p className="text-xs sm:text-sm text-slate-500 mt-4">
-                Save or print this QR code for easy sharing at events
-              </p>
-            </div>
+<div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6">
+  {/* Header */}
+  <div className="mb-4 sm:mb-5">
+    <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
+      Your QR Code
+    </h2>
+    <p className="mt-1 text-sm sm:text-base text-slate-600">
+      Scan to instantly open your digital business card
+    </p>
+  </div>
+
+  {/* QR Section */}
+  <div className="flex flex-col items-center">
+    <div
+      ref={qrContainerRef}
+      className="relative bg-gradient-to-br from-slate-50 to-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm"
+    >
+      <QRCodeSVG value={siteUrl} size={170} level="H" />
+    </div>
+
+    <p className="mt-3 text-xs sm:text-sm text-slate-500 text-center">
+      Point your camera at the code to open the link
+    </p>
+  </div>
+
+  {/* Actions */}
+  <div className="mt-5 flex flex-col sm:flex-row gap-2">
+    <button
+      onClick={handleDownloadQR}
+      className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-slate-100 hover:bg-slate-200 px-4 py-2.5 text-sm font-medium text-slate-800 transition"
+    >
+      <Download className="w-4 h-4" />
+      Download
+    </button>
+
+    <button
+      onClick={handleShareQR}
+      className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-2.5 text-sm font-medium text-white transition"
+    >
+      <Share2 className="w-4 h-4" />
+      Share
+    </button>
+  </div>
+
+  {/* Link + Copy */}
+  <div className="mt-4 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+    <a
+      href={siteUrl}
+      className="flex-1 text-xs sm:text-sm text-blue-600 hover:text-blue-800 truncate"
+    >
+      {siteUrl || "Link unavailable"}
+    </a>
+
+    <button
+      onClick={copyToClipboard}
+      className={`p-2 rounded-lg transition ${
+        copied
+          ? "bg-green-100 text-green-600"
+          : "bg-blue-600 text-white hover:bg-blue-700"
+      }`}
+      title="Copy link"
+    >
+      {copied ? (
+        <CheckCircle className="w-4 h-4" />
+      ) : (
+        <Copy className="w-4 h-4" />
+      )}
+    </button>
+  </div>
+
+  {/* Footer Hint */}
+  <p className="mt-4 text-xs sm:text-sm text-slate-500 text-center">
+    Perfect for sharing at meetings, events, or on printed material
+  </p>
+</div>
+
           </div>
         </div>
 

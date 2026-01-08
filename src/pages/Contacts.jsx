@@ -439,14 +439,14 @@ export default function Contacts() {
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 mb-6 space-y-3">
+        <div className="p-4 sm:p-6 mb-6 space-y-3">
           {filteredContacts.map((contact) => (
             <div
               key={
                 contact._id ||
                 `${contact.name}-${contact.phone || contact.email}`
               }
-              className="border border-slate-200 rounded-xl p-3 sm:p-4 relative group"
+              className="border border-slate-200 rounded-xl p-3 sm:p-4 relative group" style={{ boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.1)" }}
             >
               <button
                 onClick={() => handleEditContact(contact)}
@@ -456,15 +456,17 @@ export default function Contacts() {
               >
                 <Pen className="w-4 h-4" />
               </button>
-              <div className="min-w-0 flex flex-col lg:flex-row w-full justify-between pr-8">
+              <div className="min-w-0 flex flex-col lg:flex-row w-full items-center justify-between pr-8">
                 <p className="text-base lg:text-xl font-semibold text-slate-900">
                   {contact.name}
                 </p>
-                <div className="mt-1 flex flex-col md:flex-row items-start w-full lg:w-auto gap-1 md:gap-2 text-[12px] lg:text-sm xl:text-base text-slate-600">
-                  {contact.email && <span>Email: {contact.email}</span>}
-                  {contact.phone && <span>Phone: {contact.phone}</span>}
+                <div className="mt-1 lg:mt-0 flex flex-col md:flex-row items-start w-full lg:w-auto gap-1 md:gap-2 text-[12px] lg:text-sm xl:text-base text-slate-600">
+                  {contact.email && <p>Email: {contact.email}</p>}
+                  {contact.phone && <div className="bg-slate-600 w-px h-6" />}
+                  {contact.phone && <p>Phone: {contact.phone}</p>}
+                  {contact.whatsapp && <div className="bg-slate-600 w-px h-6" />}
                   {contact.whatsapp && (
-                    <span>WhatsApp: {contact.whatsapp}</span>
+                    <p>WhatsApp: {contact.whatsapp}</p>
                   )}
                 </div>
               </div>
