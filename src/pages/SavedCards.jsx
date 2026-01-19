@@ -448,7 +448,7 @@ export default function SavedCards() {
                   placeholder="Search your saved cards"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-full focus:outline-1 focus:outline-black transition-all text-sm sm:text-base"
+                  className="w-full pl-10 pr-10 xl:w-96 py-2 border border-slate-300 rounded-full focus:outline-1 focus:outline-black transition-all text-sm sm:text-base"
                 />
                 {searchQuery && (
                   <button
@@ -463,7 +463,7 @@ export default function SavedCards() {
               <button
                 type="button"
                 onClick={openContactModal}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-slate-300 bg-blue-600 text-sm font-medium text-white hover:bg-white hover:text-blue-600 hover:border-blue-600 transition-colors"
+                className="whitespace-nowrap inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-slate-300 bg-blue-600 text-sm font-medium text-white hover:bg-white hover:text-blue-600 hover:border-blue-600 transition-colors"
               >
                 <UserPlus className="w-4 h-4" />
                 Create Contact

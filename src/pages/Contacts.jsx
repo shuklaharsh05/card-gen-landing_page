@@ -280,7 +280,7 @@ export default function Contacts() {
     <div className="w-full mx-auto font-poppins px-4 sm:px-6 lg:px-8">
       <div className="mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3">
-          <div>
+          <div className="w-full sm:w-auto lg:max-w-72 xl:max-w-[20rem] 2xl:max-w-96">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-1">
               Contacts
             </h1>
@@ -297,7 +297,7 @@ export default function Contacts() {
                 placeholder="Search contacts by name, email, phone..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-8 py-2.5 border border-slate-300 rounded-full focus:outline-1 focus:outline-black text-xs sm:text-sm"
+                className="w-full pl-9 pr-8 xl:w-[20rem] 2xl:w-96 py-2 border border-slate-300 rounded-full focus:outline-1 focus:outline-black text-xs sm:text-sm"
               />
               {searchQuery && (
                 <button
@@ -324,7 +324,7 @@ export default function Contacts() {
                 });
                 setModalOpen(true);
               }}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-slate-300 bg-blue-600 text-xs sm:text-sm font-medium text-white hover:bg-white hover:text-blue-600 hover:border-blue-600 transition-colors"
+              className="whitespace-nowrap inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-slate-300 bg-blue-600 text-xs sm:text-sm font-medium text-white hover:bg-white hover:text-blue-600 hover:border-blue-600 transition-colors"
             >
               <UserPlus className="w-4 h-4" />
               Create Contact
