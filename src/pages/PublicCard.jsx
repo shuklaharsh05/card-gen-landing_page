@@ -5,27 +5,15 @@ export default function PublicCard() {
   const src = `https://teamserver.cloud/cards/${id}`;
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="mx-auto">
-        <div className="">
-          {/* <div className="px-4 py-3 border-b border-slate-200">
-            <h1 className="text-lg font-semibold text-slate-900">Public Card</h1>
-          </div> */}
-          <div className="">
-            <iframe
-              title="Public Card"
-              src={src}
-              className="w-full h-screen"
-              allowTransparency
-              allow="web-share; clipboard-write"
-              sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-downloads allow-top-navigation-by-user-activation"
-            />
-
-          </div>
-        </div>
-      </div>
+    <div className="fixed inset-0 bg-white">
+      <iframe
+        title="Public Card"
+        src={src}
+        className="w-full h-full border-0"
+        allow="web-share; clipboard-write"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-downloads allow-top-navigation-by-user-activation"
+      />
     </div>
   );
 }
-
 

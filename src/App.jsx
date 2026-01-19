@@ -14,7 +14,7 @@ import AuthCallback from "./pages/AuthCallback.jsx";
 import PricingClient from "./pages/Pricing.jsx";
 import Contacts from "./pages/Contacts.jsx";
 import "./index.css"; // make sure your CSS for the button is loaded
-// import PublicCard from "./pages/PublicCard.jsx";
+import PublicCard from "./pages/PublicCard.jsx";
 
 function App() {
   return (
@@ -27,7 +27,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/card/:id" element={<Inquiry />} />
-          {/* <Route path="/cards/:id" element={<PublicCard />} /> */}
+          <Route path="/cards/:id" element={<PublicCard />} />
 
           <Route
             path="/*"

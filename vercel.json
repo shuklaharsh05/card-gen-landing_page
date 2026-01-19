@@ -1,10 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/cards/:id",
-      "destination": "https://teamserver.cloud/cards/:id"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
