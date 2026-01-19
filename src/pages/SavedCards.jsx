@@ -125,6 +125,7 @@ export default function SavedCards() {
     // Try different possible paths for card name
     return (
       card.data?.companyName ||
+      card.data?.CompanyName ||
       card.data?.customCardData?.companyName ||
       card.data?.storeName ||
       card.companyName ||
@@ -166,11 +167,11 @@ export default function SavedCards() {
   const getCardAbout = (card) => {
     const about =
       card.data?.about ||
-      card.data?.customCardData?.about.description ||
-      card.data?.about.description ||
+      card.data?.companyInfo ||
+      card.data?.customCardData?.about?.description ||
+      card.data?.about?.description ||
       card.data?.customCardData?.about ||
-      card.data?.about ||
-      "No about";
+      "";
     return about.length > 100 ? about.substring(0, 100) + "..." : about;
   };
 
@@ -432,9 +433,8 @@ export default function SavedCards() {
             </h1>
             <p className="text-slate-600 text-base sm:text-lg">
               {savedCards.length > 0
-                ? `You have ${savedCards.length} saved business card${
-                    savedCards.length > 1 ? "s" : ""
-                  }`
+                ? `You have ${savedCards.length} saved business card${savedCards.length > 1 ? "s" : ""
+                }`
                 : "You haven't saved any business cards yet"}
             </p>
           </div>
@@ -502,9 +502,8 @@ export default function SavedCards() {
                     { wch: 40 },
                   ];
                   XLSX.utils.book_append_sheet(wb, ws, "Saved Cards");
-                  const fileName = `saved_cards_${
-                    new Date().toISOString().split("T")[0]
-                  }.xlsx`;
+                  const fileName = `saved_cards_${new Date().toISOString().split("T")[0]
+                    }.xlsx`;
                   const excelBuffer = XLSX.write(wb, {
                     bookType: "xlsx",
                     type: "array",
@@ -534,9 +533,8 @@ export default function SavedCards() {
           <p className="text-sm text-slate-600">
             {filteredCards.length === 0
               ? "No cards found matching your search."
-              : `Found ${filteredCards.length} card${
-                  filteredCards.length > 1 ? "s" : ""
-                } matching "${searchQuery}"`}
+              : `Found ${filteredCards.length} card${filteredCards.length > 1 ? "s" : ""
+              } matching "${searchQuery}"`}
           </p>
         )}
       </div>
@@ -593,19 +591,20 @@ export default function SavedCards() {
                     {/* {getCardType(card)} */}
                     {getCardTagline(card)}
                   </p>
-                  <p className="text-[8px] lg:text-xs text-slate-600 font-normal capitalize leading-tight">
-                    {getCardAbout(card)}
-                  </p>
+                  {getCardAbout(card) && (
+                    <p className="text-[8px] lg:text-xs text-slate-600 font-normal capitalize leading-tight">
+                      {getCardAbout(card)}
+                    </p>
+                  )}
                 </div>
                 <div className="absolute top-2 right-2">
                   <button
                     onClick={() => handleDeleteCard(card._id)}
                     disabled={deletingCardId === card._id}
-                    className={`p-2 rounded-lg transition-colors ${
-                      deletingCardId === card._id
+                    className={`p-2 rounded-lg transition-colors ${deletingCardId === card._id
                         ? "text-slate-300 cursor-not-allowed"
                         : "text-slate-400 hover:text-red-600 hover:bg-red-50"
-                    }`}
+                      }`}
                     title={
                       deletingCardId === card._id
                         ? "Deleting..."
