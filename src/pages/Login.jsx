@@ -174,7 +174,7 @@ export default function Login() {
             </div>
           </div>
 
-          {import.meta.env.GOOGLE_CLIENT_ID && (
+          {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
             <div className="mt-4">
               <div className="flex justify-center">
                 <GoogleLogin
