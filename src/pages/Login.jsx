@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { GoogleLogin } from "@react-oauth/google";
-import { CreditCard, Mail, Lock, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { CreditCard, Mail, Lock, AlertCircle, Eye, EyeOff, Phone } from "lucide-react";
 import {
   classifyIdentifier,
   getIdentifierErrorMessage,
@@ -75,8 +75,8 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-[url('/form-bg-3.webp')] lg:bg-[url('/form-bg-3.webp')] bg-cover bg-right-top lg:bg-center relative">
-      <div className="w-[90%] lg:w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-4 lg:p-8 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 lg:left-auto -right-36 xl:-right-24 2xl:right-36">
-        <div className="mb-4 space-y-2">
+      <div className="w-[90%] lg:w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 py-4 px-6 lg:py-8 lg:px-12 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 lg:left-auto -right-28 xl:-right-16 2xl:right-8">
+        <div className="mb-6 space-y-2">
           <img
             src="/form-icon.svg"
             alt="logo"
@@ -84,7 +84,7 @@ export default function Login() {
           />
           <p className="text-black/60">Welcome To Visiting Link </p>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">
-            Your access point to everything that matters.
+          Manage your profile,<br /> links & contacts easily.
           </h1>
         </div>
 
@@ -102,17 +102,17 @@ export default function Login() {
                 htmlFor="identifier"
                 className="block text-sm font-medium text-slate-700 mb-2"
               >
-                Email Address or Phone Number
+                Phone Number
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   id="identifier"
                   type="text"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   className="w-full pl-11 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all shadow-lg"
-                  placeholder="Email or Phone Number"
+                  placeholder="Phone Number"
                   disabled={loading}
                 />
               </div>
@@ -163,7 +163,7 @@ export default function Login() {
             </div>
           </form>
 
-          <div className="mt-4">
+          <div className="mt-8">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-slate-300"></div>
@@ -175,7 +175,7 @@ export default function Login() {
           </div>
 
           {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
-            <div className="mt-4">
+            <div className="mt-8">
               <div className="flex justify-center">
                 <GoogleLogin
                   onSuccess={handleGoogleSuccess}
