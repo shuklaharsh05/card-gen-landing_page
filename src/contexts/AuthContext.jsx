@@ -105,6 +105,28 @@ export function AuthProvider({ children }) {
     return { error: null };
   };
 
+  const signInWithGoogle = async (idToken) => {
+    const response = await apiService.googleAuth(idToken);
+    if (!response.success) {
+      return { error: { message: response.error || 'Google authentication failed' } };
+    }
+    
+    // If Google auth is successful, fetch the complete user profile with inquiries
+    const userResponse = await apiService.getCurrentUser();
+    if (userResponse.success && userResponse.data) {
+      console.log('AuthContext - Google auth user data (full profile):', userResponse.data);
+      setUser(userResponse.data);
+    } else {
+      // Fallback to response data if getCurrentUser fails
+      if (response.data) {
+        console.log('AuthContext - Google auth user data (fallback):', response.data);
+        setUser(response.data);
+      }
+    }
+    
+    return { error: null };
+  };
+
   const signOut = async () => {
     await apiService.logout();
     setUser(null);
@@ -134,6 +156,7 @@ export function AuthProvider({ children }) {
     loading,
     signUp,
     signIn,
+    signInWithGoogle,
     signOut,
     refreshUser,
   };

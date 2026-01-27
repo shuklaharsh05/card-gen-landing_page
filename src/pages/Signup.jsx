@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.jsx";
+import { GoogleLogin } from "@react-oauth/google";
 import {
   CreditCard,
   Mail,
@@ -22,8 +23,33 @@ export default function Signup() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { signUp } = useAuth();
+  const { signUp, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError("");
+    setLoading(true);
+    
+    try {
+      const { error } = await signInWithGoogle(credentialResponse.credential);
+      
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      setError("Google signup failed. Please try again.");
+      setLoading(false);
+      console.error("Google signup error:", err);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setError("Google signup failed. Please try again.");
+    setLoading(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,8 +87,8 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-[url('/mobile-form-bg.webp')] lg:bg-[url('/form-bg.png')] bg-cover bg-center relative">
-      <div className="w-[90%] lg:w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-4 lg:p-8 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 lg:left-auto -right-36 xl:-right-16 2xl:right-10">
+    <div className="min-h-screen bg-[url('/form-bg-3.webp')] lg:bg-[url('/form-bg-3.webp')] bg-cover bg-right-top lg:bg-center relative">
+      <div className="w-[90%] lg:w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-4 lg:p-8 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 lg:left-auto -right-36 xl:-right-24 2xl:right-36">
         <div className="space-y-1 mb-4">
           {/* <Link to="/" className="inline-flex items-center gap-2 mb-6">
             <CreditCard className="w-10 h-10 text-blue-600" />
@@ -73,12 +99,13 @@ export default function Signup() {
             alt="logo"
             className="h-8 lg:h-12 object-contain mb-4"
           />
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">
-            Create Your Account
-          </h1>
           <p className="text-slate-600">
-            Start building your digital presence today
+            Welcome To Visiting Link
           </p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">
+            Your access point to everything that matters.
+          </h1>
+          
         </div>
 
         <div className="bg-white">
@@ -179,6 +206,34 @@ export default function Signup() {
               </button>
             </div>
           </form>
+
+          <div className="mt-4">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-slate-500">Or continue with</span>
+              </div>
+            </div>
+          </div>
+
+          {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+            <div className="mt-4">
+              <div className="flex justify-center w-full">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  useOneTap={false}
+                  theme="outline"
+                  size="large"
+                  text="signup_with"
+                  shape="rectangular"
+                  logo_alignment="left"
+                />
+              </div>
+            </div>
+          )}
 
           <div className="mt-6 text-center">
             <p className="text-slate-600">

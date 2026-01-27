@@ -1,6 +1,7 @@
 // API Configuration
-const API_BASE_URL = 'https://teamserver.cloud/api';
-// const API_BASE_URL = 'http://localhost:5000/api';
+// For local testing, use localhost. For production, use teamserver.cloud
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// const API_BASE_URL = 'https://teamserver.cloud/api';
 
 // API Service Class
 class ApiService {
@@ -26,6 +27,19 @@ class ApiService {
       console.log('API Request:', { url, config, body: options.body });
 
       const response = await fetch(url, config);
+      
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response:', text.substring(0, 200));
+        return {
+          success: false,
+          error: `Server returned non-JSON response (${response.status}). The endpoint may not exist or there's a server error.`,
+          details: { status: response.status, text: text.substring(0, 200) }
+        };
+      }
+
       const data = await response.json();
 
       console.log('API Response:', { status: response.status, data });
@@ -107,6 +121,20 @@ class ApiService {
     });
 
     // If login is successful, store the token
+    if (response.success && response.data && response.data.token) {
+      localStorage.setItem('auth_token', response.data.token);
+    }
+
+    return response;
+  }
+
+  async googleAuth(idToken) {
+    const response = await this.request('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ idToken }),
+    });
+
+    // If Google auth is successful, store the token
     if (response.success && response.data && response.data.token) {
       localStorage.setItem('auth_token', response.data.token);
     }

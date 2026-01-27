@@ -153,6 +153,15 @@ export default function SavedCards() {
       "No tagline"
     );
   };
+  const getBusinessType = (card) => {
+    return (
+      card.data?.businessType ||
+      card.data?.businessCategory ||
+      card.data?.customCardData?.businessType ||
+      card.data?.businessType ||
+      "No business type"
+    );
+  };
 
   const getCardLogo = (card) => {
     return (
@@ -486,7 +495,7 @@ export default function SavedCards() {
                     Name: getCardName(card),
                     Email: getCardEmail(card),
                     Phone: getCardPhone(card),
-                    Tagline: getCardTagline(card),
+                    Tagline: getBusinessType(card),
                     About: getCardAbout(card),
                     Link: getShareableLink(card) || "",
                   }));
@@ -589,7 +598,8 @@ export default function SavedCards() {
                   <p className="text-sm lg:text-lg leading-tight text-slate-600 font-normal capitalize mb-1">
                     {/* {getCardName(card)} */}
                     {/* {getCardType(card)} */}
-                    {getCardTagline(card)}
+                    {/* {getCardTagline(card)} */}
+                    {getBusinessType(card)}
                   </p>
                   {getCardAbout(card) && (
                     <p className="text-[8px] lg:text-xs text-slate-600 font-normal capitalize leading-tight">
