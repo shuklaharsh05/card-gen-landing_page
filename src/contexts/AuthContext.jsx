@@ -37,16 +37,15 @@ export function AuthProvider({ children }) {
   const signUp = async (identifier, password, name) => {
     const identifierData = classifyIdentifier(identifier);
 
-    if (!identifierData.isValid) {
-      return { error: { message: getIdentifierErrorMessage() } };
+    if (!identifierData.isValid || identifierData.type !== 'phone') {
+      return { error: { message: 'Please enter a valid phone number' } };
     }
 
-    const normalizedValue = identifierData.value;
+    const normalizedPhone = identifierData.value;
     const payload = {
       name,
-      email: normalizedValue,
       password,
-      ...(identifierData.type === 'phone' ? { phone: normalizedValue } : {}),
+      phone: normalizedPhone,
     };
 
     const response = await apiService.signup(payload);
@@ -73,15 +72,14 @@ export function AuthProvider({ children }) {
   const signIn = async (identifier, password) => {
     const identifierData = classifyIdentifier(identifier);
 
-    if (!identifierData.isValid) {
-      return { error: { message: getIdentifierErrorMessage() } };
+    if (!identifierData.isValid || identifierData.type !== 'phone') {
+      return { error: { message: 'Please enter a valid phone number' } };
     }
 
-    const normalizedValue = identifierData.value;
+    const normalizedPhone = identifierData.value;
     const credentials = {
-      email: normalizedValue,
       password,
-      ...(identifierData.type === 'phone' ? { phone: normalizedValue } : {}),
+      phone: normalizedPhone,
     };
 
     const response = await apiService.login(credentials);

@@ -4,13 +4,13 @@ import { useAuth } from "../contexts/AuthContext.jsx";
 import { GoogleLogin } from "@react-oauth/google";
 import {
   CreditCard,
-  Mail,
+  Phone,
   Lock,
   User,
   AlertCircle,
   Eye,
   EyeOff,
-  Phone,
+  ChevronLeft,
 } from "lucide-react";
 import {
   classifyIdentifier,
@@ -30,10 +30,10 @@ export default function Signup() {
   const handleGoogleSuccess = async (credentialResponse) => {
     setError("");
     setLoading(true);
-    
+
     try {
       const { error } = await signInWithGoogle(credentialResponse.credential);
-      
+
       if (error) {
         setError(error.message);
         setLoading(false);
@@ -71,8 +71,8 @@ export default function Signup() {
 
     const identifierData = classifyIdentifier(identifier);
 
-    if (!identifierData.isValid) {
-      setError(getIdentifierErrorMessage());
+    if (!identifierData.isValid || identifierData.type !== "phone") {
+      setError("Please enter a valid phone number");
       setLoading(false);
       return;
     }
@@ -88,8 +88,14 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-[url('/form-bg-3.webp')] lg:bg-[url('/form-bg-3.webp')] bg-cover bg-right-top lg:bg-center relative">
-      <div className="w-[90%] lg:w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 py-4 px-6 lg:py-8 lg:px-12 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 lg:left-auto -right-28 xl:-right-16 2xl:right-8">
+    <div className="min-h-screen bg-[url('/form-bg-3.png')] lg:bg-[url('/form-bg-3.png')] xl:bg-[url('/form-bg-4.png')] bg-cover bg-right-top lg:bg-center relative">
+      <div>
+        <ChevronLeft
+          className="w-6 h-6 lg:w-8 lg:h-8 text-white hover:text-slate-400 transition-all duration-300 focus:outline-none absolute top-4 left-4"
+          onClick={() => navigate("/")}
+        />
+      </div>
+      <div className="w-[90%] lg:w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 py-4 px-6 lg:py-8 lg:px-12 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 lg:left-auto -right-36 xl:-right-16 2xl:right-8">
         <div className="space-y-1 mb-6">
           {/* <Link to="/" className="inline-flex items-center gap-2 mb-6">
             <CreditCard className="w-10 h-10 text-blue-600" />
@@ -99,14 +105,15 @@ export default function Signup() {
             src="/form-icon.svg"
             alt="logo"
             className="h-8 lg:h-12 object-contain mb-4"
-          />
-          <p className="text-black/60">
-            Welcome To Visiting Link
+          /> 
+          <p className="text-slate-600">
+          Welcome To Visiting Link
           </p>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">
-          Manage your profile,<br /> links & contacts easily.
+          Manage your profile,<br />
+          links & contacts easily.
           </h1>
-          
+         
         </div>
 
         <div className="bg-white">
@@ -150,11 +157,11 @@ export default function Signup() {
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   id="identifier"
-                  type="text"
+                  type="tel"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   className="w-full pl-11 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
-                  placeholder="Phone Number"
+                  placeholder="Enter phone number"
                   disabled={loading}
                 />
               </div>
@@ -208,7 +215,7 @@ export default function Signup() {
             </div>
           </form>
 
-          <div className="mt-8">
+          <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-slate-300"></div>
@@ -220,7 +227,7 @@ export default function Signup() {
           </div>
 
           {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
-            <div className="mt-8">
+            <div className="mt-6">
               <div className="flex justify-center w-full">
                 <GoogleLogin
                   onSuccess={handleGoogleSuccess}
@@ -229,8 +236,8 @@ export default function Signup() {
                   theme="outline"
                   size="large"
                   text="signup_with"
-                  shape="rectangular"
-                  logo_alignment="left"
+                  shape="square"
+                  logo_alignment="center"
                 />
               </div>
             </div>
