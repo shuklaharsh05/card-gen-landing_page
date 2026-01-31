@@ -42,6 +42,7 @@ export default function MyCard() {
   const [copied, setCopied] = useState(false);
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
   const qrContainerRef = useRef(null);
+  const errorRef = useRef(null);
 
   // Build site URL variants from a backend share URL using fixed domain mask
   const toSiteUrlFromBackend = (rawUrl) => {
@@ -180,64 +181,103 @@ export default function MyCard() {
     fetchCard();
   }, [user]);
 
+  // Map backend field names to user-friendly messages
+  const fieldToFriendlyMessage = {
+    name: 'Please enter your name.',
+    email: 'Please enter a valid email address.',
+    phone: 'Please enter a valid phone number.',
+    message: 'Please enter a message.',
+    businessType: 'Please select a business type.',
+    business_type: 'Please select a business type.',
+  };
+
+  const getErrorMessage = (response) => {
+    if (!response) return 'Something went wrong. Please try again.';
+
+    const details = response.details || response;
+    // Express-validator returns errors as array: [{ path, msg }, ...]
+    if (Array.isArray(details.errors) && details.errors.length > 0) {
+      const first = details.errors[0];
+      const path = (first.path || first.param || '').trim();
+      const friendly = fieldToFriendlyMessage[path];
+      if (friendly) return friendly;
+      const msg = first.msg || first.message;
+      if (msg && !msg.toLowerCase().includes('validation')) return msg;
+      return friendly || 'Please check the highlighted fields and try again.';
+    }
+    // Mongoose-style errors object: { fieldName: { message: '...' } }
+    if (details.errors && typeof details.errors === 'object' && !Array.isArray(details.errors)) {
+      const entries = Object.entries(details.errors);
+      if (entries.length > 0) {
+        const [key, val] = entries[0];
+        const friendly = fieldToFriendlyMessage[key];
+        if (friendly) return friendly;
+        const msg = val?.message || val?.msg || (typeof val === 'string' ? val : null);
+        if (msg) return msg;
+      }
+    }
+
+    if (typeof response.error === 'string' && response.error && !response.error.toLowerCase().includes('validation')) {
+      return response.error;
+    }
+    if (details.message && !String(details.message).toLowerCase().includes('validation')) {
+      return details.message;
+    }
+    if (details.error) return details.error;
+    if (response.message) return response.message;
+    return 'Please check your entries and try again.';
+  };
+
+  const showError = (message) => {
+    setError(message);
+    setCreating(false);
+    setSuccess('');
+    setTimeout(() => {
+      errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
     setCreating(true);
 
-    if (!formData.name || !formData.email || !formData.phone || !formData.business_type) {
-      setError('Please fill in all required fields (Name, Email, Phone, and Business Type)');
-      setCreating(false);
+    if (!formData.name?.trim()) {
+      showError('Please enter your full name.');
+      return;
+    }
+    if (!formData.phone?.trim()) {
+      showError('Please enter your phone number.');
+      return;
+    }
+    if (!formData.business_type) {
+      showError('Please select a business type.');
       return;
     }
 
-    const response = await apiService.createCard(formData, user?._id);
+    try {
+      const response = await apiService.createCard(formData, user?._id);
 
-    if (!response.success) {
-      console.log('Create inquiry error details:', response);
-      
-      // Parse error message from response for better user experience
-      let errorMessage = 'Failed to submit inquiry';
-      
-      if (response.error) {
-        errorMessage = response.error;
+      if (!response.success) {
+        const errorMessage = getErrorMessage(response);
+        showError(errorMessage);
+        return;
       }
-      
-      // Check for validation errors in details
-      if (response.details) {
-        // Check if it's a validation error object
-        if (response.details.errors) {
-          // Handle Mongoose validation errors
-          const validationErrors = response.details.errors;
-          const errorMessages = Object.keys(validationErrors).map(
-            key => `${key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}: ${validationErrors[key].message || validationErrors[key]}`
-          );
-          errorMessage = errorMessages.join('. ');
-        } else if (response.details.message) {
-          errorMessage = response.details.message;
-        } else if (typeof response.details === 'string') {
-          errorMessage = response.details;
-        } else if (response.details.error) {
-          errorMessage = response.details.error;
-        }
-      }
-      
-      setError(errorMessage);
-      setCreating(false);
-    } else {
+
       setInquirySubmitted(true);
       setInquiryData(response.data);
       setSuccess('Inquiry sent! Your card is on the way.');
       setCreating(false);
-      
-      // Refresh user data to include the new inquiry so it persists after refresh
+
       try {
         await refreshUser();
       } catch (refreshError) {
         console.log('Error refreshing user data:', refreshError);
-        // Non-critical error, user will see updated data on next refresh
       }
+    } catch (err) {
+      const message = err?.message || (err?.networkError && 'Network error. Please check your connection and try again.');
+      showError(message || 'Something went wrong. Please try again.');
     }
   };
 
@@ -624,7 +664,11 @@ export default function MyCard() {
       <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 lg:p-8">
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 flex gap-3">
+            <div
+              ref={errorRef}
+              role="alert"
+              className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 flex gap-3"
+            >
               <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 flex-shrink-0 mt-0.5" />
               <p className="text-red-800 text-sm sm:text-base">{error}</p>
             </div>
@@ -638,7 +682,7 @@ export default function MyCard() {
               id="name"
               type="text"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) => { setError(''); setFormData({ ...formData, name: e.target.value }); }}
               className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
               placeholder="John Doe"
               disabled={creating}
@@ -653,7 +697,7 @@ export default function MyCard() {
               id="email"
               type="email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) => { setError(''); setFormData({ ...formData, email: e.target.value }); }}
               className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
               placeholder="john@example.com"
               disabled={creating}
@@ -668,7 +712,7 @@ export default function MyCard() {
               id="phone"
               type="tel"
               value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              onChange={(e) => { setError(''); setFormData({ ...formData, phone: e.target.value }); }}
               className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
               placeholder="+1 (555) 123-4567"
               disabled={creating}
@@ -685,7 +729,7 @@ export default function MyCard() {
             <select
               id="business_type"
               value={formData.business_type}
-              onChange={(e) => setFormData({ ...formData, business_type: e.target.value })}
+              onChange={(e) => { setError(''); setFormData({ ...formData, business_type: e.target.value }); }}
               className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
               disabled={creating}
             >
@@ -708,7 +752,7 @@ export default function MyCard() {
             <textarea
               id="message"
               value={formData.message}
-              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              onChange={(e) => { setError(''); setFormData({ ...formData, message: e.target.value }); }}
               rows={3}
               className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all resize-none text-sm sm:text-base"
               placeholder="Tell us about your specific requirements or any additional information..."
