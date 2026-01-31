@@ -9,14 +9,19 @@ import {
   X,
   Bookmark,
   Users,
+  KeyRound,
 } from "lucide-react";
 import { useState } from "react";
+import LinkCredentialsModal from "./LinkCredentialsModal.jsx";
 
 export default function UserLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [linkModalOpen, setLinkModalOpen] = useState(false);
+
+  const needsCredentials = user && (!user.phone || !user.hasPassword);
 
   const handleSignOut = async () => {
     await signOut();
@@ -34,16 +39,14 @@ export default function UserLayout() {
   return (
     <div className="min-h-screen bg-slate-50 flex">
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-68 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          }`}
       >
         <div className="h-full flex flex-col">
           <div className="p-6 border-b border-slate-800">
-            <div className="flex items-center gap-2">
-              <CreditCard className="w-8 h-8 text-blue-400" />
-              <span className="text-2xl font-bold">Visiting Links</span>
-            </div>
+            <a href="/" className="flex items-center gap-2">
+              <img src="/visitingLink-logo-white.png" alt="Logo" className="h-8" />
+            </a>
           </div>
 
           <nav className="flex-1 p-4 space-y-2">
@@ -55,11 +58,10 @@ export default function UserLayout() {
                   key={item.path}
                   to={item.path}
                   onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                    isActive
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive
                       ? "bg-blue-600 text-white shadow-lg"
                       : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                  }`}
+                    }`}
                 >
                   <Icon className="w-5 h-5" />
                   <span className="font-medium">{item.label}</span>
@@ -68,7 +70,16 @@ export default function UserLayout() {
             })}
           </nav>
 
-          <div className="p-4 border-t border-slate-800">
+          <div className="p-4 border-t border-slate-800 space-y-2">
+            {needsCredentials && (
+              <button
+                onClick={() => setLinkModalOpen(true)}
+                className="w-full flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-all"
+              >
+                <KeyRound className="w-5 h-5" />
+                <span className="font-medium text-left">Link phone & password</span>
+              </button>
+            )}
             <button
               onClick={handleSignOut}
               className="w-full flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-all"
@@ -79,6 +90,8 @@ export default function UserLayout() {
           </div>
         </div>
       </aside>
+
+      <LinkCredentialsModal isOpen={linkModalOpen} onClose={() => setLinkModalOpen(false)} />
 
       {sidebarOpen && (
         <div

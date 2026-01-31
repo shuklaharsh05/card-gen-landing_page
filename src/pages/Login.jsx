@@ -22,13 +22,14 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const { error } = await signInWithGoogle(credentialResponse.credential);
+      const { error, user: authUser } = await signInWithGoogle(credentialResponse.credential);
 
       if (error) {
         setError(error.message);
         setLoading(false);
       } else {
-        navigate("/dashboard");
+        const hasInquiries = authUser?.inquiries && Array.isArray(authUser.inquiries) && authUser.inquiries.length > 0;
+        navigate(hasInquiries ? "/dashboard" : "/my-card");
       }
     } catch (err) {
       setError("Google login failed. Please try again.");
@@ -63,13 +64,14 @@ export default function Login() {
       return;
     }
 
-    const { error } = await signIn(identifierData.value, password);
+    const { error, user: authUser } = await signIn(identifierData.value, password);
 
     if (error) {
       setError(error.message);
       setLoading(false);
     } else {
-      navigate("/dashboard");
+      const hasInquiries = authUser?.inquiries && Array.isArray(authUser.inquiries) && authUser.inquiries.length > 0;
+      navigate(hasInquiries ? "/dashboard" : "/my-card");
     }
   };
 
@@ -84,9 +86,9 @@ export default function Login() {
       <div className="w-[90%] lg:w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 py-4 px-6 lg:py-8 lg:px-12 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 lg:left-auto -right-36 xl:-right-16 2xl:right-8">
         <div className="mb-6 space-y-2">
           <img
-            src="/form-icon.svg"
+            src="/visitingLink-logo.png"
             alt="logo"
-            className="h-8 lg:h-12 object-contain mb-4"
+            className="h-8 lg:h-10 object-contain mb-2"
           />
           <p className="text-black/60">Welcome To visiting Link </p>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">

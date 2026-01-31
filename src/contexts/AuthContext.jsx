@@ -64,18 +64,19 @@ export function AuthProvider({ children }) {
     
     // If signup is successful, fetch the complete user profile with inquiries
     const userResponse = await apiService.getCurrentUser();
+    let userData = null;
     if (userResponse.success && userResponse.data) {
       console.log('AuthContext - Signup user data (full profile):', userResponse.data);
-      setUser(userResponse.data);
+      userData = userResponse.data;
+      setUser(userData);
     } else {
-      // Fallback to response data if getCurrentUser fails
       if (response.data) {
         console.log('AuthContext - Signup user data (fallback):', response.data);
-        setUser(response.data);
+        userData = response.data;
+        setUser(userData);
       }
     }
-    
-    return { error: null };
+    return { error: null, user: userData };
   };
 
   const signIn = async (identifier, password) => {
@@ -98,18 +99,19 @@ export function AuthProvider({ children }) {
     
     // If login is successful, fetch the complete user profile with inquiries
     const userResponse = await apiService.getCurrentUser();
+    let userData = null;
     if (userResponse.success && userResponse.data) {
       console.log('AuthContext - Login user data (full profile):', userResponse.data);
-      setUser(userResponse.data);
+      userData = userResponse.data;
+      setUser(userData);
     } else {
-      // Fallback to response data if getCurrentUser fails
       if (response.data) {
         console.log('AuthContext - Login user data (fallback):', response.data);
-        setUser(response.data);
+        userData = response.data;
+        setUser(userData);
       }
     }
-    
-    return { error: null };
+    return { error: null, user: userData };
   };
 
   const signInWithGoogle = async (idToken) => {
@@ -120,18 +122,19 @@ export function AuthProvider({ children }) {
     
     // If Google auth is successful, fetch the complete user profile with inquiries
     const userResponse = await apiService.getCurrentUser();
+    let userData = null;
     if (userResponse.success && userResponse.data) {
       console.log('AuthContext - Google auth user data (full profile):', userResponse.data);
-      setUser(userResponse.data);
+      userData = userResponse.data;
+      setUser(userData);
     } else {
-      // Fallback to response data if getCurrentUser fails
       if (response.data) {
         console.log('AuthContext - Google auth user data (fallback):', response.data);
-        setUser(response.data);
+        userData = response.data;
+        setUser(userData);
       }
     }
-    
-    return { error: null };
+    return { error: null, user: userData };
   };
 
   const signOut = async () => {
@@ -158,6 +161,15 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const linkCredentials = async (phone, password) => {
+    const response = await apiService.linkCredentials({ phone, password });
+    if (!response.success) {
+      return { error: { message: response.error || 'Failed to link credentials' } };
+    }
+    await refreshUser();
+    return { error: null };
+  };
+
   const value = {
     user,
     loading,
@@ -166,6 +178,7 @@ export function AuthProvider({ children }) {
     signInWithGoogle,
     signOut,
     refreshUser,
+    linkCredentials,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -158,6 +158,17 @@ class ApiService {
     return response;
   }
 
+  async linkCredentials({ phone, password }) {
+    const response = await this.request('/auth/link-credentials', {
+      method: 'POST',
+      body: JSON.stringify({ phone, password }),
+    });
+    if (response.success && response.data?.token) {
+      localStorage.setItem('auth_token', response.data.token);
+    }
+    return response;
+  }
+
   // Get user data by ID
   async getUserById(userId) {
     return this.request(`/users/${userId}`);
@@ -569,6 +580,7 @@ export const {
   login,
   logout,
   getCurrentUser,
+  linkCredentials,
   createCard,
   getCard,
   updateCard,

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import UserLayout from "./components/UserLayout.jsx";
+import DefaultUserRedirect from "./components/DefaultUserRedirect.jsx";
 import Landing from "./pages/Landing.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
@@ -42,7 +43,7 @@ function App() {
             <Route path="my-card" element={<MyCard />} />
             <Route path="saved-cards" element={<SavedCards />} />
             <Route path="contacts" element={<Contacts />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<DefaultUserRedirect />} />
           </Route>
         </Routes>
       </BrowserRouter>

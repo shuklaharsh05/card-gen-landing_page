@@ -171,10 +171,16 @@ export default function MyCard() {
         }
       }
 
-      // No inquiries found - user can submit inquiry form
+      // No inquiries found - user can submit inquiry form; pre-fill from profile where available
       console.log('MyCard - No inquiries found for user - showing inquiry form');
       setCard(null);
       setInquirySubmitted(false);
+      setFormData((prev) => ({
+        ...prev,
+        name: user?.name ?? prev.name,
+        email: user?.email ?? prev.email,
+        phone: user?.phone ?? prev.phone,
+      }));
       setLoading(false);
     };
 
@@ -455,52 +461,10 @@ export default function MyCard() {
         )}
 
         <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8">
-          {/* <div className="bg-white rounded-xl border border-slate-200 p-8 w-full"> */}
-            {/* <h2 className="text-2xl font-bold text-slate-900 mb-6">Card Preview</h2> */}
-            {/* <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl p-8 text-white shadow-xl">
-              <div className="flex items-center gap-3 mb-6">
-                <CreditCard className="w-8 h-8" />
-                <span className="text-xl font-bold">CardPro</span>
-              </div>
-              <h3 className="text-3xl font-bold mb-2">{card.name}</h3>
-              <p className="text-blue-100 mb-6">{card.business_type}</p>
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  <span>{card.email}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  <span>{card.phone}</span>
-                </div>
-              </div>
-            </div> */}
-            {/* <iframe src={card.publicUrl} className="w-full h-full"></iframe> */}
-            {/* {console.log("my log",card)} */}
-          {/* </div> */}
+
 
           <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
-            {/* <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 lg:p-8">
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3 sm:mb-4">Shareable Link</h2>
-              <p className="text-slate-600 mb-3 sm:mb-4 text-sm sm:text-base">Share this link to let others view your card</p>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <a href={siteUrl} className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-slate-50 text-blue-600 hover:text-blue-800 underline transition-colors duration-300 text-xs sm:text-sm break-all">{siteUrl || 'Link unavailable'}</a>
-                <button
-                  onClick={copyToClipboard}
-                  className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center justify-center w-10 h-10 flex-shrink-0 self-start sm:self-auto"
-                >
-                  {copied ? (
-                    <>
-                      <CheckCircle className="w-4 h-4" />
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-              </div>
-            </div> */}
+            
 
 <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6">
   {/* Header */}
@@ -662,7 +626,7 @@ export default function MyCard() {
       </div>
 
       <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 lg:p-8">
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-4">
           {error && (
             <div
               ref={errorRef}
@@ -675,7 +639,7 @@ export default function MyCard() {
           )}
 
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
+            <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1">
               Full Name
             </label>
             <input
@@ -683,14 +647,14 @@ export default function MyCard() {
               type="text"
               value={formData.name}
               onChange={(e) => { setError(''); setFormData({ ...formData, name: e.target.value }); }}
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
+              className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
               placeholder="John Doe"
               disabled={creating}
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
               Email Address
             </label>
             <input
@@ -698,14 +662,14 @@ export default function MyCard() {
               type="email"
               value={formData.email}
               onChange={(e) => { setError(''); setFormData({ ...formData, email: e.target.value }); }}
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
+              className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
               placeholder="john@example.com"
               disabled={creating}
             />
           </div>
 
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-2">
+            <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-1">
               Phone Number
             </label>
             <input
@@ -713,7 +677,7 @@ export default function MyCard() {
               type="tel"
               value={formData.phone}
               onChange={(e) => { setError(''); setFormData({ ...formData, phone: e.target.value }); }}
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
+              className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
               placeholder="+1 (555) 123-4567"
               disabled={creating}
             />
@@ -722,7 +686,7 @@ export default function MyCard() {
           <div>
             <label
               htmlFor="business_type"
-              className="block text-sm font-medium text-slate-700 mb-2"
+              className="block text-sm font-medium text-slate-700 mb-1"
             >
               Business Type
             </label>
@@ -730,7 +694,7 @@ export default function MyCard() {
               id="business_type"
               value={formData.business_type}
               onChange={(e) => { setError(''); setFormData({ ...formData, business_type: e.target.value }); }}
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
+              className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
               disabled={creating}
             >
               <option value="">Select a business type</option>
@@ -745,7 +709,7 @@ export default function MyCard() {
           <div>
             <label
               htmlFor="message"
-              className="block text-sm font-medium text-slate-700 mb-2"
+              className="block text-sm font-medium text-slate-700 mb-1"
             >
               Additional Message (Optional)
             </label>
@@ -754,7 +718,7 @@ export default function MyCard() {
               value={formData.message}
               onChange={(e) => { setError(''); setFormData({ ...formData, message: e.target.value }); }}
               rows={3}
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all resize-none text-sm sm:text-base"
+              className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all resize-none text-sm sm:text-base"
               placeholder="Tell us about your specific requirements or any additional information..."
               disabled={creating}
             />

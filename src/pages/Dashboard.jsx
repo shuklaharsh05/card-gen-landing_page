@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { apiService } from '../lib/api.js';
 import { CreditCard, Calendar, Users, Share2, Heart, Download } from 'lucide-react';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [userName, setUserName] = useState('User');
   const [stats, setStats] = useState({
     cardAppointments: 0,
@@ -21,6 +23,13 @@ export default function Dashboard() {
     const fetchData = async () => {
       if (!user) return;
 
+      // If user has no inquiries, send them to My Card to submit one (no need to fetch)
+      if (!user.inquiries || !Array.isArray(user.inquiries) || user.inquiries.length === 0) {
+        setLoading(false);
+        navigate('/my-card', { replace: true });
+        return;
+      }
+
       console.log('Dashboard - User object:', user);
       console.log('Dashboard - User ID:', user._id);
 
@@ -33,6 +42,13 @@ export default function Dashboard() {
           const userData = userResponse.data;
           console.log('Dashboard - User data:', userData);
           console.log('Dashboard - Complete user data from API:', JSON.stringify(userData, null, 2));
+
+          // If user has no inquiries, send them to My Card to submit one
+          if (!userData.inquiries || !Array.isArray(userData.inquiries) || userData.inquiries.length === 0) {
+            setLoading(false);
+            navigate('/my-card', { replace: true });
+            return;
+          }
 
           // Get user name
           setUserName(userData.name || 'User');

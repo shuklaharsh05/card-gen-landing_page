@@ -34,13 +34,14 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      const { error } = await signInWithGoogle(credentialResponse.credential);
+      const { error, user: authUser } = await signInWithGoogle(credentialResponse.credential);
 
       if (error) {
         setError(error.message);
         setLoading(false);
       } else {
-        navigate("/dashboard");
+        const hasInquiries = authUser?.inquiries && Array.isArray(authUser.inquiries) && authUser.inquiries.length > 0;
+        navigate(hasInquiries ? "/dashboard" : "/my-card");
       }
     } catch (err) {
       setError("Google signup failed. Please try again.");
@@ -84,13 +85,14 @@ export default function Signup() {
       return;
     }
 
-    const { error } = await signUp(identifierData.value, password, name, email.trim());
+    const { error, user: authUser } = await signUp(identifierData.value, password, name, email.trim());
 
     if (error) {
       setError(error.message);
       setLoading(false);
     } else {
-      navigate("/dashboard");
+      const hasInquiries = authUser?.inquiries && Array.isArray(authUser.inquiries) && authUser.inquiries.length > 0;
+      navigate(hasInquiries ? "/dashboard" : "/my-card");
     }
   };
 
@@ -109,9 +111,9 @@ export default function Signup() {
             <span className="text-3xl font-bold text-slate-800">Visiting Links</span>
           </Link> */}
           <img
-            src="/form-icon.svg"
+            src="/visitingLink-logo.png"
             alt="logo"
-            className="h-8 lg:h-12 object-contain mb-4"
+            className="h-8 lg:h-10 object-contain mb-2"
           /> 
           <p className="text-slate-600">
           Welcome To Visiting Link

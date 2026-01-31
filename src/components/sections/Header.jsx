@@ -4,13 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
-
+import LinkCredentialsModal from "../LinkCredentialsModal.jsx";
 
 function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [linkModalOpen, setLinkModalOpen] = useState(false);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const needsCredentials = user && (!user.phone || !user.hasPassword);
 
   useEffect(() => {
     let ticking = false;
@@ -41,10 +43,10 @@ function Header() {
       }`}
     >
       {/* Main Container */}
-      <div className="max-w-[1250px] mx-auto flex items-center justify-between px-4">
+      <div className="max-w-[1250px] mx-auto flex items-center justify-between px-4 py-2 lg:py-3">
         {/* Left Side */}
         <a href="/" className="flex items-center gap-2">
-          <img src="/logo.svg" alt="logo" className="h-16 lg:h-[70px] object-contain" />
+          <img src="/visitingLink-logo.png" alt="logo" className="h-10 object-contain" />
         </a>
 
         {/* Desktop Buttons */}
@@ -60,6 +62,14 @@ function Header() {
               >
                 Dashboard
               </button>
+              {needsCredentials && (
+                <button
+                  onClick={() => setLinkModalOpen(true)}
+                  className="px-5 py-1.5 bg-amber-600 text-white rounded-full font-semibold hover:bg-amber-700 transition"
+                >
+                  Link phone & password
+                </button>
+              )}
               <button
                 onClick={signOut}
                 className="px-5 py-1.5 bg-gray-700 text-white rounded-full font-semibold hover:bg-gray-800 transition"
@@ -130,6 +140,17 @@ function Header() {
                   >
                     Dashboard
                   </button>
+                  {needsCredentials && (
+                    <button
+                      onClick={() => {
+                        setLinkModalOpen(true);
+                        setMenuOpen(false);
+                      }}
+                      className="px-5 py-2 bg-amber-600 text-white rounded-full font-semibold w-4/5 hover:bg-amber-700 transition"
+                    >
+                      Link phone & password
+                    </button>
+                  )}
                   <button
                     onClick={() => {
                       signOut();
@@ -166,6 +187,8 @@ function Header() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <LinkCredentialsModal isOpen={linkModalOpen} onClose={() => setLinkModalOpen(false)} />
     </header>
   );
 }
