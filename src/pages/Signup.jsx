@@ -11,6 +11,7 @@ import {
   Eye,
   EyeOff,
   ChevronLeft,
+  Mail,
 } from "lucide-react";
 import {
   classifyIdentifier,
@@ -20,6 +21,7 @@ import {
 export default function Signup() {
   const [name, setName] = useState("");
   const [identifier, setIdentifier] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -57,8 +59,13 @@ export default function Signup() {
     setError("");
     setLoading(true);
 
-    if (!name || !identifier || !password) {
-      setError("Please fill in all fields");
+    if (!name || !identifier || !email?.trim() || !password) {
+      setError("Please fill in all fields (name, phone, email, password)");
+      setLoading(false);
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError("Please enter a valid email");
       setLoading(false);
       return;
     }
@@ -77,7 +84,7 @@ export default function Signup() {
       return;
     }
 
-    const { error } = await signUp(identifierData.value, password, name);
+    const { error } = await signUp(identifierData.value, password, name, email.trim());
 
     if (error) {
       setError(error.message);
@@ -165,6 +172,31 @@ export default function Signup() {
                   disabled={loading}
                 />
               </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-slate-700 mb-2"
+              >
+                Email
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-11 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
+                  placeholder="e.g. you@example.com"
+                  disabled={loading}
+                  required
+                />
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Same email lets you sign in with Google too.
+              </p>
             </div>
 
             <div>

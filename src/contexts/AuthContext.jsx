@@ -34,7 +34,15 @@ export function AuthProvider({ children }) {
     checkAuth();
   }, []);
 
-  const signUp = async (identifier, password, name) => {
+  const signUp = async (identifier, password, name, email) => {
+    if (!email || !email.trim()) {
+      return { error: { message: 'Email is required' } };
+    }
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      return { error: { message: 'Please enter a valid email' } };
+    }
+
     const identifierData = classifyIdentifier(identifier);
 
     if (!identifierData.isValid || identifierData.type !== 'phone') {
@@ -46,6 +54,7 @@ export function AuthProvider({ children }) {
       name,
       password,
       phone: normalizedPhone,
+      email: trimmedEmail,
     };
 
     const response = await apiService.signup(payload);
