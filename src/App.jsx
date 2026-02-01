@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import UserLayout from "./components/UserLayout.jsx";
@@ -16,6 +16,25 @@ import PricingClient from "./pages/Pricing.jsx";
 import Contacts from "./pages/Contacts.jsx";
 import "./index.css"; // make sure your CSS for the button is loaded
 import PublicCard from "./pages/PublicCard.jsx";
+
+function FloatingWhatsApp() {
+  const location = useLocation();
+  const isPublicCardPage = /^\/cards\/[^/]+$/.test(location.pathname);
+  if (isPublicCardPage) return null;
+  return (
+    <a
+      href="https://wa.me/919236553585"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="floating-whatsapp"
+    >
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+        alt="WhatsApp"
+      />
+    </a>
+  );
+}
 
 function App() {
   return (
@@ -46,20 +65,8 @@ function App() {
             <Route path="*" element={<DefaultUserRedirect />} />
           </Route>
         </Routes>
+        <FloatingWhatsApp />
       </BrowserRouter>
-
-      {/* Floating WhatsApp Button */}
-      <a
-        href="https://wa.me/919236553585"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="floating-whatsapp"
-      >
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
-          alt="WhatsApp"
-        />
-      </a>
     </AuthProvider>
   );
 }
