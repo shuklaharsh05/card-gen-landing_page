@@ -248,17 +248,12 @@ class ApiService {
 
   // Public Inquiry API
   async submitInquiry(inquiryData) {
-    // Send only the required fields as specified
     const requestData = {
       name: inquiryData.name,
       email: inquiryData.email,
       phone: inquiryData.phone,
-      businessType: inquiryData.businessType,
-      message: inquiryData.message || '', // Include message if provided
     };
-    
     console.log('Submitting inquiry with data:', requestData);
-    
     return this.request('/inquiries', {
       method: 'POST',
       body: JSON.stringify(requestData),
@@ -284,19 +279,13 @@ class ApiService {
 
   // Business Card Management APIs (for authenticated users)
   async createCard(cardData, userId) {
-    // Send all fields collected in the MyCard form including message
+    // Send inquiry contact details from the form. Phone here is the number entered in the inquiry form (contact for the inquiry), not the user's linked login number.
     const requestData = {
       name: cardData.name,
       email: cardData.email,
-      phone: cardData.phone,
-      businessType: cardData.business_type, // Note: using businessType instead of business_type
-      message: cardData.message || '', // Include message if provided
+      phone: cardData.phone ?? '',
     };
-    
     console.log('Creating card with data:', requestData);
-    console.log('Sending to endpoint: /api/inquiries');
-    
-    // Use /api/inquiries endpoint for card creation
     return this.request('/inquiries', {
       method: 'POST',
       body: JSON.stringify(requestData),

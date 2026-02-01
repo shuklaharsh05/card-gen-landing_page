@@ -6,7 +6,7 @@ import {
   CreditCard,
   Mail,
   Phone,
-  Briefcase,
+  User,
   Link as LinkIcon,
   CheckCircle,
   AlertCircle,
@@ -14,14 +14,6 @@ import {
   Download,
   Share2,
 } from 'lucide-react';
-
-const businessTypes = [
-  'E-commerce',
-  'Interior Designer', 
-  'Makeup Artist',
-  'Travel Agent',
-  'Other'
-];
 
 export default function MyCard() {
   const { user, refreshUser } = useAuth();
@@ -33,8 +25,6 @@ export default function MyCard() {
     name: '',
     email: '',
     phone: '',
-    business_type: '',
-    message: '',
   });
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
@@ -172,14 +162,16 @@ export default function MyCard() {
       }
 
       // No inquiries found - user can submit inquiry form; pre-fill from profile where available
+      // Inquiry phone: initially show user's login number if available (editable); else empty, required
       console.log('MyCard - No inquiries found for user - showing inquiry form');
       setCard(null);
       setInquirySubmitted(false);
+      const userPhone = user?.phone ? String(user.phone) : '';
       setFormData((prev) => ({
         ...prev,
         name: user?.name ?? prev.name,
         email: user?.email ?? prev.email,
-        phone: user?.phone ?? prev.phone,
+        phone: userPhone ? (prev.phone === '' || prev.phone === userPhone ? userPhone : prev.phone) : prev.phone,
       }));
       setLoading(false);
     };
@@ -192,9 +184,6 @@ export default function MyCard() {
     name: 'Please enter your name.',
     email: 'Please enter a valid email address.',
     phone: 'Please enter a valid phone number.',
-    message: 'Please enter a message.',
-    businessType: 'Please select a business type.',
-    business_type: 'Please select a business type.',
   };
 
   const getErrorMessage = (response) => {
@@ -255,10 +244,6 @@ export default function MyCard() {
     }
     if (!formData.phone?.trim()) {
       showError('Please enter your phone number.');
-      return;
-    }
-    if (!formData.business_type) {
-      showError('Please select a business type.');
       return;
     }
 
@@ -610,11 +595,18 @@ export default function MyCard() {
   // Only show form if user has no inquiries (one inquiry per user rule)
   // hasInquiries check ensures form is never shown if user already submitted inquiry
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Submit Your Inquiry</h1>
-        <p className="text-slate-600 text-base sm:text-lg">
-          Fill in your information to submit an inquiry for your business card
+    <div className="max-w-5xl 2xl:max-w-[66rem] mx-auto p-4 sm:p-6 lg:px-16 2xl:px-24 lg:py-10 2xl:py-16 bg-gradient-to-t from-[#BED6EC] to-white rounded-2xl sm:rounded-3xl lg:rounded-[40px] flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-20 border border-[#6600FF]">
+      {/* Image: hidden on phone, visible from lg */}
+      <div className="hidden lg:block lg:flex-shrink-0 lg:w-[min(50%,26rem)] lg:min-w-0">
+        <img src="inquiry-img.png" alt="" className="w-full h-auto max-w-[23.5rem] mx-auto object-cover rounded-xl" />
+      </div>
+
+      <div className="w-full min-w-0 lg:w-1/2 lg:max-w-xl flex flex-col">
+        <div className="mb-4 sm:mb-6">
+          <p className="text-lg sm:text-xl text-black font-bold">Confirm info, your</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-black to-[#004DFF] mb-3 mt-2 my-4">Card ready in 60 min By Experts</h1>
+        <p className="text-slate-800 text-xs sm:text-sm lg:leading-tight">
+        Our experts design your card. You’ll receive a call after form submission. Your information is used for contact purposes only.
         </p>
         {cardGenerated && (
           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
@@ -623,10 +615,9 @@ export default function MyCard() {
             </p>
           </div>
         )}
-      </div>
+        </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 lg:p-8">
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-4 w-full">
           {error && (
             <div
               ref={errorRef}
@@ -638,99 +629,54 @@ export default function MyCard() {
             </div>
           )}
 
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1">
-              Full Name
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={formData.name}
-              onChange={(e) => { setError(''); setFormData({ ...formData, name: e.target.value }); }}
-              className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
-              placeholder="John Doe"
-              disabled={creating}
-            />
-          </div>
+          <div className="space-y-1 sm:space-y-2 mb-8 mt-2">
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700 pointer-events-none" strokeWidth={1.5}/>
+              <input
+                id="name"
+                type="text"
+                value={formData.name}
+                onChange={(e) => { setError(''); setFormData({ ...formData, name: e.target.value }); }}
+                className="w-full pl-10 pr-3 sm:pl-11 sm:pr-4 py-2 border border-slate-700 rounded-xl focus:ring-1 focus:ring-black focus:border-transparent outline-none transition-all text-sm sm:text-base"
+                placeholder="Your Name"
+                disabled={creating}
+              />
+            </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
-              Email Address
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => { setError(''); setFormData({ ...formData, email: e.target.value }); }}
-              className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
-              placeholder="john@example.com"
-              disabled={creating}
-            />
-          </div>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700 pointer-events-none" strokeWidth={1.5}/>
+              <input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => { setError(''); setFormData({ ...formData, email: e.target.value }); }}
+                className="w-full pl-10 pr-3 sm:pl-11 sm:pr-4 py-2 border border-slate-700 rounded-xl focus:ring-1 focus:ring-black focus:border-transparent outline-none transition-all text-sm sm:text-base"
+                placeholder="Your Email"
+                disabled={creating}
+              />
+            </div>
 
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-1">
-              Phone Number
-            </label>
-            <input
-              id="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => { setError(''); setFormData({ ...formData, phone: e.target.value }); }}
-              className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
-              placeholder="+1 (555) 123-4567"
-              disabled={creating}
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="business_type"
-              className="block text-sm font-medium text-slate-700 mb-1"
-            >
-              Business Type
-            </label>
-            <select
-              id="business_type"
-              value={formData.business_type}
-              onChange={(e) => { setError(''); setFormData({ ...formData, business_type: e.target.value }); }}
-              className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm sm:text-base"
-              disabled={creating}
-            >
-              <option value="">Select a business type</option>
-              {businessTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="message"
-              className="block text-sm font-medium text-slate-700 mb-1"
-            >
-              Additional Message (Optional)
-            </label>
-            <textarea
-              id="message"
-              value={formData.message}
-              onChange={(e) => { setError(''); setFormData({ ...formData, message: e.target.value }); }}
-              rows={3}
-              className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all resize-none text-sm sm:text-base"
-              placeholder="Tell us about your specific requirements or any additional information..."
-              disabled={creating}
-            />
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700 pointer-events-none" strokeWidth={1.5}/>
+              <input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => { setError(''); setFormData({ ...formData, phone: e.target.value }); }}
+                className="w-full pl-10 pr-3 sm:pl-11 sm:pr-4 py-2 border border-slate-700 rounded-xl focus:ring-1 focus:ring-black focus:border-transparent outline-none transition-all text-sm sm:text-base"
+                placeholder={user?.phone ? undefined : "Your Phone Number"}
+                disabled={creating}
+              />
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={creating}
-            className="w-full py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
+            className="w-full py-2.5 sm:py-3 bg-black text-white rounded-[15px] font-semibold transition-all shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
           >
-            <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
-            {creating ? 'Submitting...' : 'Submit Inquiry'}
+            {/* <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" /> */}
+            {creating ? 'Sending...' : 'Create My Vistinglink Card'}
           </button>
         </form>
       </div>

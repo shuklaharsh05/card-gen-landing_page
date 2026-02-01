@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { apiService } from '../lib/api.js';
-import { CreditCard, Mail, Phone, Briefcase, MessageSquare, Send, CheckCircle, AlertCircle, User } from 'lucide-react';
+import { CreditCard, Mail, Phone, Send, CheckCircle, AlertCircle, User } from 'lucide-react';
 
 export default function Inquiry() {
   const { id } = useParams();
@@ -44,7 +44,7 @@ export default function Inquiry() {
     setSuccess('');
     setSubmitting(true);
 
-    if (!inquiryData.name || !inquiryData.email || !inquiryData.phone || !inquiryData.businessType) {
+    if (!inquiryData.name || !inquiryData.email || !inquiryData.phone) {
       setError('Please fill in all required fields');
       setSubmitting(false);
       return;
@@ -58,8 +58,6 @@ export default function Inquiry() {
         name: '',
         email: '',
         phone: '',
-        message: '',
-        businessType: ''
       });
     } else {
       setError(response.error || 'Failed to submit inquiry');
@@ -213,50 +211,6 @@ export default function Inquiry() {
                     className="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
                     placeholder="+1 (555) 123-4567"
                     required
-                    disabled={submitting}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="businessType" className="block text-sm font-medium text-slate-700 mb-2">
-                  Business Type *
-                </label>
-                <div className="relative">
-                  <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <select
-                    id="businessType"
-                    name="businessType"
-                    value={inquiryData.businessType}
-                    onChange={handleInputChange}
-                    className="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all appearance-none"
-                    required
-                    disabled={submitting}
-                  >
-                    <option value="">Select your business type</option>
-                    <option value="E-commerce">E-commerce</option>
-                    <option value="Interior Designer">Interior Designer</option>
-                    <option value="Makeup Artist">Makeup Artist</option>
-                    <option value="Travel Agent">Travel Agent</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-slate-700 mb-2">
-                  Additional Message
-                </label>
-                <div className="relative">
-                  <MessageSquare className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={inquiryData.message}
-                    onChange={handleInputChange}
-                    rows={4}
-                    className="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all resize-none"
-                    placeholder="Tell us about your specific requirements..."
                     disabled={submitting}
                   />
                 </div>
