@@ -46,7 +46,7 @@ function Header() {
       <div className="max-w-[1250px] mx-auto flex items-center justify-between px-4 py-2 lg:py-3">
         {/* Left Side */}
         <a href="/" className="flex items-center gap-2">
-          <img src="/visitingLink-logo.png" alt="logo" className="h-10 object-contain" />
+          <img src="/visitingLink-logo.png" alt="logo" className="lg:h-10 h-7 object-contain" />
         </a>
 
         {/* Desktop Buttons */}
@@ -99,7 +99,7 @@ function Header() {
         <div className="md:hidden">
           <button
             onClick={() => setMenuOpen((prev) => !prev)}
-            className="text-3xl text-black"
+            className="text-2xl text-black"
           >
             {menuOpen ? <HiX /> : <HiMenuAlt3 />}
           </button>

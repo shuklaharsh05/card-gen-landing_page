@@ -1,6 +1,7 @@
 // API Configuration
 // For local testing, use localhost. For production, use teamserver.cloud
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 // const API_BASE_URL = 'https://teamserver.cloud/api';
 
 // API Service Class
@@ -13,36 +14,36 @@ class ApiService {
   async request(endpoint, options = {}) {
     try {
       const url = `${this.baseURL}${endpoint}`;
-      const token = localStorage.getItem('auth_token');
-      
+      const token = localStorage.getItem("auth_token");
+
       const config = {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
           ...options.headers,
         },
         ...options,
       };
 
-      console.log('API Request:', { url, config, body: options.body });
+      console.log("API Request:", { url, config, body: options.body });
 
       const response = await fetch(url, config);
-      
+
       // Check if response is JSON
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
         const text = await response.text();
-        console.error('Non-JSON response:', text.substring(0, 200));
+        console.error("Non-JSON response:", text.substring(0, 200));
         return {
           success: false,
           error: `Server returned non-JSON response (${response.status}). The endpoint may not exist or there's a server error.`,
-          details: { status: response.status, text: text.substring(0, 200) }
+          details: { status: response.status, text: text.substring(0, 200) },
         };
       }
 
       const data = await response.json();
 
-      console.log('API Response:', { status: response.status, data });
+      console.log("API Response:", { status: response.status, data });
 
       if (!response.ok) {
         return {
@@ -58,19 +59,19 @@ class ApiService {
         message: data.message,
       };
     } catch (error) {
-      console.log('API Error:', error);
+      console.log("API Error:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Network error',
+        error: error instanceof Error ? error.message : "Network error",
       };
     }
   }
 
   // Auth code exchange (short-lived code -> JWT/session)
   async exchangeAuthCode(code) {
-    const response = await this.request('/auth/exchange-code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await this.request("/auth/exchange-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         code,
         origin: window.location.origin,
@@ -80,7 +81,7 @@ class ApiService {
     // If exchange is successful, store the token (support both top-level and wrapped shapes)
     const token = response?.token || response?.data?.token;
     if (response?.success && token) {
-      localStorage.setItem('auth_token', token);
+      localStorage.setItem("auth_token", token);
     }
 
     return response;
@@ -95,14 +96,14 @@ class ApiService {
       ...(phone ? { phone } : {}),
     };
 
-    const response = await this.request('/auth/register', {
-      method: 'POST',
+    const response = await this.request("/auth/register", {
+      method: "POST",
       body: JSON.stringify(payload),
     });
 
     // If signup is successful, store the token
     if (response.success && response.data && response.data.token) {
-      localStorage.setItem('auth_token', response.data.token);
+      localStorage.setItem("auth_token", response.data.token);
     }
 
     return response;
@@ -115,56 +116,56 @@ class ApiService {
       ...(phone ? { phone } : {}),
     };
 
-    const response = await this.request('/auth/login', {
-      method: 'POST',
+    const response = await this.request("/auth/login", {
+      method: "POST",
       body: JSON.stringify(payload),
     });
 
     // If login is successful, store the token
     if (response.success && response.data && response.data.token) {
-      localStorage.setItem('auth_token', response.data.token);
+      localStorage.setItem("auth_token", response.data.token);
     }
 
     return response;
   }
 
   async googleAuth(idToken) {
-    const response = await this.request('/auth/google', {
-      method: 'POST',
+    const response = await this.request("/auth/google", {
+      method: "POST",
       body: JSON.stringify({ idToken }),
     });
 
     // If Google auth is successful, store the token
     if (response.success && response.data && response.data.token) {
-      localStorage.setItem('auth_token', response.data.token);
+      localStorage.setItem("auth_token", response.data.token);
     }
 
     return response;
   }
 
   async logout() {
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem("auth_token");
     return { success: true, data: null };
   }
 
   async getCurrentUser() {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem("auth_token");
     if (!token) {
       return { success: true, data: null };
     }
 
-    const response = await this.request('/auth/profile');
-    console.log('getCurrentUser response:', response);
+    const response = await this.request("/auth/profile");
+    console.log("getCurrentUser response:", response);
     return response;
   }
 
   async linkCredentials({ phone, password }) {
-    const response = await this.request('/auth/link-credentials', {
-      method: 'POST',
+    const response = await this.request("/auth/link-credentials", {
+      method: "POST",
       body: JSON.stringify({ phone, password }),
     });
     if (response.success && response.data?.token) {
-      localStorage.setItem('auth_token', response.data.token);
+      localStorage.setItem("auth_token", response.data.token);
     }
     return response;
   }
@@ -182,7 +183,7 @@ class ApiService {
   // Delete a saved card
   async deleteSavedCard(userId, cardId) {
     return this.request(`/users/${userId}/saved-cards/${cardId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
@@ -197,7 +198,7 @@ class ApiService {
       // Get user data first
       const userResponse = await this.getUserById(userId);
       if (!userResponse.success || !userResponse.data) {
-        return { success: false, error: 'User not found' };
+        return { success: false, error: "User not found" };
       }
 
       const userData = userResponse.data;
@@ -206,8 +207,8 @@ class ApiService {
       if (userData.inquiries && Array.isArray(userData.inquiries)) {
         for (const inquiryRef of userData.inquiries) {
           let inquiry;
-          
-          if (typeof inquiryRef === 'string') {
+
+          if (typeof inquiryRef === "string") {
             const inquiryResponse = await this.getInquiryById(inquiryRef);
             if (inquiryResponse.success && inquiryResponse.data) {
               inquiry = inquiryResponse.data;
@@ -215,19 +216,20 @@ class ApiService {
           } else {
             inquiry = inquiryRef;
           }
-          
+
           if (inquiry && inquiry.cardGenerated === true && inquiry.cardId) {
             const cardResponse = await this.getCardById(inquiry.cardId);
             if (cardResponse.success && cardResponse.data) {
               const cardData = cardResponse.data;
               cardsWithData.push({
                 id: inquiry.cardId,
-                name: cardData.name || 'Business Card',
-                businessType: cardData.business_type || cardData.businessType || 'Business',
+                name: cardData.name || "Business Card",
+                businessType:
+                  cardData.business_type || cardData.businessType || "Business",
                 email: cardData.email,
                 createdAt: inquiry.createdAt || inquiry.created_at,
                 inquiryId: inquiry._id,
-                cardData: cardData
+                cardData: cardData,
               });
             }
           }
@@ -236,12 +238,12 @@ class ApiService {
 
       return {
         success: true,
-        data: cardsWithData
+        data: cardsWithData,
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message || 'Failed to fetch user cards'
+        error: error.message || "Failed to fetch user cards",
       };
     }
   }
@@ -253,17 +255,31 @@ class ApiService {
       email: inquiryData.email,
       phone: inquiryData.phone,
     };
-    console.log('Submitting inquiry with data:', requestData);
-    return this.request('/inquiries', {
-      method: 'POST',
+    console.log("Submitting inquiry with data:", requestData);
+    return this.request("/inquiries", {
+      method: "POST",
       body: JSON.stringify(requestData),
     });
   }
 
+  // Details form (public, no auth) - shareable link per card
+  async getDetailsByToken(token) {
+    const response = await this.request(`/details/by-token/${token}`);
+    return response;
+  }
+
+  async submitDetailsByToken(token, data) {
+    const response = await this.request(`/details/submit-by-token/${token}`, {
+      method: "POST",
+      body: JSON.stringify({ data }),
+    });
+    return response;
+  }
+
   // Public Card Viewing API
   async getCardById(cardId) {
-    console.log('getCardById - Fetching card with ID:', cardId);
-    console.log('getCardById - Calling endpoint: /api/cards/' + cardId);
+    console.log("getCardById - Fetching card with ID:", cardId);
+    console.log("getCardById - Calling endpoint: /api/cards/" + cardId);
     return this.request(`/cards/${cardId}`);
   }
 
@@ -283,28 +299,27 @@ class ApiService {
     const requestData = {
       name: cardData.name,
       email: cardData.email,
-      phone: cardData.phone ?? '',
+      phone: cardData.phone ?? "",
     };
-    console.log('Creating card with data:', requestData);
-    return this.request('/inquiries', {
-      method: 'POST',
+    console.log("Creating card with data:", requestData);
+    return this.request("/inquiries", {
+      method: "POST",
       body: JSON.stringify(requestData),
     });
   }
 
   // Note: Removed getCategoryId method as we're sending simple form data
 
-
   async updateCard(cardId, cardData) {
     return this.request(`/cards/${cardId}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(cardData),
     });
   }
 
   async deleteCard(cardId) {
     return this.request(`/cards/${cardId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
@@ -314,9 +329,9 @@ class ApiService {
     const endpoints = [
       `/appointments/user/${userId}`,
       `/appointments/${userId}`,
-      `/users/${userId}/appointments`
+      `/users/${userId}/appointments`,
     ];
-    
+
     for (const endpoint of endpoints) {
       try {
         const response = await this.request(endpoint);
@@ -324,81 +339,85 @@ class ApiService {
           // console.log(`Found appointments at endpoint: ${endpoint}`);
           return {
             ...response,
-            data: Array.isArray(response.data) ? response.data : []
+            data: Array.isArray(response.data) ? response.data : [],
           };
         }
       } catch (error) {
         console.log(`Endpoint ${endpoint} failed:`, error);
       }
     }
-    
+
     // If all endpoints fail, return empty array
     return {
       success: true,
       data: [],
-      message: 'No appointments found'
+      message: "No appointments found",
     };
   }
 
   // Get appointments for a specific card with pagination and filtering
   async getCardAppointments(cardId, options = {}) {
-    console.log('🚀 getCardAppointments called with:', { cardId, options });
-    
+    console.log("🚀 getCardAppointments called with:", { cardId, options });
+
     const { page = 1, limit = 10, status } = options;
-    
+
     // Build query parameters
     const queryParams = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
     });
-    
+
     if (status) {
-      queryParams.append('status', status);
+      queryParams.append("status", status);
     }
-    
+
     const endpoint = `/appointments/card/${cardId}?${queryParams.toString()}`;
-    
-    console.log('📡 Fetching card appointments:', { 
-      cardId, 
-      options, 
+
+    console.log("📡 Fetching card appointments:", {
+      cardId,
+      options,
       endpoint,
-      queryParams: queryParams.toString()
+      queryParams: queryParams.toString(),
     });
-    
+
     try {
       const response = await this.request(endpoint);
-      console.log('✅ getCardAppointments response:', response);
+      console.log("✅ getCardAppointments response:", response);
       return response;
     } catch (error) {
-      console.error('❌ getCardAppointments error:', error);
+      console.error("❌ getCardAppointments error:", error);
       throw error;
     }
   }
 
   async updateAppointmentStatus(appointmentId, status) {
     return this.request(`/appointments/${appointmentId}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify({ status }),
     });
   }
 
   async deleteAppointment(appointmentId) {
     return this.request(`/appointments/${appointmentId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
   // Payment APIs
   async createPaymentOrder(inquiryId, amount) {
-    return this.request('/payment/create-order', {
-      method: 'POST',
+    return this.request("/payment/create-order", {
+      method: "POST",
       body: JSON.stringify({ inquiryId, amount }),
     });
   }
 
-  async verifyPayment({ razorpay_order_id, razorpay_payment_id, razorpay_signature }) {
-    return this.request('/payment/verify', {
-      method: 'POST',
+  async verifyPayment({
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+  }) {
+    return this.request("/payment/verify", {
+      method: "POST",
       body: JSON.stringify({
         razorpay_order_id,
         razorpay_payment_id,
@@ -415,7 +434,7 @@ class ApiService {
       `/contacts/${userId}`,
       `/contacts?userId=${encodeURIComponent(userId)}`,
     ];
-    
+
     for (const endpoint of endpoints) {
       try {
         const response = await this.request(endpoint);
@@ -439,36 +458,36 @@ class ApiService {
         console.log(`Endpoint ${endpoint} failed:`, error);
       }
     }
-    
+
     // If all endpoints fail, return empty array
     return {
       success: true,
       data: [],
-      message: 'No contacts found',
+      message: "No contacts found",
     };
   }
 
   // Contacts API
   async saveContact(contactData) {
     // contactData should include: userId, name, and optional email, phone, whatsapp, notes
-    console.log('saveContact - Sending payload:', contactData);
-    const response = await this.request('/contacts', {
-      method: 'POST',
+    console.log("saveContact - Sending payload:", contactData);
+    const response = await this.request("/contacts", {
+      method: "POST",
       body: JSON.stringify(contactData),
     });
-    console.log('saveContact - API response:', response);
+    console.log("saveContact - API response:", response);
     return response;
   }
 
   // Update contact
   async updateContact(contactId, contactData) {
     // contactData should include: name, and optional email, phone, whatsapp, notes
-    console.log('updateContact - Sending payload:', { contactId, contactData });
+    console.log("updateContact - Sending payload:", { contactId, contactData });
     const response = await this.request(`/contacts/${contactId}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(contactData),
     });
-    console.log('updateContact - API response:', response);
+    console.log("updateContact - API response:", response);
     return response;
   }
 
@@ -476,26 +495,26 @@ class ApiService {
 
   // Additional helper methods for user profile data
   getUserId() {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem("auth_token");
     if (!token) return null;
-    
+
     try {
       // Decode JWT token to get user ID (basic implementation)
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(token.split(".")[1]));
       return payload.userId || payload.sub || payload._id;
     } catch (error) {
-      console.error('Error decoding token:', error);
+      console.error("Error decoding token:", error);
       return null;
     }
   }
 
   isAuthenticated() {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem("auth_token");
     if (!token) return false;
-    
+
     try {
       // Check if token is expired
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(token.split(".")[1]));
       const currentTime = Date.now() / 1000;
       return payload.exp > currentTime;
     } catch (error) {
@@ -508,56 +527,60 @@ class ApiService {
 export const apiService = new ApiService();
 
 // Add test functions to window for easy console testing
-if (typeof window !== 'undefined') {
-  window.testCardAppointments = async (cardId = 'test123', options = {}) => {
-    console.log('🧪 Testing getCardAppointments...');
+if (typeof window !== "undefined") {
+  window.testCardAppointments = async (cardId = "test123", options = {}) => {
+    console.log("🧪 Testing getCardAppointments...");
     try {
       const result = await apiService.getCardAppointments(cardId, options);
-      console.log('🧪 Test result:', result);
+      console.log("🧪 Test result:", result);
       return result;
     } catch (error) {
-      console.error('🧪 Test error:', error);
+      console.error("🧪 Test error:", error);
       return error;
     }
   };
 
-  window.testMyAppointments = async (userId = '68e119bf1055a2e0c74bc4a9') => {
-    console.log('🧪 Testing getAppointments (My Appointments)...');
+  window.testMyAppointments = async (userId = "68e119bf1055a2e0c74bc4a9") => {
+    console.log("🧪 Testing getAppointments (My Appointments)...");
     try {
       const result = await apiService.getAppointments(userId);
-      console.log('🧪 Test result:', result);
+      console.log("🧪 Test result:", result);
       return result;
     } catch (error) {
-      console.error('🧪 Test error:', error);
+      console.error("🧪 Test error:", error);
       return error;
     }
   };
 
-  window.testUserCards = async (userId = '68e119bf1055a2e0c74bc4a9') => {
-    console.log('🧪 Testing getUserCardsWithData...');
+  window.testUserCards = async (userId = "68e119bf1055a2e0c74bc4a9") => {
+    console.log("🧪 Testing getUserCardsWithData...");
     try {
       const result = await apiService.getUserCardsWithData(userId);
-      console.log('🧪 Test result:', result);
+      console.log("🧪 Test result:", result);
       return result;
     } catch (error) {
-      console.error('🧪 Test error:', error);
+      console.error("🧪 Test error:", error);
       return error;
     }
   };
 
-  window.testDateFilter = async (cardId = 'test123', startDate = '2023-12-01', endDate = '2023-12-31') => {
-    console.log('🧪 Testing date filtering...');
+  window.testDateFilter = async (
+    cardId = "test123",
+    startDate = "2023-12-01",
+    endDate = "2023-12-31"
+  ) => {
+    console.log("🧪 Testing date filtering...");
     try {
       const result = await apiService.getCardAppointments(cardId, {
         page: 1,
         limit: 10,
         startDate,
-        endDate
+        endDate,
       });
-      console.log('🧪 Date filter test result:', result);
+      console.log("🧪 Date filter test result:", result);
       return result;
     } catch (error) {
-      console.error('🧪 Date filter test error:', error);
+      console.error("🧪 Date filter test error:", error);
       return error;
     }
   };
@@ -583,5 +606,5 @@ export const {
   createPaymentOrder,
   verifyPayment,
   getContacts,
-  saveContact
+  saveContact,
 } = apiService;
