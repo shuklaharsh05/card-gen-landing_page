@@ -62,14 +62,14 @@ function Header() {
               >
                 Dashboard
               </button>
-              {needsCredentials && (
+              {/* {needsCredentials && (
                 <button
                   onClick={() => setLinkModalOpen(true)}
                   className="px-5 py-1.5 bg-amber-600 text-white rounded-full font-semibold hover:bg-amber-700 transition"
                 >
                   Link phone & password
                 </button>
-              )}
+              )} */}
               <button
                 onClick={signOut}
                 className="px-5 py-1.5 bg-gray-700 text-white rounded-full font-semibold hover:bg-gray-800 transition"
@@ -140,7 +140,7 @@ function Header() {
                   >
                     Dashboard
                   </button>
-                  {needsCredentials && (
+                  {/* {needsCredentials && (
                     <button
                       onClick={() => {
                         setLinkModalOpen(true);
@@ -150,7 +150,7 @@ function Header() {
                     >
                       Link phone & password
                     </button>
-                  )}
+                  )} */}
                   <button
                     onClick={() => {
                       signOut();
