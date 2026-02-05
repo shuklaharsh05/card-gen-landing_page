@@ -54,7 +54,7 @@ function Header() {
           <button onClick={() => navigate("/prices")} className="px-5 py-1.5 bg-white text-black rounded-full font-semibold border border-gray-300 hover:bg-gray-100">
             Prices
           </button>
-          {user ? (
+          {/* {user ? (
             <>
               <button
                 onClick={() => navigate("/dashboard")}
@@ -62,14 +62,14 @@ function Header() {
               >
                 Dashboard
               </button>
-              {/* {needsCredentials && (
+              {needsCredentials && (
                 <button
                   onClick={() => setLinkModalOpen(true)}
                   className="px-5 py-1.5 bg-amber-600 text-white rounded-full font-semibold hover:bg-amber-700 transition"
                 >
                   Link phone & password
                 </button>
-              )} */}
+              )}
               <button
                 onClick={signOut}
                 className="px-5 py-1.5 bg-gray-700 text-white rounded-full font-semibold hover:bg-gray-800 transition"
@@ -92,7 +92,7 @@ function Header() {
                 Get Your Link
               </button>
             </>
-          )}
+          )} */}
         </div>
 
         {/* Hamburger Icon (Mobile) */}
@@ -129,7 +129,7 @@ function Header() {
                 Prices
               </button>
 
-              {user ? (
+              {/* {user ? (
                 <>
                   <button
                     onClick={() => {
@@ -140,7 +140,7 @@ function Header() {
                   >
                     Dashboard
                   </button>
-                  {/* {needsCredentials && (
+                  {needsCredentials && (
                     <button
                       onClick={() => {
                         setLinkModalOpen(true);
@@ -150,7 +150,7 @@ function Header() {
                     >
                       Link phone & password
                     </button>
-                  )} */}
+                  )}
                   <button
                     onClick={() => {
                       signOut();
@@ -182,7 +182,7 @@ function Header() {
                     Get Your Link
                   </button>
                 </>
-              )}
+              )} */}
             </div>
           </motion.div>
         )}
