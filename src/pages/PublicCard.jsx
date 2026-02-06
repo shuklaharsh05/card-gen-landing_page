@@ -11,7 +11,7 @@ export default function PublicCard() {
         src={src}
         className="w-full h-full border-0"
         allow="web-share; clipboard-write"
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-downloads allow-top-navigation-by-user-activation"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-downloads allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox"
       />
     </div>
   );
