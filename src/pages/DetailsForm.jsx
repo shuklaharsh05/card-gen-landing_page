@@ -320,7 +320,7 @@ export default function DetailsForm() {
                                   return { ...prev, [name]: current };
                                 })
                               }
-                              className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-full hover:bg-blue-100"
+                              className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700"
                             >
                               + Add {label.toLowerCase()}
                             </button>

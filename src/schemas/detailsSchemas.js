@@ -3,9 +3,9 @@ export const detailsSchemas = {
     fields: [
       // Basic Info
       { name: "CompanyName", type: "text", label: "Company Name" },
-      { name: "heading", type: "text", label: "Heading" },
+      { name: "heading", type: "text", label: "We Deals In" },
       { name: "businessCategory", type: "text", label: "Business Category" },
-      { name: "foundedYear", type: "text", label: "Founded Year" },
+      { name: "foundedYear", type: "text", label: "Founded Year (Like 2020)" },
       { name: "tagline", type: "text", label: "Tagline" },
 
       // Contact
@@ -39,7 +39,7 @@ export const detailsSchemas = {
       {
         name: "founderDescription",
         type: "textarea",
-        label: "Founder Description",
+        label: "Founder Designation (Like Founder, CEO, etc.)",
       },
       {
         name: "founderMessage",
@@ -55,14 +55,24 @@ export const detailsSchemas = {
       { name: "youtubeVideo", type: "url", label: "YouTube Video URL" },
 
       // CTA
-      { name: "ctaTitle", type: "text", label: "CTA Title" },
-      { name: "ctaSubtitle", type: "text", label: "CTA Subtitle" },
+      // { name: "ctaTitle", type: "text", label: "CTA Title" },
+      // { name: "ctaSubtitle", type: "text", label: "CTA Subtitle" },
+      {
+        name: "testimonials",
+        type: "array",
+        label: "What our clients say about us",
+        multiple: true,
+        itemSchema: {
+          name: "",
+          reviewText: "",
+        },
+      },
 
       // Metrics
       {
         name: "ourNumbers",
         type: "array",
-        label: "Our Numbers (like 100+ clients, 10+ years of experience, etc.)",
+        label: "What we have done (like 100+ clients, 10+ years of experience, etc.)",
         multiple: true,
         itemSchema: {
           number: "",
@@ -110,7 +120,7 @@ export const detailsSchemas = {
       {
         name: "headquarters",
         type: "array",
-        label: "Your Offices",
+        label: "Your Offices Locations",
         multiple: true,
         itemSchema: {
           city: "",
