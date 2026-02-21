@@ -154,7 +154,7 @@ export default function Expo() {
 
     return (
         <>
-        <div className="bg-gray-300 flex flex-col items-center justify-center py-8">
+        <div className="bg-gray-300 flex flex-col items-center justify-center">
             <div className="max-w-96 w-full h-full bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col gap-8 px-4 pt-6 pb-8" style={{background: "linear-gradient(to bottom, #ffffff 50%, #030A10 90%)"}}>
                 {/* Header / branding */}
                 <section className="flex flex-col items-center gap-3">
