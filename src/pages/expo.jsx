@@ -243,7 +243,7 @@ export default function Expo() {
                     <p className="text-center text-xs">Network & Grow Together</p>
                     </div>
  
-                    <form onSubmit={handleSubmit} className="space-y-2 max-w-72 mx-auto mt-3">
+                    <form onSubmit={handleSubmit} className="max-w-72 mx-auto mt-3">
                         <input
                             type="text"
                             placeholder="Enter your name"
@@ -254,14 +254,14 @@ export default function Expo() {
                         />
                         <input
                             type="tel"
-                            placeholder="Enter your phone"
+                            placeholder="Enter your phone number"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
-                            className="w-full border-2 border-gray-400 rounded-full px-3 py-2 text-sm"
+                            className="w-full border-2 border-gray-400 rounded-full px-3 py-2 text-sm mt-2"
                             required
                         />
                         {!submitted ? (
-                            <button type="submit" className="bg-black text-white px-6 py-2 rounded-full font-medium w-full mt-2">
+                            <button type="submit" className="bg-black text-white px-6 py-2 rounded-full font-medium w-full mt-4">
                                 Submit
                             </button>
                         ) : null}
@@ -315,7 +315,7 @@ export default function Expo() {
 
                 <p className="text-center text-xs text-white">OR Get Tickets from </p>
                 <a
-                    href="https://bookmyshow.com"
+                    href="https://rzp.io/rzp/2QdeHpRb"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mb-4"
