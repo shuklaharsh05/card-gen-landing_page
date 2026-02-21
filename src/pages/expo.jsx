@@ -158,17 +158,31 @@ export default function Expo() {
             <div className="max-w-96 w-full h-full bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col gap-8 px-4 pt-6 pb-8" style={{background: "linear-gradient(to bottom, #ffffff 50%, #030A10 90%)"}}>
                 {/* Header / branding */}
                 <section className="flex flex-col items-center gap-3">
-                    <img src="/visitingLink-logo.png" alt="expo-logo" className="w-24 mx-auto" />
+                    {/* <img src="/visitingLink-logo.png" alt="expo-logo" className="w-24 mx-auto" /> */}
+                    <div className="flex items-center justify-between w-full mb-2 mt-1">
+                        <p className="text-[15px] font-bold">Get you Passes Now</p>
+                        <a
+                    href="https://in.bookmyshow.com/events/bollywood-rang-concert-jhansi/ET00486745/ticket/CMCZ/10001"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className=""
+                    onClick={() => apiService.recordExpoBookMyShowClick().catch(() => {})}
+                >
+                    <img src="/expo/bookmyshow.png" alt="expo-logo" className="w-32 mx-auto" />
+                </a>
+                    </div>
                     <div className="relative w-full max-w-4xl mx-auto mt-2" style={{ paddingBottom: "120%" }}>
                         <iframe width="383" height="680" src="https://www.youtube.com/embed/hBDzAvYFrJw" title="Get Ready jhansi , EXPO is comming" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen className="absolute top-0 left-0 w-full h-full rounded-lg"></iframe>
                     </div>
                     {/* https://www.instagram.com/reels/DVAl56eEoNg/ */}
                     <img src="/expo/logos.png" alt="expo-logo" className="w-full h-full object-cover mt-2" />
                     <img src="/expo/expo-logo.png" alt="expo-logo" className="w-60 mx-auto mt-4" />
-                    <h1 className="text-2xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-l from-black to-[#004DFF] mt-2 mb-2">BUNDELKHAND <br /> VENTURE SUMMIT 2026</h1>
+                    <h1 className="text-2xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-l from-black to-[#004DFF] mt-2 mb-0">BUNDELKHAND <br /> VENTURE SUMMIT 2026</h1>
                 </section>
 
                 <section className="flex flex-col gap-3">
+
+                    <img src="/expo/sanfran.png" alt="expo-logo" className="w-36 mx-auto" />
                     <img src="/expo/sponsers.png" alt="expo-logo" className="w-full h-full object-cover" />
 
                     <div className="grid grid-cols-3 gap-4 mt-6 mb-10">
@@ -228,12 +242,7 @@ export default function Expo() {
                 </section>
 
                 <section className="flex flex-col gap-3">
-                <div
-                      className="relative w-full max-w-4xl mx-auto"
-                      style={{ paddingBottom: "56.25%" }}
-                    >
-                    <iframe width="946" height="532" src="https://www.youtube.com/embed/CTv4l47QsmQ" title="Bundelkhand… ready ho jao" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen className="absolute top-0 left-0 w-full h-full rounded-2xl"></iframe>
-                    </div>
+               
                 </section>
 
                 <section className="flex flex-col items-center gap-3">
@@ -288,7 +297,13 @@ export default function Expo() {
                     )}
                 </section>
 
-                <section className="flex flex-col gap-3 mt-6">
+                <section className="flex flex-col gap-3 mt-4">
+                     <div
+                      className="relative w-full max-w-4xl mx-auto mb-12"
+                      style={{ paddingBottom: "56.25%" }}
+                    >
+                    <iframe width="946" height="532" src="https://www.youtube.com/embed/CTv4l47QsmQ" title="Bundelkhand… ready ho jao" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen className="absolute top-0 left-0 w-full h-full rounded-2xl"></iframe>
+                    </div>
                     <img src="/expo/concert-img.png" alt="expo-logo" className="w-full h-full object-cover" />
                     <p className="text-center text-xl font-bold text-yellow-400 mt-4">Popular Bollywood Dance Hits (2017–2025)</p>
                     <p className="text-center text-lg font-bold text-white">Title & Major Film Tracks</p>
@@ -307,13 +322,13 @@ export default function Expo() {
                     href="https://in.bookmyshow.com/events/bollywood-rang-concert-jhansi/ET00486745/ticket/CMCZ/10001"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-6"
+                    className="mt-4 mb-4"
                     onClick={() => apiService.recordExpoBookMyShowClick().catch(() => {})}
                 >
                     <img src="/expo/book-my-show.png" alt="expo-logo" className="w-60 mx-auto" />
                 </a>
 
-                <p className="text-center text-xs text-white">OR Get Tickets from </p>
+                {/* <p className="text-center text-xs text-white">OR Get Tickets from </p>
                 <a
                     href="https://rzp.io/rzp/2QdeHpRb"
                     target="_blank"
@@ -322,16 +337,16 @@ export default function Expo() {
                     onClick={() => apiService.recordExpoRazorpayClick().catch(() => {})}
                 >
                     <img src="/expo/razorpay.png" alt="expo-logo" className="w-60 mx-auto" />
-                </a>
+                </a> */}
 
-
+{/* 
                 <ul className="list-decimal pl-6 text-sm space-y-1 text-white">
                     <li>Click & Pay</li>
                     <li>Complete the Payment</li>
                     <li>Take a Payment Screenshot</li>
                     <li>Share the Screenshot on WhatsApp</li>
                     
-                </ul>
+                </ul> */}
 
 
                 <div>
