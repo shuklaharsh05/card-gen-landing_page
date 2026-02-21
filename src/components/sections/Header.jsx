@@ -51,9 +51,9 @@ function Header() {
 
         {/* Desktop Buttons */}
         <div className="hidden md:flex items-center gap-3">
-          <button onClick={() => navigate("/prices")} className="px-5 py-1.5 bg-white text-black rounded-full font-semibold border border-gray-300 hover:bg-gray-100">
+          {/* <button onClick={() => navigate("/prices")} className="px-5 py-1.5 bg-white text-black rounded-full font-semibold border border-gray-300 hover:bg-gray-100">
             Prices
-          </button>
+          </button> */}
           {/* {user ? (
             <>
               <button
@@ -119,7 +119,7 @@ function Header() {
             className="absolute top-full left-0 w-full bg-white shadow-lg border-t border-gray-100 md:hidden"
           >
             <div className="flex flex-col items-center gap-4 py-5">
-              <button
+              {/* <button
                 className="px-5 py-2 bg-white text-black rounded-full font-semibold border border-gray-300 w-4/5 hover:bg-gray-100"
                 onClick={() => {
                   navigate("/prices");
@@ -127,7 +127,7 @@ function Header() {
                 }}
               >
                 Prices
-              </button>
+              </button> */}
 
               {/* {user ? (
                 <>

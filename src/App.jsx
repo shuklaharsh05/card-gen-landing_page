@@ -17,6 +17,7 @@ import Contacts from "./pages/Contacts.jsx";
 import "./index.css"; // make sure your CSS for the button is loaded
 import PublicCard from "./pages/PublicCard.jsx";
 import DetailsForm from "./pages/DetailsForm.jsx";
+import Expo from "./pages/expo.jsx";
 
 function FloatingWhatsApp() {
   const location = useLocation();
@@ -45,6 +46,7 @@ function App() {
           <Route path="/" element={<Landing />} />
           {/* <Route path="/login" element={<Login />} /> */}
           <Route path="/prices" element={<PricingClient />} />
+          <Route path="/expo" element={<Expo />} />
           {/* <Route path="/signup" element={<Signup />} /> */}
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/card/:id" element={<Inquiry />} />

@@ -276,6 +276,22 @@ class ApiService {
     return response;
   }
 
+  // Expo (public) - form submissions and link clicks
+  async submitExpoSubmission({ name, phone }) {
+    return this.request("/expo/submissions", {
+      method: "POST",
+      body: JSON.stringify({ name, phone }),
+    });
+  }
+
+  async recordExpoBookMyShowClick() {
+    return this.request("/expo/clicks/bookmyshow", { method: "POST" });
+  }
+
+  async recordExpoRazorpayClick() {
+    return this.request("/expo/clicks/razorpay", { method: "POST" });
+  }
+
   // Public Card Viewing API
   async getCardById(cardId) {
     console.log("getCardById - Fetching card with ID:", cardId);
