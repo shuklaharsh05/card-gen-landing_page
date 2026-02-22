@@ -9,16 +9,19 @@ const PASS_TEXT = {
 
 const PASS_IMAGE_SRC = "/expo/pass.jpeg";
 
-// Event date: 28 Feb 2026
-const EVENT_DATE = new Date(2026, 1, 28); // Feb = month 1
+// Event date: 28 Feb 2026, 10:00 AM
+const EVENT_DATE = new Date(2026, 1, 28, 10, 0, 0, 0); // Feb = month 1
 
-const getDaysLeft = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const event = new Date(EVENT_DATE);
-    event.setHours(0, 0, 0, 0);
-    const diffMs = event - today;
-    return Math.ceil(diffMs / (24 * 60 * 60 * 1000));
+const getTimeLeft = () => {
+    const now = new Date();
+    const diffMs = EVENT_DATE - now;
+    if (diffMs <= 0) return null;
+    const totalSeconds = Math.floor(diffMs / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return { days, hours, minutes, seconds };
 };
 
 // Parse "35" -> { value: 35, suffix: "" }, "10k" -> { value: 10, suffix: "k" }
@@ -83,13 +86,13 @@ export default function Expo() {
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
     const [submitted, setSubmitted] = useState(false);
-    const [daysLeft, setDaysLeft] = useState(getDaysLeft);
+    const [timeLeft, setTimeLeft] = useState(getTimeLeft);
     const canvasRef = useRef(null);
 
     useEffect(() => {
-        const update = () => setDaysLeft(getDaysLeft());
-        update();
-        const id = setInterval(update, 60 * 60 * 1000); // update every hour
+        const tick = () => setTimeLeft(getTimeLeft());
+        tick();
+        const id = setInterval(tick, 1000); // update every second
         return () => clearInterval(id);
     }, []);
 
@@ -156,21 +159,99 @@ export default function Expo() {
         <>
         <div className="bg-gray-300 flex flex-col items-center justify-center">
             <div className="max-w-96 w-full h-full bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col gap-8 px-4 pt-6 pb-8" style={{background: "linear-gradient(to bottom, #ffffff 50%, #030A10 90%)"}}>
+
+
+            <div className="mt-6 mb-4">
+                    <p className="text-center text-xl font-bold text-black mb-5">Book your tickets Now</p>
+                    {timeLeft === null ? (
+                        <p className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#ffffff] to-[#48C44F] text-center px-2">
+                            Event is live now. Come join us!
+                        </p>
+                    ) : (
+                        <div className="flex flex-wrap items-center justify-center gap-2">
+                            <div className="flex flex-col items-center min-w-[3rem] sm:min-w-[4rem] px-2 py-2 rounded-xl bg-black/10 border border-black/20">
+                                <span className="text-2xl font-bold tabular-nums text-black">{String(timeLeft.days).padStart(2, "0")}</span>
+                                <span className="text-[10px] font-medium text-black/70 uppercase tracking-wider">Days</span>
+                            </div>
+                            <span className="text-xl font-bold text-black/50 self-end pb-5">:</span>
+                            <div className="flex flex-col items-center min-w-[3rem] sm:min-w-[4rem] px-2 py-2 rounded-xl bg-black/10 border border-black/20">
+                                <span className="text-2xl font-bold tabular-nums text-black">{String(timeLeft.hours).padStart(2, "0")}</span>
+                                <span className="text-[10px] font-medium text-black/70 uppercase tracking-wider">Hours</span>
+                            </div>
+                            <span className="text-xl font-bold text-black/50 self-end pb-5">:</span>
+                            <div className="flex flex-col items-center min-w-[3rem] sm:min-w-[4rem] px-2 py-2 rounded-xl bg-black/10 border border-black/20">
+                                <span className="text-2xl font-bold tabular-nums text-black">{String(timeLeft.minutes).padStart(2, "0")}</span>
+                                <span className="text-[10px] font-medium text-black/70 uppercase tracking-wider">Mins</span>
+                            </div>
+                            <span className="text-xl font-bold text-black/50 self-end pb-5">:</span>
+                            <div className="flex flex-col items-center min-w-[3rem] sm:min-w-[4rem] px-2 py-2 rounded-xl bg-black/10 border border-black/20">
+                                <span className="text-2xl font-bold tabular-nums text-black ">{String(timeLeft.seconds).padStart(2, "0")}</span>
+                                <span className="text-[10px] font-medium text-black/70 uppercase tracking-wider">Secs</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+            <section className="bg-gray-200 p-4 rounded-2xl">
+                    <p className="text-center text-xl font-bold">28-01 FEB to MAR 2026</p>
+                    <p className="text-center text-[19px] my-0.5 font-bold text-red-700">10:00 Am onward </p>
+                    <p className="text-center text-base">Urban Haat Behind Deen Dayal Sabhagar </p>
+                </section>
+
+                 <section className="flex flex-col items-center gap-3">
+                    <img src="/expo/clients.png" alt="expo-logo" className="w-60 mx-auto mt-2 mb-4" />
+                    <div>
+                    <p className="text-center text-xl font-bold">Free Pass For EXPO</p>
+                    <p className="text-center text-xs">Network & Grow Together</p>
+                    </div>
+ 
+                    <form onSubmit={handleSubmit} className="max-w-72 mx-auto mt-3">
+                        <input
+                            type="text"
+                            placeholder="Enter your name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full border-2 border-gray-400 rounded-full px-3 py-2 text-sm"
+                            required
+                        />
+                        <input
+                            type="tel"
+                            placeholder="Enter your phone number"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            className="w-full border-2 border-gray-400 rounded-full px-3 py-2 text-sm mt-2"
+                            required
+                        />
+                        {!submitted ? (
+                            <button type="submit" className="bg-black text-white px-6 py-2 rounded-full font-medium w-full mt-4">
+                                Submit
+                            </button>
+                        ) : null}
+                    </form>
+
+                    {!submitted ? (
+                        <></>
+                    ) : (
+                        <canvas
+                            ref={canvasRef}
+                            className="w-full max-w-xs mx-auto my-4 block rounded-lg border border-gray-200"
+                        />
+                    )}
+                    {submitted ? (
+                        <p className="text-center text-xs text-gray-600">You can Download this and come to us <br /> <span className="text-gray-800 text-[13px] font-medium">Visitor pass Will be remain valid</span></p>
+                    ) : 
+                    (
+                        <p className="text-center text-xs text-gray-600">Submit your details to get your free visitor pass</p>
+                    )}
+                    {submitted && (
+                        <button type="button" onClick={handleDownload} className="bg-black text-white px-6 py-2 rounded-full font-medium">
+                            Download
+                        </button>
+                    )}
+                </section>
                 {/* Header / branding */}
                 <section className="flex flex-col items-center gap-3">
-                    {/* <img src="/visitingLink-logo.png" alt="expo-logo" className="w-24 mx-auto" /> */}
-                    <div className="flex items-center justify-between w-full mb-2 mt-1">
-                        <p className="text-[15px] font-bold">Get you Passes Now</p>
-                        <a
-                    href="https://in.bookmyshow.com/events/bollywood-rang-concert-jhansi/ET00486745/ticket/CMCZ/10001"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className=""
-                    onClick={() => apiService.recordExpoBookMyShowClick().catch(() => {})}
-                >
-                    <img src="/expo/bookmyshow.png" alt="expo-logo" className="w-32 mx-auto" />
-                </a>
-                    </div>
+                    
                     <div className="relative w-full max-w-4xl mx-auto mt-2" style={{ paddingBottom: "120%" }}>
                         <iframe width="383" height="680" src="https://www.youtube.com/embed/hBDzAvYFrJw" title="Get Ready jhansi , EXPO is comming" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen className="absolute top-0 left-0 w-full h-full rounded-lg"></iframe>
                     </div>
@@ -235,67 +316,13 @@ export default function Expo() {
                 }
                 </section>
 
-                <section className="bg-gray-200 p-4 rounded-2xl">
-                    <p className="text-center text-xl font-bold">28-01 FEB to MAR 2026</p>
-                    <p className="text-center text-[19px] my-0.5 font-bold text-red-700">10:00 Am onward </p>
-                    <p className="text-center text-base">Urban Haat Behind Deen Dayal Sabhagar </p>
-                </section>
+                
 
                 <section className="flex flex-col gap-3">
                
                 </section>
 
-                <section className="flex flex-col items-center gap-3">
-                    <img src="/expo/clients.png" alt="expo-logo" className="w-60 mx-auto mt-2 mb-4" />
-                    <div>
-                    <p className="text-center text-xl font-bold">Free Pass For EXPO</p>
-                    <p className="text-center text-xs">Network & Grow Together</p>
-                    </div>
- 
-                    <form onSubmit={handleSubmit} className="max-w-72 mx-auto mt-3">
-                        <input
-                            type="text"
-                            placeholder="Enter your name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="w-full border-2 border-gray-400 rounded-full px-3 py-2 text-sm"
-                            required
-                        />
-                        <input
-                            type="tel"
-                            placeholder="Enter your phone number"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            className="w-full border-2 border-gray-400 rounded-full px-3 py-2 text-sm mt-2"
-                            required
-                        />
-                        {!submitted ? (
-                            <button type="submit" className="bg-black text-white px-6 py-2 rounded-full font-medium w-full mt-4">
-                                Submit
-                            </button>
-                        ) : null}
-                    </form>
-
-                    {!submitted ? (
-                        <></>
-                    ) : (
-                        <canvas
-                            ref={canvasRef}
-                            className="w-full max-w-xs mx-auto my-4 block rounded-lg border border-gray-200"
-                        />
-                    )}
-                    {submitted ? (
-                        <p className="text-center text-xs text-gray-600">You can Download this and come to us <br /> <span className="text-gray-800 text-[13px] font-medium">Visitor pass Will be remain valid</span></p>
-                    ) : 
-                    (
-                        <p className="text-center text-xs text-gray-600">Submit your details to get your free visitor pass</p>
-                    )}
-                    {submitted && (
-                        <button type="button" onClick={handleDownload} className="bg-black text-white px-6 py-2 rounded-full font-medium">
-                            Download
-                        </button>
-                    )}
-                </section>
+               
 
                 <section className="flex flex-col gap-3 mt-4">
                      <div
@@ -349,18 +376,7 @@ export default function Expo() {
                 </ul> */}
 
 
-                <div>
-                    <p className="text-center text-lg font-bold text-white mt-6">Book your tickets Now</p>
-                    {daysLeft <= 0 ? (
-                        <p className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#ffffff] to-[#48C44F] mb-4 text-center px-2">
-                            Event is live now. Come join us!
-                        </p>
-                    ) : (
-                        <p className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#ffffff] to-[#48C44F] mb-4 text-center animate-pulse">
-                            <span key={daysLeft} className="inline-block">{daysLeft} Day{daysLeft !== 1 ? "s" : ""} left!</span>
-                        </p>
-                    )}
-                </div>
+               
                 </section>
 
                 <p className="text-center text-xs text-white flex items-center justify-center gap-2">Powered by <img src="/visitingLink-logo-white.png" alt="expo-logo" className="w-20" /></p>
