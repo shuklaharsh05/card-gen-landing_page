@@ -86,6 +86,7 @@ export default function Expo() {
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
     const [submitted, setSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [timeLeft, setTimeLeft] = useState(getTimeLeft);
     const canvasRef = useRef(null);
 
@@ -127,11 +128,14 @@ export default function Expo() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!name.trim() || !phone.trim()) return;
+        if (!name.trim() || !phone.trim() || isSubmitting) return;
+        setIsSubmitting(true);
         try {
             await apiService.submitExpoSubmission({ name: name.trim(), phone: phone.trim() });
         } catch (err) {
             console.warn("Expo submission save failed:", err);
+        } finally {
+            setIsSubmitting(false);
         }
         setSubmitted(true);
     };
@@ -223,8 +227,12 @@ export default function Expo() {
                             required
                         />
                         {!submitted ? (
-                            <button type="submit" className="bg-black text-white px-6 py-2 rounded-full font-medium w-full mt-4">
-                                Submit
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="bg-black text-white px-6 py-2 rounded-full font-medium w-full mt-4 disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                                {isSubmitting ? "Submitting…" : "Submit"}
                             </button>
                         ) : null}
                     </form>
