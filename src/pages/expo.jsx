@@ -89,6 +89,7 @@ export default function Expo() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [timeLeft, setTimeLeft] = useState(getTimeLeft);
     const canvasRef = useRef(null);
+    const submitInProgressRef = useRef(false);
 
     useEffect(() => {
         const tick = () => setTimeLeft(getTimeLeft());
@@ -128,16 +129,23 @@ export default function Expo() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!name.trim() || !phone.trim() || isSubmitting) return;
+        if (!name.trim() || !phone.trim()) return;
+        if (submitInProgressRef.current || isSubmitting) return;
+        submitInProgressRef.current = true;
         setIsSubmitting(true);
         try {
-            await apiService.submitExpoSubmission({ name: name.trim(), phone: phone.trim() });
+            const result = await apiService.submitExpoSubmission({ name: name.trim(), phone: phone.trim() });
+            if (result?.success) {
+                setSubmitted(true);
+            } else {
+                console.warn("Expo submission save failed:", result?.error);
+            }
         } catch (err) {
             console.warn("Expo submission save failed:", err);
         } finally {
+            submitInProgressRef.current = false;
             setIsSubmitting(false);
         }
-        setSubmitted(true);
     };
 
     const handleDownload = () => {
