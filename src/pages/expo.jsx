@@ -7,7 +7,7 @@ const PASS_TEXT = {
     number: { x: 0.88, y: 0.785, fontSize: 20, font: "500 24px Poppins, sans-serif" },
 };
 
-const PASS_IMAGE_SRC = "/expo/pass.jpeg";
+const PASS_IMAGE_SRC = "/expo/pass.png";
 
 // Event date: 28 Feb 2026, 10:00 AM
 const EVENT_DATE = new Date(2026, 1, 28, 10, 0, 0, 0); // Feb = month 1
