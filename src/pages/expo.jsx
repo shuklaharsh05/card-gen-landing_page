@@ -188,10 +188,19 @@ export default function Expo() {
                 aria-label="Your visitor pass"
             >
                 <div
-                    className="bg-[url('/expo/popup.svg')] bg-contain bg-center bg-no-repeat max-w-sm w-full min-h-[550px] overflow-hidden flex flex-col items-center pt-[19rem]"
+                    className="bg-gradient-to-b from-[#000000] to-[#0E3253] max-w-[22rem] w-full flex flex-col items-center pt-12 pb-8 rounded-3xl px-4 relative"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    {/* <p className="text-lg font-bold text-black mb-3">Your Visitor Pass</p> */}
+                    <div>
+                        <img src="/expo/bms.png" alt="expo-logo" className="absolute -top-6 left-1/2 -translate-x-1/2 w-40" />
+                    </div>
+                    <p className="text-base text-white mb-5 text-center">Collect, send & Share </p>
+                    <p className="text-lg text-white mb-5 text-center">you won <span className="font-semibold"> 15% off</span> on Concert + Pannel Discussion Pass  </p>
+                    <p className="text-3xl text-white mb-5 text-center italic">“Rotary15”</p>
+                    <p className="text-xs text-white mb-1 text-center">Apply BookMyShow coupon code for discount on Concert Pass + Panel Discussion at Rs349 only 
+                    </p>
+                    <p className="text-xs text-white font-light mb-8 text-center">You can Get your Printed passes Offline too 
+                    write Physical pass</p>
                     {passDataUrl ? (
                         <img
                             src={passDataUrl}
@@ -231,7 +240,7 @@ export default function Expo() {
                         </button>
                     </div>
 
-                    <p className="text-center text-[13px] text-white mt-4"><a href="https://wa.me/919236553585" target="_blank" rel="noopener noreferrer" className="text-white underline">For any queries Whatsapp us at +91 9236553585</a></p>
+                    <p className="text-center text-[13px] text-white mt-6"><a href="https://wa.me/919236553585" target="_blank" rel="noopener noreferrer" className="text-white underline">For any queries Whatsapp us at +91 9236553585</a></p>
                 </div>
             </div>
         )}
