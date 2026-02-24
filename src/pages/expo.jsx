@@ -82,12 +82,16 @@ function CountUp({ valueStr, duration = 1800 }) {
     );
 }
 
+const BOOKMYSHOW_URL = "https://in.bookmyshow.com/events/bollywood-rang-concert-jhansi/ET00486745/ticket/CMCZ/10001";
+
 export default function Expo() {
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
     const [submitted, setSubmitted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [timeLeft, setTimeLeft] = useState(getTimeLeft);
+    const [showPassModal, setShowPassModal] = useState(false);
+    const [passDataUrl, setPassDataUrl] = useState(null);
     const canvasRef = useRef(null);
     const submitInProgressRef = useRef(false);
 
@@ -123,9 +127,14 @@ export default function Expo() {
             if (!canvas) return;
             const ctx = canvas.getContext("2d");
             drawPassWithText(canvas, ctx, img);
+            setPassDataUrl(canvas.toDataURL("image/png"));
         };
         img.src = PASS_IMAGE_SRC;
     }, [submitted, name, phone]);
+
+    useEffect(() => {
+        if (submitted) setShowPassModal(true);
+    }, [submitted]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -169,6 +178,64 @@ export default function Expo() {
 
     return (
         <>
+        {/* Pass success modal: generated pass + BookMyShow */}
+        {showPassModal && (
+            <div
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
+                onClick={() => setShowPassModal(false)}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Your visitor pass"
+            >
+                <div
+                    className="bg-[url('/expo/popup.svg')] bg-contain bg-center bg-no-repeat max-w-sm w-full min-h-[550px] overflow-hidden flex flex-col items-center pt-[19rem]"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {/* <p className="text-lg font-bold text-black mb-3">Your Visitor Pass</p> */}
+                    {passDataUrl ? (
+                        <img
+                            src={passDataUrl}
+                            alt="Expo visitor pass"
+                            className="w-full max-w-xs rounded-lg border border-gray-200 mb-4"
+                        />
+                    ) : (
+                        <div className="w-full max-w-xs aspect-[3/4] bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                            <span className="text-gray-500 text-sm">Loading pass…</span>
+                        </div>
+                    )}
+                    {/* <p className="text-xs text-gray-600 text-center mb-4">Save this pass. Visitor pass will remain valid.</p> */}
+                    <div className="flex gap-2 w-full max-w-xs mx-auto mt-2">
+                        {/* <button
+                            type="button"
+                            onClick={handleDownload}
+                            className="w-full bg-black text-white px-6 py-3 rounded-full font-medium"
+                        >
+                            Download Pass
+                        </button> */}
+                        <a
+                            href={BOOKMYSHOW_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full max-w-xs mx-auto text-xs text-center flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full font-medium transition-colors "
+                            onClick={() => apiService.recordExpoBookMyShowClick().catch(() => {})}
+                        >
+                            {/* <img src="/expo/book-my-show.png" alt="" className="h-6 object-contain" /> */}
+                            BookMyShow @15% OFF
+                        </a>
+                        <button
+                            type="button"
+                            onClick={handleDownload}
+                            className=" min-w-[120px] text-white text-sm bg-black px-4 py-2 rounded-full font-medium transition-colors"
+                        >
+                            Download
+                        </button>
+                    </div>
+
+                    <p className="text-center text-[13px] text-white mt-4"><a href="https://wa.me/919236553585" target="_blank" rel="noopener noreferrer" className="text-white underline">For any queries Whatsapp us at +91 9236553585</a></p>
+                </div>
+            </div>
+        )}
+
         <div className="bg-gray-300 flex flex-col items-center justify-center">
             <div className="max-w-96 w-full h-full bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col gap-8 px-4 pt-6 pb-8" style={{background: "linear-gradient(to bottom, #ffffff 50%, #030A10 90%)"}}>
 
