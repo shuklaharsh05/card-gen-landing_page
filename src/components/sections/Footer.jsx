@@ -47,9 +47,11 @@ function Footer() {
         {/* Right Section */}
         <div className="flex flex-col items-center md:items-end justify-between h-full gap-6 md:gap-0 border-t border-white/10 md:border-none pt-6 md:pt-0">
           <div className="text-center md:text-left">
-            <h4 className="font-semibold mb-3 text-gray-200 text-base sm:text-lg">Privacy Policies</h4>
+            <h4 className="font-semibold mb-3 text-gray-200 text-base sm:text-lg">Policies</h4>
             <ul className="space-y-2 text-gray-400 text-sm sm:text-base">
-              <li><a href="#" className="hover:text-white transition">Terms And Conditions</a></li>
+              <li><a href="/terms-and-conditions" className="hover:text-white transition">Terms And Conditions</a></li>
+              <li><a href="/privacy-policy" className="hover:text-white transition">Privacy Policy</a></li>
+              <li><a href="/refund-policy" className="hover:text-white transition">Refund Policy</a></li>
             </ul>
           </div>
 

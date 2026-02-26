@@ -595,7 +595,8 @@ export default function MyCard() {
   // Only show form if user has no inquiries (one inquiry per user rule)
   // hasInquiries check ensures form is never shown if user already submitted inquiry
   return (
-    <div className="max-w-5xl 2xl:max-w-[66rem] mx-auto p-4 sm:p-6 lg:px-16 2xl:px-24 lg:py-10 2xl:py-16 bg-gradient-to-t from-[#BED6EC] to-white rounded-2xl sm:rounded-3xl lg:rounded-[40px] flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-20 border border-[#6600FF]">
+    <div className='h-full w-full flex items-center justify-center'>
+      <div className="w-[90%] lg:w-full max-w-5xl 2xl:max-w-[66rem] mx-auto p-4 sm:p-6 lg:px-16 2xl:px-24 lg:py-10 2xl:py-16 bg-gradient-to-t from-[#BED6EC] to-white rounded-2xl sm:rounded-3xl lg:rounded-[40px] flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-20 border border-[#6600FF]">
       {/* Image: hidden on phone, visible from lg */}
       <div className="hidden lg:block lg:flex-shrink-0 lg:w-[min(50%,26rem)] lg:min-w-0">
         <img src="inquiry-img.png" alt="" className="w-full h-auto max-w-[23.5rem] mx-auto object-cover rounded-xl" />
@@ -680,6 +681,7 @@ export default function MyCard() {
           </button>
         </form>
       </div>
+    </div>
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { AuthProvider } from "./contexts/AuthContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import UserLayout from "./components/UserLayout.jsx";
-import DefaultUserRedirect from "./components/DefaultUserRedirect.jsx";
+// import DefaultUserRedirect from "./components/DefaultUserRedirect.jsx";
 import Landing from "./pages/Landing.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
@@ -18,6 +18,10 @@ import "./index.css"; // make sure your CSS for the button is loaded
 import PublicCard from "./pages/PublicCard.jsx";
 import DetailsForm from "./pages/DetailsForm.jsx";
 import Expo from "./pages/expo.jsx";
+import TermsAndConditions from "./pages/TermsAndConditions.jsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
+import Registration from "./pages/registration.jsx";
+import RefundPolicy from "./pages/RefundPolicy.jsx";
 
 function FloatingWhatsApp() {
   const location = useLocation();
@@ -44,10 +48,14 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
-          {/* <Route path="/login" element={<Login />} /> */}
+          <Route path="/login" element={<Login />} />
           <Route path="/prices" element={<PricingClient />} />
           <Route path="/expo" element={<Expo />} />
-          {/* <Route path="/signup" element={<Signup />} /> */}
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/registration" element={<Registration />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/card/:id" element={<Inquiry />} />
           <Route path="/cards/:id" element={<PublicCard />} />
@@ -66,7 +74,7 @@ function App() {
             <Route path="my-card" element={<MyCard />} />
             <Route path="saved-cards" element={<SavedCards />} />
             <Route path="contacts" element={<Contacts />} />
-            <Route path="*" element={<DefaultUserRedirect />} />
+            {/* <Route path="*" element={<DefaultUserRedirect />} /> */}
           </Route>
         </Routes>
         <FloatingWhatsApp />

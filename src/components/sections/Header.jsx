@@ -54,7 +54,7 @@ function Header() {
           {/* <button onClick={() => navigate("/prices")} className="px-5 py-1.5 bg-white text-black rounded-full font-semibold border border-gray-300 hover:bg-gray-100">
             Prices
           </button> */}
-          {/* {user ? (
+          {user ? (
             <>
               <button
                 onClick={() => navigate("/dashboard")}
@@ -92,7 +92,7 @@ function Header() {
                 Get Your Link
               </button>
             </>
-          )} */}
+          )}
         </div>
 
         {/* Hamburger Icon (Mobile) */}

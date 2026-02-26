@@ -24,11 +24,11 @@ export default function Dashboard() {
       if (!user) return;
 
       // If user has no inquiries, send them to My Card to submit one (no need to fetch)
-      if (!user.inquiries || !Array.isArray(user.inquiries) || user.inquiries.length === 0) {
-        setLoading(false);
-        navigate('/my-card', { replace: true });
-        return;
-      }
+      // if (!user.inquiries || !Array.isArray(user.inquiries) || user.inquiries.length === 0) {
+      //   setLoading(false);
+      //   navigate('/my-card', { replace: true });
+      //   return;
+      // }
 
       console.log('Dashboard - User object:', user);
       console.log('Dashboard - User ID:', user._id);
@@ -44,11 +44,11 @@ export default function Dashboard() {
           console.log('Dashboard - Complete user data from API:', JSON.stringify(userData, null, 2));
 
           // If user has no inquiries, send them to My Card to submit one
-          if (!userData.inquiries || !Array.isArray(userData.inquiries) || userData.inquiries.length === 0) {
-            setLoading(false);
-            navigate('/my-card', { replace: true });
-            return;
-          }
+          // if (!userData.inquiries || !Array.isArray(userData.inquiries) || userData.inquiries.length === 0) {
+          //   setLoading(false);
+          //   navigate('/my-card', { replace: true });
+          //   return;
+          // }
 
           // Get user name
           setUserName(userData.name || 'User');
