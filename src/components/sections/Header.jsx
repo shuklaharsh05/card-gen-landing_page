@@ -129,7 +129,7 @@ function Header() {
                 Prices
               </button> */}
 
-              {/* {user ? (
+              {user ? (
                 <>
                   <button
                     onClick={() => {
@@ -182,7 +182,7 @@ function Header() {
                     Get Your Link
                   </button>
                 </>
-              )} */}
+              )}
             </div>
           </motion.div>
         )}

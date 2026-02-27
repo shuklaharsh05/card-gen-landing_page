@@ -91,6 +91,7 @@ export default function Expo() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [timeLeft, setTimeLeft] = useState(getTimeLeft);
     const [showPassModal, setShowPassModal] = useState(false);
+    const [showVideoPopup, setShowVideoPopup] = useState(true);
     const [passDataUrl, setPassDataUrl] = useState(null);
     const canvasRef = useRef(null);
     const submitInProgressRef = useRef(false);
@@ -178,10 +179,38 @@ export default function Expo() {
 
     return (
         <>
+        {/* Fullscreen video popup */}
+        {showVideoPopup && (
+            <div
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Expo video"
+            >
+                <button
+                    type="button"
+                    onClick={() => setShowVideoPopup(false)}
+                    className="absolute top-4 right-4 text-white text-2xl font-semibold leading-none"
+                    aria-label="Close video"
+                >
+                    ×
+                </button>
+                <div className="w-full max-w-5xl lg:aspect-video bg-white rounded-2xl overflow-hidden">
+                    <video
+                        src="/expo/popup-video.mp4"
+                        autoPlay
+                        controls
+                        playsInline
+                        className="w-full h-full object-contain"
+                    />
+                </div>
+            </div>
+        )}
+
         {/* Pass success modal: generated pass + BookMyShow */}
         {showPassModal && (
             <div
-                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
+                className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/60"
                 onClick={() => setShowPassModal(false)}
                 role="dialog"
                 aria-modal="true"
