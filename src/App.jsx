@@ -20,7 +20,6 @@ import DetailsForm from "./pages/DetailsForm.jsx";
 import Expo from "./pages/expo.jsx";
 import TermsAndConditions from "./pages/TermsAndConditions.jsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
-import Registration from "./pages/registration.jsx";
 import RefundPolicy from "./pages/RefundPolicy.jsx";
 
 function FloatingWhatsApp() {
@@ -54,7 +53,6 @@ function App() {
           <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/registration" element={<Registration />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/card/:id" element={<Inquiry />} />

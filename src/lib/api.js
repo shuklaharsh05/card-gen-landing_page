@@ -324,6 +324,12 @@ class ApiService {
     });
   }
 
+  async deleteInquiry(inquiryId) {
+    return this.request(`/inquiries/${inquiryId}`, {
+      method: "DELETE",
+    });
+  }
+
   // Note: Removed getCategoryId method as we're sending simple form data
 
   async updateCard(cardId, cardData) {
@@ -440,6 +446,41 @@ class ApiService {
         razorpay_signature,
       }),
     });
+  }
+
+  // User plan payments (basic/pro) ---------------------------------------
+  async createUserPlanOrder(plan, couponCode) {
+    return this.request("/payment/user-plan/create-order", {
+      method: "POST",
+      body: JSON.stringify({ plan, couponCode }),
+    });
+  }
+
+  async verifyUserPlanPayment({
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+  }) {
+    return this.request("/payment/user-plan/verify", {
+      method: "POST",
+      body: JSON.stringify({
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+      }),
+    });
+  }
+
+  async previewUserPlanPrice(plan, couponCode) {
+    return this.request("/payment/user-plan/preview", {
+      method: "POST",
+      body: JSON.stringify({ plan, couponCode }),
+    });
+  }
+
+  // Plans ---------------------------------------------------------------
+  async getPlans() {
+    return this.request("/plans");
   }
 
   // Contacts API

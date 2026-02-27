@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { apiService } from "../lib/api.js";
+import { useUserPlanRazorpay } from "../hooks/useUserPlanRazorpay.js";
 import * as XLSX from "xlsx";
 import {
   User,
@@ -17,7 +18,7 @@ import {
 } from "lucide-react";
 
 export default function Contacts() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
 
   const [contacts, setContacts] = useState([]);
   const [contactsLoading, setContactsLoading] = useState(true);
@@ -39,25 +40,26 @@ export default function Contacts() {
   const [modalOpen, setModalOpen] = useState(false);
   const [sameAsPhone, setSameAsPhone] = useState(false);
   const [editingContactId, setEditingContactId] = useState(null);
+  const userPlan = user?.plan || "free";
+  const canSaveContacts = userPlan === "pro";
 
-  if (!user) {
-    return (
-      <div className="w-full mx-auto font-poppins px-4 sm:px-6 lg:px-8">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 flex gap-3">
-          <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h2 className="text-yellow-900 font-semibold mb-1">
-              You need to be signed in
-            </h2>
-            <p className="text-sm text-yellow-800">
-              Please sign in to save contacts to your account.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [planUpgradeMessage, setPlanUpgradeMessage] = useState("");
+  const [planUpgradeError, setPlanUpgradeError] = useState("");
+  const [plans, setPlans] = useState([]);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponApplying, setCouponApplying] = useState(false);
+  const [couponApplyError, setCouponApplyError] = useState("");
+  const [discountedPrices, setDiscountedPrices] = useState({ basic: null, pro: null });
 
+  const {
+    initiatePlanPayment,
+    loading: planLoading,
+    error: planError,
+  } = useUserPlanRazorpay();
+
+  // Fetch contacts (only when user is signed in and has Pro access)
   useEffect(() => {
     const fetchContacts = async () => {
       if (!user) return;
@@ -96,6 +98,341 @@ export default function Contacts() {
 
     fetchContacts();
   }, [user]);
+
+  // Load plan pricing from backend so we always show correct amounts
+  useEffect(() => {
+    const loadPlans = async () => {
+      try {
+        const res = await apiService.getPlans();
+        if (res.success && Array.isArray(res.data)) {
+          setPlans(res.data);
+        }
+      } catch (err) {
+        console.log("Failed to load plans for contacts page:", err);
+      }
+    };
+    loadPlans();
+  }, []);
+
+  const basicPlan = plans.find((p) => p.key === "basic");
+  const proPlan = plans.find((p) => p.key === "pro");
+  const basicAmount = typeof basicPlan?.amount === "number" ? basicPlan.amount : null;
+  const proAmount = typeof proPlan?.amount === "number" ? proPlan.amount : null;
+  const proPayableAmount =
+    userPlan === "basic" && basicAmount != null && proAmount != null && proAmount > basicAmount
+      ? proAmount - basicAmount
+      : proAmount;
+
+  if (!user) {
+    return (
+      <div className="w-full mx-auto font-poppins px-4 sm:px-6 lg:px-8">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 flex gap-3">
+          <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <h2 className="text-yellow-900 font-semibold mb-1">
+              You need to be signed in
+            </h2>
+            <p className="text-sm text-yellow-800">
+              Please sign in to save contacts to your account.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!canSaveContacts) {
+    return renderUpgradePrompt();
+  }
+
+  async function handlePlanPurchase(planKey) {
+    if (!user) return;
+    setSelectedPlan(planKey);
+    setPlanUpgradeMessage("");
+    setPlanUpgradeError("");
+
+    try {
+      await initiatePlanPayment({
+        plan: planKey,
+        couponCode: couponCode || undefined,
+        customerName: user.name,
+        customerEmail: user.email,
+        customerPhone: user.phone,
+        onSuccess: async () => {
+          setPlanUpgradeMessage(
+            planKey === "basic"
+              ? "Basic plan activated. Reloading your access…"
+              : "Pro plan activated. Reloading your access…"
+          );
+          setShowPlanModal(false);
+          setSelectedPlan(null);
+          try {
+            await refreshUser();
+          } catch (err) {
+            console.log("Error refreshing user after plan upgrade:", err);
+          }
+        },
+        onFailure: (msg) => {
+          setPlanUpgradeError(msg || "Payment failed or cancelled. Please try again.");
+          setShowPlanModal(false);
+          setSelectedPlan(null);
+        },
+      });
+    } catch (err) {
+      setPlanUpgradeError(err?.message || "Failed to start payment. Please try again.");
+      setShowPlanModal(false);
+      setSelectedPlan(null);
+    }
+  }
+
+  async function handleApplyCoupon() {
+    if (!couponCode.trim()) return;
+    setCouponApplying(true);
+    setCouponApplyError("");
+
+    try {
+      const [basicRes, proRes] = await Promise.all([
+        apiService.previewUserPlanPrice("basic", couponCode.trim()),
+        apiService.previewUserPlanPrice("pro", couponCode.trim()),
+      ]);
+
+      const next = { basic: null, pro: null };
+
+      if (basicRes.success) {
+        const val = basicRes.data?.amount ?? basicRes.data?.data?.amount ?? basicRes.amount;
+        if (typeof val === "number") next.basic = val;
+      }
+      if (proRes.success) {
+        const val = proRes.data?.amount ?? proRes.data?.data?.amount ?? proRes.amount;
+        if (typeof val === "number") next.pro = val;
+      }
+
+      if (!basicRes.success && !proRes.success) {
+        setCouponApplyError(
+          basicRes.error || proRes.error || "Invalid or expired coupon code."
+        );
+        setDiscountedPrices({ basic: null, pro: null });
+      } else {
+        setDiscountedPrices(next);
+      }
+    } catch (err) {
+      setCouponApplyError(
+        err?.message || "Failed to apply coupon. Please try again."
+      );
+      setDiscountedPrices({ basic: null, pro: null });
+    } finally {
+      setCouponApplying(false);
+    }
+  }
+
+  function renderUpgradePrompt() {
+    return (
+      <div className="w-full mx-auto font-poppins px-4 sm:px-6 lg:px-8">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 flex flex-col gap-3">
+          <div className="flex gap-3">
+            <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h2 className="text-blue-900 font-semibold mb-1">
+                Upgrade to Pro to save contacts
+              </h2>
+              <p className="text-sm text-blue-800">
+                The contact library is available only on the Pro plan. Upgrade your plan to start saving and managing contacts here.
+              </p>
+            </div>
+          </div>
+          <div className="mt-2">
+            <button
+              type="button"
+              onClick={() => {
+                setPlanUpgradeError("");
+                setPlanUpgradeMessage("");
+                setShowPlanModal(true);
+              }}
+              className="inline-flex items-center px-4 py-2 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed"
+              disabled={planLoading}
+            >
+              Upgrade Plan
+            </button>
+          </div>
+          {planUpgradeMessage && (
+            <p className="mt-2 text-xs text-green-700">{planUpgradeMessage}</p>
+          )}
+          {planUpgradeError && (
+            <p className="mt-2 text-xs text-red-700">{planUpgradeError}</p>
+          )}
+          {planError && !planUpgradeError && (
+            <p className="mt-2 text-xs text-red-700">{planError}</p>
+          )}
+        </div>
+
+        {showPlanModal && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+            onClick={() => !planLoading && setShowPlanModal(false)}
+          >
+            <div
+              className="bg-white rounded-2xl max-w-xl w-full p-6 sm:p-7 space-y-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+            <h2 className="text-xl sm:text-2xl font-bold text-center text-slate-900">
+              Choose Your Plan
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 text-center mb-2">
+              Upgrade your account to unlock contacts. Prices are loaded from backend.
+            </p>
+            <div className="mb-3 flex flex-col sm:flex-row gap-2 items-center">
+              <input
+                type="text"
+                value={couponCode}
+                onChange={(e) => {
+                  setCouponCode(e.target.value);
+                  setCouponApplyError("");
+                }}
+                className="w-full sm:flex-1 border border-slate-300 rounded-full px-3 py-1.5 text-xs sm:text-sm"
+                placeholder="Have a coupon code?"
+                disabled={planLoading || couponApplying}
+              />
+              <button
+                type="button"
+                onClick={handleApplyCoupon}
+                disabled={
+                  planLoading ||
+                  couponApplying ||
+                  !couponCode.trim()
+                }
+                className="px-3 py-1.5 rounded-full bg-slate-900 text-white text-xs sm:text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {couponApplying ? "Applying…" : "Apply"}
+              </button>
+            </div>
+            {couponApplyError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-xs text-red-700">
+                {couponApplyError}
+              </div>
+            )}
+            {planError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs sm:text-sm text-red-700">
+                {planError}
+              </div>
+            )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div
+                  className={`border rounded-2xl p-4 flex flex-col justify-between ${
+                    selectedPlan === "basic"
+                      ? "border-blue-600 ring-2 ring-blue-100"
+                      : "border-slate-200"
+                  }`}
+                >
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900">Individual</h3>
+                    <p className="text-2xl font-bold text-slate-900 mt-1">
+                      {(() => {
+                        const base = basicAmount ?? 0;
+                        const final =
+                          discountedPrices.basic != null
+                            ? discountedPrices.basic
+                            : base;
+                        if (
+                          discountedPrices.basic != null &&
+                          discountedPrices.basic < base
+                        ) {
+                          return (
+                            <>
+                              <span className="text-sm text-slate-400 line-through mr-1">
+                                ₹{base}
+                              </span>
+                              <span>₹{final}</span>
+                            </>
+                          );
+                        }
+                        return <>₹{final}</>;
+                      })()}
+                    </p>
+                    {userPlan === "basic" && (
+                      <p className="inline-flex items-center px-2 py-0.5 rounded-full bg-green-50 text-[11px] font-medium text-green-700 mt-2">
+                        Current plan
+                      </p>
+                    )}
+                    <p className="text-xs text-slate-500 mt-1">
+                      Starter plan with limited features.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={planLoading || userPlan === "basic"}
+                    onClick={() => handlePlanPurchase("basic")}
+                    className="mt-4 w-full py-2 rounded-full text-sm font-semibold border border-slate-300 text-slate-800 hover:bg-slate-50 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {userPlan === "basic"
+                      ? "Current Plan"
+                      : planLoading && selectedPlan === "basic"
+                      ? "Processing…"
+                      : "Choose Basic"}
+                  </button>
+                </div>
+
+                <div
+                  className={`border rounded-2xl p-4 flex flex-col justify-between ${
+                    selectedPlan === "pro"
+                      ? "border-blue-600 ring-2 ring-blue-100"
+                      : "border-slate-200"
+                  }`}
+                >
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900">Business</h3>
+                    <p className="text-2xl font-bold text-slate-900 mt-1">
+                      {(() => {
+                        const base = proPayableAmount ?? proAmount ?? 0;
+                        const final =
+                          discountedPrices.pro != null
+                            ? discountedPrices.pro
+                            : base;
+                        if (discountedPrices.pro != null && discountedPrices.pro < base) {
+                          return (
+                            <>
+                              <span className="text-sm text-slate-400 line-through mr-1">
+                                ₹{base}
+                              </span>
+                              <span>₹{final}</span>
+                            </>
+                          );
+                        }
+                        return <>₹{final}</>;
+                      })()}
+                    </p>
+                    {userPlan === "basic" && basicAmount != null && proAmount != null && proAmount > basicAmount && (
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        You already paid ₹{basicAmount}. Pay remaining ₹{proPayableAmount} to upgrade to Pro.
+                      </p>
+                    )}
+                    <p className="text-xs text-slate-500 mt-1">
+                      Unlock full contacts access and all features.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={planLoading}
+                    onClick={() => handlePlanPurchase("pro")}
+                    className="mt-4 w-full py-2 rounded-full text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {planLoading && selectedPlan === "pro" ? "Processing…" : "Choose Pro"}
+                  </button>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => !planLoading && setShowPlanModal(false)}
+                className="w-full text-xs sm:text-sm text-slate-500 mt-2"
+                disabled={planLoading}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;

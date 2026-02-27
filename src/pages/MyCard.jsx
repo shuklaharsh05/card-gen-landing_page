@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { apiService } from '../lib/api.js';
+import { useUserPlanRazorpay } from '../hooks/useUserPlanRazorpay.js';
 import { QRCodeSVG } from 'qrcode.react';
 import {
   CreditCard,
@@ -31,8 +32,36 @@ export default function MyCard() {
   const [success, setSuccess] = useState('');
   const [copied, setCopied] = useState(false);
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
+  const [showPricingModal, setShowPricingModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [plans, setPlans] = useState([]);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponApplying, setCouponApplying] = useState(false);
+  const [couponApplyError, setCouponApplyError] = useState("");
+  const [discountedPrices, setDiscountedPrices] = useState({ basic: null, pro: null });
+  const [pendingFormData, setPendingFormData] = useState(null);
   const qrContainerRef = useRef(null);
   const errorRef = useRef(null);
+
+  const {
+    initiatePlanPayment,
+    loading: paymentLoading,
+    error: paymentError,
+  } = useUserPlanRazorpay();
+
+  useEffect(() => {
+    const loadPlans = async () => {
+      try {
+        const res = await apiService.getPlans();
+        if (res.success && Array.isArray(res.data)) {
+          setPlans(res.data);
+        }
+      } catch (err) {
+        console.log("Failed to load plans:", err);
+      }
+    };
+    loadPlans();
+  }, []);
 
   // Build site URL variants from a backend share URL using fixed domain mask
   const toSiteUrlFromBackend = (rawUrl) => {
@@ -236,7 +265,6 @@ export default function MyCard() {
     e.preventDefault();
     setError('');
     setSuccess('');
-    setCreating(true);
 
     if (!formData.name?.trim()) {
       showError('Please enter your full name.');
@@ -247,12 +275,27 @@ export default function MyCard() {
       return;
     }
 
+    const plan = user?.plan || 'free';
+    const isPaidPlan = plan === 'basic' || plan === 'pro';
+
+    if (!isPaidPlan) {
+      // Store the current form data so we can submit the inquiry
+      // automatically after the user upgrades their plan.
+      setPendingFormData(formData);
+      setShowPricingModal(true);
+      return;
+    }
+
+    setPendingFormData(null);
+    setCreating(true);
+
     try {
       const response = await apiService.createCard(formData, user?._id);
 
       if (!response.success) {
         const errorMessage = getErrorMessage(response);
         showError(errorMessage);
+        setCreating(false);
         return;
       }
 
@@ -269,6 +312,130 @@ export default function MyCard() {
     } catch (err) {
       const message = err?.message || (err?.networkError && 'Network error. Please check your connection and try again.');
       showError(message || 'Something went wrong. Please try again.');
+      setCreating(false);
+    }
+  };
+
+  const handlePlanPurchase = async (planKey) => {
+    if (!user) return;
+
+    setSelectedPlan(planKey);
+    setCreating(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      await initiatePlanPayment({
+        plan: planKey,
+        couponCode: couponCode || undefined,
+        customerName: user.name,
+        customerEmail: user.email,
+        customerPhone: user.phone,
+        onSuccess: async () => {
+          setSuccess(
+            planKey === 'basic'
+              ? 'Payment successful! Individual plan activated.'
+              : 'Payment successful! Business plan activated.'
+          );
+          setShowPricingModal(false);
+          setSelectedPlan(null);
+
+          try {
+            await refreshUser();
+          } catch (refreshError) {
+            console.log('Error refreshing user data after plan upgrade:', refreshError);
+          }
+
+          // If the user had attempted to submit an inquiry before upgrading
+          // (we stored their form data in pendingFormData), automatically
+          // create the inquiry now that the plan is active.
+          if (pendingFormData) {
+            setCreating(true);
+            try {
+              const response = await apiService.createCard(pendingFormData, user?._id);
+
+              if (!response.success) {
+                const errorMessage = getErrorMessage(response);
+                showError(errorMessage);
+                setCreating(false);
+                setPendingFormData(null);
+                return;
+              }
+
+              setInquirySubmitted(true);
+              setInquiryData(response.data);
+              setSuccess('Inquiry sent! Your card is on the way.');
+              setPendingFormData(null);
+
+              try {
+                await refreshUser();
+              } catch (refreshError) {
+                console.log('Error refreshing user data after auto inquiry creation:', refreshError);
+              }
+            } catch (err) {
+              const message =
+                err?.message ||
+                (err?.networkError && 'Network error. Please check your connection and try again.');
+              showError(message || 'Something went wrong while creating your inquiry after plan upgrade.');
+            } finally {
+              setCreating(false);
+            }
+          } else {
+            setCreating(false);
+          }
+        },
+        onFailure: (message) => {
+          showError(message || 'Payment failed or cancelled. Please try again.');
+          setShowPricingModal(false);
+          setCreating(false);
+          setSelectedPlan(null);
+        },
+      });
+    } catch (err) {
+      showError(err?.message || 'Something went wrong while starting payment.');
+      setShowPricingModal(false);
+      setCreating(false);
+      setSelectedPlan(null);
+    }
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setCouponApplying(true);
+    setCouponApplyError("");
+
+    try {
+      const [basicRes, proRes] = await Promise.all([
+        apiService.previewUserPlanPrice("basic", couponCode.trim()),
+        apiService.previewUserPlanPrice("pro", couponCode.trim()),
+      ]);
+
+      const next = { basic: null, pro: null };
+
+      if (basicRes.success) {
+        const val = basicRes.data?.amount ?? basicRes.data?.data?.amount ?? basicRes.amount;
+        if (typeof val === "number") next.basic = val;
+      }
+      if (proRes.success) {
+        const val = proRes.data?.amount ?? proRes.data?.data?.amount ?? proRes.amount;
+        if (typeof val === "number") next.pro = val;
+      }
+
+      if (!basicRes.success && !proRes.success) {
+        setCouponApplyError(
+          basicRes.error || proRes.error || "Invalid or expired coupon code."
+        );
+        setDiscountedPrices({ basic: null, pro: null });
+      } else {
+        setDiscountedPrices(next);
+      }
+    } catch (err) {
+      setCouponApplyError(
+        err?.message || "Failed to apply coupon. Please try again."
+      );
+      setDiscountedPrices({ basic: null, pro: null });
+    } finally {
+      setCouponApplying(false);
     }
   };
 
@@ -682,6 +849,155 @@ export default function MyCard() {
         </form>
       </div>
     </div>
+    {/* Pricing modal (plan upgrade) */}
+    {showPricingModal && (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+        onClick={() => !creating && setShowPricingModal(false)}
+      >
+        <div
+          className="bg-white rounded-2xl max-w-xl w-full p-6 sm:p-7 space-y-4"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h2 className="text-xl sm:text-2xl font-bold text-center text-slate-900">
+            Choose Your Plan
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-600 text-center mb-2">
+            Upgrade your account to unlock features. Prices are loaded from backend.
+          </p>
+          <div className="mb-3 flex flex-col sm:flex-row gap-2 items-center">
+            <input
+              type="text"
+              value={couponCode}
+              onChange={(e) => {
+                setCouponCode(e.target.value);
+                setCouponApplyError("");
+              }}
+              className="w-full sm:flex-1 border border-slate-300 rounded-full px-3 py-1.5 text-xs sm:text-sm"
+              placeholder="Have a coupon code?"
+              disabled={creating || paymentLoading || couponApplying}
+            />
+            <button
+              type="button"
+              onClick={handleApplyCoupon}
+              disabled={
+                creating ||
+                paymentLoading ||
+                couponApplying ||
+                !couponCode.trim()
+              }
+              className="px-3 py-1.5 rounded-full bg-slate-900 text-white text-xs sm:text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {couponApplying ? "Applying…" : "Apply"}
+            </button>
+          </div>
+          {couponApplyError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-xs text-red-700">
+              {couponApplyError}
+            </div>
+          )}
+          {paymentError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs sm:text-sm text-red-700">
+              {paymentError}
+            </div>
+          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Individual plan (basic key) */}
+            <div
+              className={`border rounded-2xl p-4 flex flex-col justify-between ${
+                selectedPlan === 'basic' ? 'border-blue-600 ring-2 ring-blue-100' : 'border-slate-200'
+              }`}
+            >
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">Individual</h3>
+                <p className="text-2xl font-bold text-slate-900 mt-1">
+                  {(() => {
+                    const base = plans.find((p) => p.key === "basic")?.amount ?? 0;
+                    const final =
+                      discountedPrices.basic != null
+                        ? discountedPrices.basic
+                        : base;
+                    if (
+                      discountedPrices.basic != null &&
+                      discountedPrices.basic < base
+                    ) {
+                      return (
+                        <>
+                          <span className="text-sm text-slate-400 line-through mr-1">
+                            ₹{base}
+                          </span>
+                          <span>₹{final}</span>
+                        </>
+                      );
+                    }
+                    return <>₹{final}</>;
+                  })()}
+                </p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Appointments &amp; save contacts disabled.
+                </p>
+              </div>
+              <button
+                type="button"
+                disabled={creating || paymentLoading}
+                onClick={() => handlePlanPurchase('basic')}
+                className="mt-4 w-full py-2 rounded-full text-sm font-semibold border border-slate-300 text-slate-800 hover:bg-slate-50 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {creating && selectedPlan === 'basic' ? 'Processing…' : 'Buy Individual'}
+              </button>
+            </div>
+
+            {/* Business plan (pro key) */}
+            <div
+              className={`border rounded-2xl p-4 flex flex-col justify-between ${
+                selectedPlan === 'pro' ? 'border-blue-600 ring-2 ring-blue-100' : 'border-slate-200'
+              }`}
+            >
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">Business</h3>
+                <p className="text-2xl font-bold text-slate-900 mt-1">
+                  {(() => {
+                    const base = plans.find((p) => p.key === "pro")?.amount ?? 0;
+                    const final =
+                      discountedPrices.pro != null ? discountedPrices.pro : base;
+                    if (discountedPrices.pro != null && discountedPrices.pro < base) {
+                      return (
+                        <>
+                          <span className="text-sm text-slate-400 line-through mr-1">
+                            ₹{base}
+                          </span>
+                          <span>₹{final}</span>
+                        </>
+                      );
+                    }
+                    return <>₹{final}</>;
+                  })()}
+                </p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Unlock appointments, contacts and all features.
+                </p>
+              </div>
+              <button
+                type="button"
+                disabled={creating || paymentLoading}
+                onClick={() => handlePlanPurchase('pro')}
+                className="mt-4 w-full py-2 rounded-full text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {creating && selectedPlan === 'pro' ? 'Processing…' : 'Buy Pro'}
+              </button>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => !creating && setShowPricingModal(false)}
+            className="w-full text-xs sm:text-sm text-slate-500 mt-2"
+            disabled={creating}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    )}
     </div>
   );
 }
