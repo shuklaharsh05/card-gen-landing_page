@@ -281,7 +281,7 @@ export default function Expo() {
             <div className="mt-6 mb-4">
                     <p className="text-center text-xl font-bold text-black mb-5">Book your tickets Now</p>
                     {timeLeft === null ? (
-                        <p className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#ffffff] to-[#48C44F] text-center px-2">
+                        <p className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-[#000000] to-[#48C44F] text-center px-2">
                             Event is live now. Come join us!
                         </p>
                     ) : (
